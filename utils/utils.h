@@ -8,6 +8,11 @@
 int setOmpEnv(int *);
 
 /*
+ *  Detect CPU SIMD features
+ */
+int printSIMDconf(void);
+
+/*
  *  Print some system configurations
  */
 void printSysconf(void);

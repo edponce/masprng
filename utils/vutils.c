@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "vutils.h"
 
 
@@ -5,7 +6,7 @@
 #define ERROR -1
 
 
-int vload(VECTOR_INT *vdat, int *dat)
+int vload(VECTOR_INT *vdat, const int *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -20,7 +21,7 @@ int vload(VECTOR_INT *vdat, int *dat)
 }
 
 
-int vload(VECTOR_INT *vdat, unsigned int *dat)
+int vload(VECTOR_INT *vdat, const unsigned int *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -35,7 +36,7 @@ int vload(VECTOR_INT *vdat, unsigned int *dat)
 }
 
 
-int vload(VECTOR_INT *vdat, long int *dat)
+int vload(VECTOR_INT *vdat, const long int *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -50,7 +51,7 @@ int vload(VECTOR_INT *vdat, long int *dat)
 }
 
 
-int vload(VECTOR_INT *vdat, unsigned long int *dat)
+int vload(VECTOR_INT *vdat, const unsigned long int *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -65,7 +66,7 @@ int vload(VECTOR_INT *vdat, unsigned long int *dat)
 }
 
 
-int vload(VECTOR_SP *vdat, float *dat)
+int vload(VECTOR_SP *vdat, const float *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -80,7 +81,7 @@ int vload(VECTOR_SP *vdat, float *dat)
 }
 
 
-int vload(VECTOR_DP *vdat, double *dat)
+int vload(VECTOR_DP *vdat, const double *dat)
 {
     if (!vdat || !dat)
         return ERROR;
@@ -95,7 +96,7 @@ int vload(VECTOR_DP *vdat, double *dat)
 }
 
 
-int vstore(int *dat, VECTOR_INT vdat)
+int vstore(int *dat, const VECTOR_INT vdat)
 {
     if (!dat)
         return ERROR;
@@ -110,7 +111,7 @@ int vstore(int *dat, VECTOR_INT vdat)
 }
 
 
-int vstore(unsigned int *dat, VECTOR_INT vdat)
+int vstore(unsigned int *dat, const VECTOR_INT vdat)
 {
     if (!dat)
         return ERROR;
@@ -125,7 +126,7 @@ int vstore(unsigned int *dat, VECTOR_INT vdat)
 }
 
 
-int vstore(long int *dat, VECTOR_INT vdat)
+int vstore(long int *dat, const VECTOR_INT vdat)
 {
     if (!dat)
         return ERROR;
@@ -140,7 +141,7 @@ int vstore(long int *dat, VECTOR_INT vdat)
 }
 
 
-int vstore(unsigned long int *dat, VECTOR_INT vdat)
+int vstore(unsigned long int *dat, const VECTOR_INT vdat)
 {
     if (!dat)
         return ERROR;
@@ -155,7 +156,7 @@ int vstore(unsigned long int *dat, VECTOR_INT vdat)
 }
 
 
-int vstore(float *dat, VECTOR_SP vdat)
+int vstore(float *dat, const VECTOR_SP vdat)
 {
     if (!dat)
         return ERROR;
@@ -170,7 +171,7 @@ int vstore(float *dat, VECTOR_SP vdat)
 }
 
 
-int vstore(double *dat, VECTOR_DP vdat)
+int vstore(double *dat, const VECTOR_DP vdat)
 {
     if (!dat)
         return ERROR;
@@ -182,5 +183,61 @@ int vstore(double *dat, VECTOR_DP vdat)
 #endif
 
     return SUCCESS;
+}
+
+
+void vprint(const char *str, const VECTOR_INT vdat)
+{
+    unsigned int i;
+
+    // int
+    int itmp[VECTOR_NUM_32BIT] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vstore(itmp, vdat);
+    printf("%s", str);
+    for (i = 0; i < VECTOR_NUM_32BIT; ++i)
+      printf("%d\t", itmp[i]);
+    printf("\n");
+
+    // unsigned int
+    unsigned int utmp[VECTOR_NUM_32BIT] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vstore(utmp, vdat);
+    printf("%s", str);
+    for (i = 0; i < VECTOR_NUM_32BIT; ++i)
+      printf("%u\t", utmp[i]);
+    printf("\n");
+
+    // unsigned long 
+    unsigned long int lutmp[VECTOR_NUM_64BIT] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vstore(lutmp, vdat);
+    printf("%s", str);
+    for (i = 0; i < VECTOR_NUM_64BIT; ++i)
+      printf("%lu\t", lutmp[i]);
+    printf("\n");
+}
+
+
+void vprint(const char *str, const VECTOR_SP vdat)
+{
+    unsigned int i;
+
+    float tmp[VECTOR_NUM_32BIT] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vstore(tmp, vdat);
+    printf("%s", str);
+    for (i = 0; i < VECTOR_NUM_32BIT; ++i)
+      printf("%f\t", tmp[i]);
+    printf("\n");
+}
+
+
+void vprint(const char *str, const VECTOR_DP vdat)
+{
+    unsigned int i;
+
+    double tmp[VECTOR_NUM_64BIT] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vstore(tmp, vdat);
+    printf("%s", str);
+    for (i = 0; i < VECTOR_NUM_64BIT; ++i)
+      printf("%f\t", tmp[i]);
+    printf("\n");
 }
 

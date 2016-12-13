@@ -46,7 +46,7 @@ LFLAGS :=
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -D_GNU_SOURCE
 #DEFINES := -D_GNU_SOURCE -DUSE_AVX
-DEFINES := -D_GNU_SOURCE -DUSE_SSE
+DEFINES := -DDEBUG -DUSE_SSE
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include

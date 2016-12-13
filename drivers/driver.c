@@ -58,6 +58,7 @@ int main(int argc, char **argv)
 
     // Print system info
     printSysconf();
+    printSIMDconf();
     printf("\n");
 
     if (argc > 1)

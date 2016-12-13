@@ -16,6 +16,9 @@
 #define NSTRMS 1
 #define VECTOR_ALIGN 8
 
+// Extras
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
+
 #include "lcg.h"
 
 
