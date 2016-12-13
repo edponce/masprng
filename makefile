@@ -21,13 +21,15 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -msse4 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c99 -O3 -march=native -mavx2 -funroll-loops
+CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -msse4 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -mavx2 -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c99 -O3 -msse4 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c99 -O3 -march=core-avx2 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -msse4 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=core-avx2 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -openmp
 
 # Linker options
@@ -44,9 +46,8 @@ LFLAGS :=
 # -DOMP_NESTED=TRUE = enables nested parallelism
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
-#DEFINES := -D_GNU_SOURCE
-#DEFINES := -D_GNU_SOURCE -DUSE_AVX
-DEFINES := -DDEBUG -DUSE_SSE
+#DEFINES := -DUSE_SSE
+#DEFINES := -DUSE_AVX
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include

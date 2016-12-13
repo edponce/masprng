@@ -1,2 +1,8 @@
 MASPRNG - Intel MIC (vector) accelerated SPRNG library
 
+C++ - function overloading
+C++11 - variadic macros
+
+SIMD requirements:
+SSE - need SSE4.1
+AVX - need AVX2

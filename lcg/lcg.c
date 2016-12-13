@@ -96,8 +96,9 @@ int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, 
     int need = 1;
     int prime = 0;
     int prime_position = offs;
+    VECTOR_INT vs;
 
-    VECTOR_INT vs = _mm256_set_epi64x(s[3], s[2], s[1], s[0]);
+    vs = _mm256_set_epi64x(s[3], s[2], s[1], s[0]);
     vs = _mm256_and_si256(vs, vmsk_seed); // s &= 0x7FFFFFFF
 
     getprime_32(need, &prime, offs);
@@ -136,23 +137,18 @@ int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, 
 // SIMD multiply and new seed
 VECTOR_INT get_vrn_int(VECTOR_INT *vseed, const VECTOR_INT vmultiplier, const VECTOR_INT vprime)
 {
-    VECTOR_INT st = _mm256_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
+    VECTOR_INT st, vtmp, u, vrng;
 
+    st = _mm256_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
     //st = _mm_hadd_epi32(st, st); // s + t 
-    const VECTOR_INT vtmp = _mm256_slli_epi64(st, 0x20); // shift << 32 
+    vtmp = _mm256_slli_epi64(st, 0x20); // shift << 32 
     st = _mm256_add_epi64(st, vtmp); // s + t 
-
     st = _mm256_and_si256(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
-
-    const VECTOR_INT u = _mm256_mul_epu32(*vseed, vmultiplier); // xl * yl
-
+    u = _mm256_mul_epu32(*vseed, vmultiplier); // xl * yl
     *vseed = _mm256_add_epi64(u, st); // u + s + t 
-
     *vseed = _mm256_add_epi64(*vseed, vprime);    // seed += prime
-
     *vseed = _mm256_and_si256(*vseed, vmsk_lsb48); // seed &= LSB48
-
-    const VECTOR_INT vrng = _mm256_srli_epi64(*vseed, 0x11); // seed >> 17
+    vrng = _mm256_srli_epi64(*vseed, 0x11); // seed >> 17
 
     return vrng;
 }
@@ -161,32 +157,30 @@ VECTOR_INT get_vrn_int(VECTOR_INT *vseed, const VECTOR_INT vmultiplier, const VE
 // SIMD multiply and new seed
 VECTOR_DP get_vrn_dbl(VECTOR_INT *vseed, const VECTOR_INT vmultiplier, const VECTOR_INT vprime)
 {
-    VECTOR_INT st = _mm256_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
-
-    //st = _mm_hadd_epi32(st, st); // s + t 
-    const VECTOR_INT vtmp = _mm256_slli_epi64(st, 0x20); // shift << 32 
-    st = _mm256_add_epi64(st, vtmp); // s + t 
-
-    st = _mm256_and_si256(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
-
-    const VECTOR_INT u = _mm256_mul_epu32(*vseed, vmultiplier); // xl * yl
-
-    *vseed = _mm256_add_epi64(u, st); // u + s + t 
-
-    *vseed = _mm256_add_epi64(*vseed, vprime);    // seed += prime
-
-    *vseed = _mm256_and_si256(*vseed, vmsk_lsb48); // seed &= LSB48
-
+    VECTOR_INT st, vtmp, u;
+    VECTOR_DP vseedd, vrng;
     const double val[4] = {RNG_LONG64_DBL, RNG_LONG64_DBL, RNG_LONG64_DBL, RNG_LONG64_DBL};
-    VECTOR_DP vrng = _mm256_load_pd(val); 
+    unsigned long int seed[4] __attribute__ ((aligned(VECTOR_ALIGN)));
+    double seedd[4];
+
+    st = _mm256_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
+    //st = _mm_hadd_epi32(st, st); // s + t 
+    vtmp = _mm256_slli_epi64(st, 0x20); // shift << 32 
+    st = _mm256_add_epi64(st, vtmp); // s + t 
+    st = _mm256_and_si256(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
+    u = _mm256_mul_epu32(*vseed, vmultiplier); // xl * yl
+    *vseed = _mm256_add_epi64(u, st); // u + s + t 
+    *vseed = _mm256_add_epi64(*vseed, vprime);    // seed += prime
+    *vseed = _mm256_and_si256(*vseed, vmsk_lsb48); // seed &= LSB48
+    vrng = _mm256_load_pd(val); 
 
     // NOTE: To convert from unsigned long seed to double, need to store and load as double
-    unsigned long int seed[4] __attribute__ ((aligned(VECTOR_ALIGN)));
     _mm256_store_si256((VECTOR_INT *)seed, *vseed);
-
-    double seedd[4] = {(double)seed[0], (double)seed[1], (double)seed[2], (double)seed[3]};
-    VECTOR_DP vseedd =    _mm256_load_pd((double *)seedd);
-
+    seedd[0] = (double)seed[0];
+    seedd[1] = (double)seed[1];
+    seedd[2] = (double)seed[2];
+    seedd[3] = (double)seed[3];
+    vseedd =    _mm256_load_pd((double *)seedd);
     vrng = _mm256_mul_pd(vseedd, vrng); // seed * constant
 
     return vrng;
@@ -228,8 +222,9 @@ int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, 
     int need = 1;
     int prime = 0;
     int prime_position = offs;
+    VECTOR_INT vs;
 
-    VECTOR_INT vs = _mm_set_epi64x(s[1], s[0]);
+    vs = _mm_set_epi64x(s[1], s[0]);
     vs = _mm_and_si128(vs, vmsk_seed); // s &= 0x7FFFFFFF
 
     getprime_32(need, &prime, offs);
@@ -245,12 +240,17 @@ int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, 
     // Vector masks
     vmult_shf = _mm_shuffle_epi32(*vmult, 0xB1); // shuffle multiplier 
 
+#if defined(__SSE4_1__)
     if (_mm_test_all_zeros(*vprime, vmsk_lh64[0]) == 1) // all streams have prime = 0
         *vseed = _mm_or_si128(*vseed, vmsk_lsb1[0]);
     else if (_mm_test_all_zeros(*vprime, vmsk_lh64[1]) == 1) // first stream has prime = 0
         *vseed = _mm_or_si128(*vseed, vmsk_lsb1[1]);
     else if (_mm_test_all_zeros(*vprime, vmsk_lh64[2]) == 1) // second stream has prime = 0
         *vseed = _mm_or_si128(*vseed, vmsk_lsb1[2]);
+#else
+    printf("ERROR: require at least SSE4.1\n");
+    return -1;
+#endif
 
     // Run generator
     for (i = 0; i < (LCGRUNUP * prime_position); ++i)
@@ -263,28 +263,25 @@ int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, 
 // SIMD multiply and new seed
 VECTOR_INT get_vrn_int(VECTOR_INT *vseed, const VECTOR_INT vmult, const VECTOR_INT vprime)
 {
+    VECTOR_INT st, vtmp, u, vrng;
+
 #if defined(__SSE4_1__)
     vmult_shf = _mm_shuffle_epi32(vmult, 0xB1); // shuffle multiplier 
-    VECTOR_INT st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
-    vprint("xl * yh, xh * yl", st);
+    st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
 #else
-    vmult_shf = _mm_shuffle_epi32(vmult, 0xB1); // shuffle multiplier 
-    VECTOR_INT st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
+    printf("ERROR: require at least SSE4.1\n");
+    return _mm_setzero_si128();
 #endif
 
     //st = _mm_hadd_epi32(st, st); // s + t 
-    const VECTOR_INT vtmp = _mm_slli_epi64(st, 0x20); // shift << 32 
+    vtmp = _mm_slli_epi64(st, 0x20); // shift << 32 
     st = _mm_add_epi64(st, vtmp); // s + t 
-
     st = _mm_and_si128(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
-
-    const VECTOR_INT u = _mm_mul_epu32(*vseed, vmult); // xl * yl
-
+    u = _mm_mul_epu32(*vseed, vmult); // xl * yl
     *vseed = _mm_add_epi64(u, st); // u + s + t 
-
     *vseed = _mm_add_epi64(*vseed, vprime);    // seed += prime
     *vseed = _mm_and_si128(*vseed, vmsk_lsb48); // seed &= LSB48
-    const VECTOR_INT vrng = _mm_srli_epi64(*vseed, 0x11); // seed >> 17
+    vrng = _mm_srli_epi64(*vseed, 0x11); // seed >> 17
 
     return vrng;
 }
@@ -293,37 +290,33 @@ VECTOR_INT get_vrn_int(VECTOR_INT *vseed, const VECTOR_INT vmult, const VECTOR_I
 // SIMD multiply and new seed
 VECTOR_DP get_vrn_dbl(VECTOR_INT *vseed, const VECTOR_INT vmult, const VECTOR_INT vprime)
 {
+    VECTOR_INT st, vtmp, u;
+    VECTOR_DP vseedd, vrng;
+    const double val[2] = {RNG_LONG64_DBL, RNG_LONG64_DBL};
+    unsigned long int seed[2] __attribute__ ((aligned(VECTOR_ALIGN)));
+    double seedd[2];
+
 #if defined(__SSE4_1__)
     vmult_shf = _mm_shuffle_epi32(vmult, 0xB1); // shuffle multiplier 
-    VECTOR_INT st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
-    vprint("xl * yh, xh * yl", st);
+    st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
 #else
-    vmult_shf = _mm_shuffle_epi32(vmult, 0xB1); // shuffle multiplier 
-    VECTOR_INT st = _mm_mullo_epi32(*vseed, vmult_shf); // xl * yh, xh * yl
+    printf("ERROR: require at least SSE4.1\n");
+    return _mm_setzero_pd();
 #endif
 
     //st = _mm_hadd_epi32(st, st); // s + t 
-    const VECTOR_INT vtmp = _mm_slli_epi64(st, 0x20); // shift << 32 
+    vtmp = _mm_slli_epi64(st, 0x20); // shift << 32 
     st = _mm_add_epi64(st, vtmp); // s + t 
-
     st = _mm_and_si128(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
-
-    const VECTOR_INT u = _mm_mul_epu32(*vseed, vmult); // xl * yl
-
+    u = _mm_mul_epu32(*vseed, vmult); // xl * yl
     *vseed = _mm_add_epi64(u, st); // u + s + t 
-
     *vseed = _mm_add_epi64(*vseed, vprime);    // seed += prime
     *vseed = _mm_and_si128(*vseed, vmsk_lsb48); // seed &= LSB48
-
-    const double val[2] = {RNG_LONG64_DBL, RNG_LONG64_DBL};
-
-    VECTOR_DP vrng = _mm_load_pd(val);
-
-    unsigned long int seed[2] __attribute__ ((aligned(VECTOR_ALIGN)));
+    vrng = _mm_load_pd(val);
     _mm_store_si128((VECTOR_INT *)seed, *vseed);
-
-    double seedd[2] = {(double)seed[0], (double)seed[1]};
-    VECTOR_DP vseedd =    _mm_load_pd((double *)seedd);
+    seedd[0] = (double)seed[0];
+    seedd[1] = (double)seed[1];
+    vseedd =    _mm_load_pd((double *)seedd);
     vrng = _mm_mul_pd(vseedd, vrng); // seed * constant
 
     return vrng;
