@@ -1,2 +1,9 @@
+# Temporary developer stuff 
 TODO
 play/
+
+# Binary file 
+rng
+
+# Object files
+*.o
