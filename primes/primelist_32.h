@@ -1,6 +1,7 @@
 #define PRIMELISTSIZE1 1000
-#define STEP 1000
 #define PRIMELISTSIZE2 1778
+#define STEP 1000
+
 
 int prime_list_32[PRIMELISTSIZE2] = 
 {
@@ -1784,13 +1785,3 @@ int prime_list_32[PRIMELISTSIZE2] =
 4733
 };
 
-
-/***********************************************************************************
-* SPRNG (c) 2014 by Florida State University                                       *
-*                                                                                  *
-* SPRNG is licensed under a                                                        *
-* Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. *
-*                                                                                  *
-* You should have received a copy of the license along with this                   *
-* work. If not, see <http://creativecommons.org/licenses/by-nc-sa/4.0/>.           *
-************************************************************************************/

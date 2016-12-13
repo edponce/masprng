@@ -12,16 +12,12 @@
 #endif
 
 
-// SIMD mode
-#if defined(USE_SSE) || defined(USE_AVX)
-#define SIMD_MODE
-#include "vutils.h"
-#else
-
 // Scalar mode
 #define NSTRMS 1
 #define VECTOR_ALIGN 8
-#endif
+
+#include "lcg.h"
+
 
 #endif  // __MASPRNG_H
 

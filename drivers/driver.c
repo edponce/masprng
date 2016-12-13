@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "masprng.h"
-#include "lcg.h"
 #include "timers.h"
 #include "utils.h"
 #include "check.h"
+
 
 // Run settings
 #if defined(DEBUG)
@@ -53,195 +53,186 @@ int run(int);
 // Driver
 int main(int argc, char **argv)
 {
-  // Parse CLI args
-  int rng_lim = RNG_LIM;
+    // Parse CLI args
+    int rng_lim = RNG_LIM;
 
-  // Print system info
-  printSysconf();
-  printf("\n");
+    // Print system info
+    printSysconf();
+    printf("\n");
 
-  if (argc > 1)
-    rng_lim = atoi(argv[1]); // get number of iterations
+    if (argc > 1)
+        rng_lim = atoi(argv[1]); // get number of iterations
 
-  if (rng_lim > 0)
-    run(rng_lim);
-  else
-    check_errors();
+    if (rng_lim > 0)
+        run(rng_lim);
+    else
+        check_errors();
 
-  return 0;
+    return 0;
 }
 
 
 int run(int rng_lim)
 {
-  int i, j;  // iteration variables
-  int rval;  // function return value
+    int i, j; // iteration variables
+    int rval; // function return value
 
-  // Configure OpenMP environment
-  setOmpEnv(NULL);
+    // Configure OpenMP environment
+    setOmpEnv(NULL);
 
-  // Timers
-  long long int timers[2];
-  double t1, t2;
+    // Timers
+    long long int timers[2];
+    double t1, t2;
 
-  const int nstrms = NSTRMS;
-  const int nstrms32 = 2 * nstrms;
-  const int nstrms64 = nstrms;
+    const int nstrms = NSTRMS;
+    const int nstrms32 = 2 * nstrms;
+    const int nstrms64 = nstrms;
 
-  // Initial seeds
-  int *iseeds = NULL;
-  rval = posix_memalign((void **)&iseeds, VECTOR_ALIGN, nstrms * sizeof(int));
-  for (i = 0; i < nstrms; ++i) { 
-      iseeds[i] = 985456376 - i;
-  }
+    // Initial seeds
+    int *iseeds = NULL;
+    rval = posix_memalign((void **)&iseeds, VECTOR_ALIGN, nstrms * sizeof(int));
+    for (i = 0; i < nstrms; ++i)
+            iseeds[i] = 985456376 - i;
 
-  // Initial multiplier indices 
-  int *m = NULL;
-  rval = posix_memalign((void **)&m, VECTOR_ALIGN, nstrms * sizeof(int));
-  for (i = 0; i < nstrms; ++i) { 
-    m[i] = 0;
-  }
+    // Initial multiplier indices 
+    int *m = NULL;
+    rval = posix_memalign((void **)&m, VECTOR_ALIGN, nstrms * sizeof(int));
+    for (i = 0; i < nstrms; ++i)
+        m[i] = 0;
 
-  // Scalar
-  unsigned long int *seeds = NULL;
-  rval = posix_memalign((void **)&seeds, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
-  for (i = 0; i < nstrms64; ++i) { 
-    seeds[i] = 0;
-  }
+    // Scalar
+    unsigned long int *seeds = NULL;
+    rval = posix_memalign((void **)&seeds, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    for (i = 0; i < nstrms64; ++i)
+        seeds[i] = 0;
 
-  unsigned long int *mults = NULL;
-  rval = posix_memalign((void **)&mults, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
-  for (i = 0; i < nstrms64; ++i) { 
-    mults[i] = 0;
-  }
+    unsigned long int *mults = NULL;
+    rval = posix_memalign((void **)&mults, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    for (i = 0; i < nstrms64; ++i)
+        mults[i] = 0;
 
-  unsigned int *primes = NULL;
-  rval = posix_memalign((void **)&primes, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
-  for (i = 0; i < nstrms32; ++i) { 
-    primes[i] = 0;
-  }
+    unsigned int *primes = NULL;
+    rval = posix_memalign((void **)&primes, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    for (i = 0; i < nstrms32; ++i)
+        primes[i] = 0;
 
-  RNG_TYPE *rngs = NULL;
-  rval = posix_memalign((void **)&rngs, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
-  for (i = 0; i < RNG_ELEMS; ++i) { 
-    rngs[i] = 0;
-  }
+    RNG_TYPE *rngs = NULL;
+    rval = posix_memalign((void **)&rngs, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    for (i = 0; i < RNG_ELEMS; ++i)
+        rngs[i] = 0;
 
-  // Initialize RNG params
-  for (i = 0; i < nstrms; ++i) { 
-    init_rng(&seeds[i], &mults[i], &primes[i], iseeds[i], m[i]);
-  }
+    // Initialize RNG params
+    for (i = 0; i < nstrms; ++i)
+        init_rng(&seeds[i], &mults[i], &primes[i], iseeds[i], m[i]);
 
-  // Run kernel
-  startTime(timers);
-  #pragma omp parallel for ordered default(shared) firstprivate(rngs) lastprivate(rngs) schedule(SCHED_OMP)
-  for (i = 0; i < rng_lim; ++i) {
-    #pragma omp ordered
-    for (j = 0; j < nstrms; ++j) { 
-      rngs[j] = get_rn(&seeds[j], mults[j], primes[j]);
-    }
-  }
-  t1 = stopTime(timers);
+    // Run kernel
+    startTime(timers);
+    #pragma omp parallel for ordered default(shared) firstprivate(rngs) lastprivate(rngs) schedule(SCHED_OMP)
+    for (i = 0; i < rng_lim; ++i)
+        #pragma omp ordered
+        for (j = 0; j < nstrms; ++j)
+            rngs[j] = get_rn(&seeds[j], mults[j], primes[j]);
+    t1 = stopTime(timers);
 
-  // Print results 
-  for (i = 0; i < nstrms; ++i) { 
-    printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
-  }
-  printf("\n");
+    // Print results 
+    printf("Real time = %.16lf sec\n", t1);
+    for (i = 0; i < nstrms; ++i)
+        printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
+    printf("\n");
 
 
 #if defined(SIMD_MODE)
-  // SIMD
-  unsigned long int *seeds2 = NULL;
-  rval = posix_memalign((void **)&seeds2, VECTOR_ALIGN, nstrms * sizeof(unsigned long int));
-  for (i = 0; i < nstrms; ++i) { 
-    seeds2[i] = 0;
-  }
+    // SIMD
+    unsigned long int *seeds2 = NULL;
+    rval = posix_memalign((void **)&seeds2, VECTOR_ALIGN, nstrms * sizeof(unsigned long int));
+    for (i = 0; i < nstrms; ++i)
+        seeds2[i] = 0;
 
-  unsigned long int *mults2 = NULL;
-  rval = posix_memalign((void **)&mults2, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
-  for (i = 0; i < nstrms64; ++i) { 
-    mults2[i] = 0;
-  }
+    unsigned long int *mults2 = NULL;
+    rval = posix_memalign((void **)&mults2, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    for (i = 0; i < nstrms64; ++i)
+        mults2[i] = 0;
 
-  unsigned int *primes2 = NULL;
-  rval = posix_memalign((void **)&primes2, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
-  for (i = 0; i < nstrms32; ++i) { 
-    primes2[i] = 0;
-  }
+    unsigned int *primes2 = NULL;
+    rval = posix_memalign((void **)&primes2, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    for (i = 0; i < nstrms32; ++i)
+        primes2[i] = 0;
 
-  RNG_TYPE *rngs2 = NULL;
-  rval = posix_memalign((void **)&rngs2, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
-  for (i = 0; i < RNG_ELEMS; ++i) { 
-    rngs2[i] = 0;
-  }
+    RNG_TYPE *rngs2 = NULL;
+    rval = posix_memalign((void **)&rngs2, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    for (i = 0; i < RNG_ELEMS; ++i)
+        rngs2[i] = 0;
 
-  VECTOR_INT vseeds; rval = vload(&vseeds, seeds2);
-  VECTOR_INT vmults; rval = vload(&vmults, mults2);
-  VECTOR_INT vprimes; rval = vload(&vprimes, primes2);
-  VRNG_TYPE vrngs; rval = vload(&vrngs, rngs2);
+    VECTOR_INT vseeds;
+    VECTOR_INT vmults;
+    VECTOR_INT vprimes;
+    VRNG_TYPE vrngs;
 
-  // Initial RNG params 
-  init_vrng(&vseeds, &vmults, &vprimes, iseeds, m);
+    rval = vload(&vseeds, seeds2);
+    rval = vload(&vmults, mults2);
+    rval = vload(&vprimes, primes2);
+    rval = vload(&vrngs, rngs2);
 
-  // Run kernel
-  startTime(timers);
-  #pragma omp parallel for ordered default(shared) firstprivate(vrngs) lastprivate(vrngs) schedule(SCHED_OMP)
-  for (i = 0; i < rng_lim; ++i) {
-    #pragma omp ordered
-    vrngs = get_vrn(&vseeds, vmults, vprimes);
-  }
-  t2 = stopTime(timers);
+    // Initial RNG params 
+    init_vrng(&vseeds, &vmults, &vprimes, iseeds, m);
 
-  // Print results 
-  vstore(seeds2, vseeds);
-  vstore(mults2, vmults);
-  vstore(primes2, vprimes);
-  vstore(rngs2, vrngs);
+    // Run kernel
+    startTime(timers);
+    #pragma omp parallel for ordered default(shared) firstprivate(vrngs) lastprivate(vrngs) schedule(SCHED_OMP)
+    for (i = 0; i < rng_lim; ++i)
+        #pragma omp ordered
+        vrngs = get_vrn(&vseeds, vmults, vprimes);
+    t2 = stopTime(timers);
 
-  for (i = 0; i < nstrms; ++i) { 
-    printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
-  }
-  printf("\n");
+    // Print results 
+    vstore(seeds2, vseeds);
+    vstore(mults2, vmults);
+    vstore(primes2, vprimes);
+    vstore(rngs2, vrngs);
 
-  // Info
-  printf("RNG nums = %d\n", rng_lim);
+    printf("Real time = %.16lf sec\n", t2);
+    for (i = 0; i < nstrms; ++i)
+        printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
+    printf("\n");
 
-  // Speedup
-  if (t2 > 0)
-    printf("speedup = scalar/vector = %g\n", t1 / t2);
-  else
-    printf("invalid speedup = %g/%g\n", t1, t2);
+    // Info
+    printf("RNG nums = %d\n", rng_lim);
 
-  // Validate run
-  int valid = 1;
-  for (i = 0; i < nstrms; ++i) { 
-    if (rngs[i] != rngs2[i*RNG_SHIFT] || seeds[i] != seeds2[i]) {
-      valid = 0;
-      break;
+    // Speedup
+    if (t2 > 0)
+        printf("speedup = scalar/vector = %g\n", t1 / t2);
+    else
+        printf("invalid speedup = %g/%g\n", t1, t2);
+
+    // Validate run
+    int valid = 1;
+    for (i = 0; i < nstrms; ++i) { 
+        if (rngs[i] != rngs2[i*RNG_SHIFT] || seeds[i] != seeds2[i]) {
+            valid = 0;
+            break;
+        }
     }
-  }
 
-  if (valid > 0)
-    printf("PASSED: " RNG_TYPE_STR " generator passed the reproducibility test.\n");
-  else
-    printf("FAILED: " RNG_TYPE_STR " generator does not reproduce correct stream.\n");
-  printf("\n");
+    if (valid > 0)
+        printf("PASSED: " RNG_TYPE_STR " generator passed the reproducibility test.\n");
+    else
+        printf("FAILED: " RNG_TYPE_STR " generator does not reproduce correct stream.\n");
+    printf("\n");
 
-  // Deallocate memory
-  free(seeds2);
-  free(mults2);
-  free(primes2);
-  free(rngs2);
+    // Deallocate memory
+    free(seeds2);
+    free(mults2);
+    free(primes2);
+    free(rngs2);
 #endif
-  
-  // Deallocate memory
-  free(iseeds);
-  free(seeds);
-  free(mults);
-  free(primes);
-  free(rngs);
+    
+    // Deallocate memory
+    free(iseeds);
+    free(seeds);
+    free(mults);
+    free(primes);
+    free(rngs);
  
-  return 0;
+    return 0;
 }
 

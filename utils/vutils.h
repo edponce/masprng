@@ -16,6 +16,9 @@
 #define VECTOR_INT __m128i
 #define VECTOR_SP __m128
 #define VECTOR_DP __m128d
+#define VECTOR_NUM_32BIT VECTOR_ALIGN/4
+#define VECTOR_NUM_64BIT VECTOR_ALIGN/8
+#define SIMD_MODE
 
 // AVX mode
 #elif USE_AVX
@@ -26,10 +29,11 @@
 #define VECTOR_INT __m256i
 #define VECTOR_SP __m256
 #define VECTOR_DP __m256d
-#endif
-
 #define VECTOR_NUM_32BIT VECTOR_ALIGN/4
 #define VECTOR_NUM_64BIT VECTOR_ALIGN/8
+#define SIMD_MODE
+#endif
+
 
 int vload(VECTOR_INT *, int *);
 int vload(VECTOR_INT *, unsigned int *);
