@@ -68,12 +68,12 @@ double get_rn_dbl(unsigned long int *seed, const unsigned long int multiplier, c
 #if defined(SIMD_MODE)
 #if defined(USE_AVX)
 // Global constants
-VECTOR_INT vmsk_lsb1[5];
-VECTOR_INT vmsk_lh64[5];
-VECTOR_INT vmsk_hi64;
-VECTOR_INT vmsk_lsb48;
-VECTOR_INT vmult_shf;
-VECTOR_INT vmsk_seed;
+static VECTOR_INT vmsk_lsb1[5];
+static VECTOR_INT vmsk_lh64[5];
+static VECTOR_INT vmsk_hi64;
+static VECTOR_INT vmsk_lsb48;
+static VECTOR_INT vmsk_seed;
+static VECTOR_INT vmult_shf;
 
 // Initialize SIMD RNG
 int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, int *m)
@@ -198,12 +198,12 @@ VECTOR_SP get_vrn_flt(VECTOR_INT *vseed, const VECTOR_INT vmultiplier, const VEC
 
 #elif defined(USE_SSE)
 // Global constants
-VECTOR_INT vmsk_lsb1[3];
-VECTOR_INT vmsk_lh64[3];
-VECTOR_INT vmsk_hi64;
-VECTOR_INT vmsk_lsb48;
-VECTOR_INT vmult_shf;
-VECTOR_INT vmsk_seed;
+static VECTOR_INT vmsk_lsb1[3];
+static VECTOR_INT vmsk_lh64[3];
+static VECTOR_INT vmsk_hi64;
+static VECTOR_INT vmsk_lsb48;
+static VECTOR_INT vmsk_seed;
+static VECTOR_INT vmult_shf;
 
 // Initialize SIMD RNG
 int init_vrng(VECTOR_INT *vseed, VECTOR_INT *vmult, VECTOR_INT *vprime, int *s, int *m)

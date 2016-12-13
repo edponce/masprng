@@ -14,7 +14,7 @@
 #define SIMD_MODE // MASPRNG vector flag
 
 // AVX mode
-#elif USE_AVX
+#elif defined(USE_AVX)
 #define NSTRMS 4
 #define VECTOR_ALIGN 32
 #define VECTOR_INT __m256i
@@ -35,12 +35,17 @@
 #define VECTOR_NUM_64BIT VECTOR_ALIGN/8
 #endif
 
-// Any SIMD mode
+// If SIMD mode, select required header files based on architecture
 #if defined(SIMD_MODE)
 #if (defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__)
 #include <x86intrin.h>
+#else
+// NOTE: currently only support x86_64
+#undef SIMD_MODE
+#endif
 #endif
 
+#if defined(SIMD_MODE)
 int vload(VECTOR_INT *, const int *);
 int vload(VECTOR_INT *, const unsigned int *);
 int vload(VECTOR_INT *, const long int *);
