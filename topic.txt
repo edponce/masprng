@@ -1,2 +1,0 @@
-gcc builtin('sse') etc.
-select stream config
