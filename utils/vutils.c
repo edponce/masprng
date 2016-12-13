@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "vutils.h"
 
-
 #define SUCCESS 0
 #define ERROR -1
 

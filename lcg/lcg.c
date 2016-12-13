@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "primes_32.h"
+#include "vutils.h"
 #include "lcg.h"
 
 
@@ -64,6 +65,7 @@ double get_rn_dbl(unsigned long int *seed, const unsigned long int multiplier, c
 }
 
 
+#if defined(SIMD_MODE)
 #if defined(USE_AVX)
 // Global constants
 VECTOR_INT vmsk_lsb1[5];
@@ -194,7 +196,7 @@ VECTOR_SP get_vrn_flt(VECTOR_INT *vseed, const VECTOR_INT vmultiplier, const VEC
 }
 
 
-#elif USE_SSE
+#elif defined(USE_SSE)
 // Global constants
 VECTOR_INT vmsk_lsb1[3];
 VECTOR_INT vmsk_lh64[3];
@@ -329,4 +331,5 @@ VECTOR_SP get_vrn_flt(VECTOR_INT *vseed, const VECTOR_INT vmult, const VECTOR_IN
     return _mm_cvtpd_ps(get_vrn_dbl(vseed, vmult, vprime));
 }
 #endif
+#endif // SIMD_MODE
 

@@ -6,3 +6,8 @@ C++11 - variadic macros
 SIMD requirements:
 SSE - need SSE4.1
 AVX - need AVX2
+
+Only a single SIMD technology is allowed per program.
+All SIMD macro decisions are ordered from most recent technology backwards.
+This allows the use of best available technology without the user having to specify.
+Note that the user is allowed to decide on a specific technology using a macro define.

@@ -52,8 +52,7 @@ double get_rn_dbl(unsigned long int *, unsigned long int, unsigned int);
 
 
 // SIMD mode
-#if defined(USE_SSE) || defined(USE_AVX)
-#include "vutils.h"
+#if defined(SIMD_MODE)
 int init_vrng(VECTOR_INT *, VECTOR_INT *, VECTOR_INT *, int *, int *);
 VECTOR_INT get_vrn_int(VECTOR_INT *, const VECTOR_INT , const VECTOR_INT);
 VECTOR_SP get_vrn_flt(VECTOR_INT *, const VECTOR_INT , const VECTOR_INT);
