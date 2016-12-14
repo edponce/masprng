@@ -34,6 +34,7 @@ int setOmpEnv(int *num_threads)
  */
 int printSIMDconf(void)
 {
+#if defined(__GNUC__) 
     if (__builtin_cpu_supports("sse"))
         puts("SSE");
     if (__builtin_cpu_supports("sse2"))
@@ -52,6 +53,7 @@ int printSIMDconf(void)
         puts("AVX2");
     if (__builtin_cpu_supports("avx512f"))
         puts("AVX512F");
+#endif
 
     return 0;
 }

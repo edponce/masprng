@@ -6,8 +6,8 @@
 MKFILE := $(MAKEFILE_LIST)
 
 # C/C++ compiler
-CC := g++
-#CC := icc
+#CC := g++
+CC := icpc
 
 # GNU compiler and linker options
 # -Wall, -Wextra = enable warnings
@@ -21,13 +21,13 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -msse4 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=core-avx2 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -msse4 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -march=core-avx2 -funroll-loops
+CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -openmp
 
 # Linker options

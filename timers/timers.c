@@ -30,8 +30,8 @@ double stopTime(long long int *timers)
         timers[1] = tv.tv_usec - timers[1];
     }
     else {
-        timers[0] = tv.tv_sec - timers[0] - 1.0;
-        timers[1] = 1.0 - timers[1] - tv.tv_usec;
+        timers[0] = tv.tv_sec - timers[0];
+        timers[1] = timers[1] - tv.tv_usec;
     }
     rtime = (double)timers[0] + timers[1] / 1000000.0;
 
