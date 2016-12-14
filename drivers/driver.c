@@ -136,7 +136,7 @@ int run(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-    printf("Real time = %.16lf sec\n", t1);
+    printf("Real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
     printf("\n");
@@ -191,7 +191,7 @@ int run(int rng_lim)
     vstore(primes2, vprimes);
     vstore(rngs2, vrngs);
 
-    printf("Real time = %.16lf sec\n", t2);
+    printf("Real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
     printf("\n");

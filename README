@@ -1,5 +1,6 @@
 MASPRNG - Intel MIC (vector) accelerated SPRNG library
 
+For GNU compilers, require 4.8 or greater
 C++ - function overloading
 C++11 - variadic macros
 
