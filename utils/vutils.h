@@ -37,7 +37,7 @@
 
 // If SIMD mode, select required header files based on architecture
 #if defined(SIMD_MODE)
-#if ((__GNUC__ > 3 && _GNUC_MINOR > 7) || defined(__INTEL_COMPILER)) && defined(__x86_64__)
+#if (((__GNUC__ > 3 && _GNUC_MINOR > 7) || __GNUC__ > 4) || defined(__INTEL_COMPILER)) && defined(__x86_64__)
 #include <x86intrin.h>
 #else
 // NOTE: currently only support x86_64
