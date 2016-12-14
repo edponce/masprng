@@ -34,7 +34,7 @@ int setOmpEnv(int *num_threads)
  */
 int printSIMDconf(void)
 {
-#if (__GNUC__ > 3  && __GNUC_MINOR__ > 7) || __GNUC__ > 4
+#if GNUC_VERSION > 40800
     if (__builtin_cpu_supports("sse"))
         puts("SSE");
     if (__builtin_cpu_supports("sse2"))

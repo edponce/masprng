@@ -35,9 +35,13 @@
 #define VECTOR_NUM_64BIT VECTOR_ALIGN/8
 #endif
 
+
 // If SIMD mode, select required header files based on architecture
 #if defined(SIMD_MODE)
-#if (((__GNUC__ > 3 && _GNUC_MINOR > 7) || __GNUC__ > 4) || defined(__INTEL_COMPILER)) && defined(__x86_64__)
+#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+// Check for either GCC 4.8 or greater or Intel compiler for x86_64 architectures
+#if (GNUC_VERSION > 40800 || defined(__INTEL_COMPILER)) && defined(__x86_64__)
 #include <x86intrin.h>
 #else
 // NOTE: currently only support x86_64
