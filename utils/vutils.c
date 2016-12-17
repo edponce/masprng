@@ -4,6 +4,7 @@
 
 #if defined(SIMD_MODE)
 
+/*
 #define SUCCESS 0
 #define ERROR -1
 
@@ -186,6 +187,7 @@ int vstore(double *dat, const VECTOR_DP vdat)
 
     return SUCCESS;
 }
+*/
 
 
 void vprint(const char *str, const VECTOR_INT vdat)
