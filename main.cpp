@@ -44,7 +44,7 @@ int main()
             iseeds[i] = 985456376 - i;
 
     VRNG_TYPE vdat;
-    vdat = vload(iseeds);
+    vdat = simd_load(iseeds);
     vprint("vdat ", vdat);
 
     vdat = simd_sll_64(vdat, 1); 

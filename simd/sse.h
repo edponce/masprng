@@ -32,22 +32,52 @@
 #define SIMD_MODE
 
 
+/**************************
+ *  Arithmetic intrinsics
+ **************************/
+/*
+ *  Add packed 32-bit integers
+ */
+inline SIMD_INT simd_add_32(SIMD_INT const va, SIMD_INT const vb)
+{ return _mm_add_epi32(va, vb); }
+
+/*
+ *  Add packed 64-bit integers
+ */
+inline SIMD_INT simd_add_64(SIMD_INT const va, SIMD_INT const vb)
+{ return _mm_add_epi64(va, vb); }
+
+/*
+ *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
+ *  and store the unsigned 64-bit results 
+ */
+inline SIMD_INT simd_mul_u32(SIMD_INT const va, SIMD_INT const vb)
+{ return _mm_mul_epu32(va, vb); }
+
+/*
+ *  Multiply packed 32-bit integers,
+ *  produce intermediate 64-bit integers, 
+ *  and store the low 32-bit results
+ */
+inline SIMD_INT simd_mullo_32(SIMD_INT const va, SIMD_INT const vb)
+{ return _mm_mullo_epi32(va, vb); }
+
+/*
+ *  Multiply packed single-precision floating-point elements
+ */
+inline SIMD_SP simd_mul_ps(SIMD_SP const va, SIMD_SP const vb)
+{ return _mm_mul_ps(va, vb); }
+
+/*
+ *  Multiply packed double-precision floating-point elements
+ */
+inline SIMD_DP simd_mul_pd(SIMD_DP const va, SIMD_DP const vb)
+{ return _mm_mul_pd(va, vb); }
+
 
 /********************************
  *  Integral logical intrinsics
  ********************************/
-/*
- *  Shift left (logical) packed 32-bit integers
- */
-inline SIMD_INT simd_sll_32(SIMD_INT const va, int const shft)
-{ return _mm_slli_epi32(va, shft); }
-
-/*
- *  Shift left (logical) packed 64-bit integers
- */
-inline SIMD_INT simd_sll_64(SIMD_INT const va, int const shft)
-{ return _mm_slli_epi64(va, shft); }
-
 /*
  *  Bitwise OR full-vector integers
  */
@@ -66,10 +96,40 @@ inline SIMD_INT simd_xor(SIMD_INT const va, SIMD_INT const vb)
 inline SIMD_INT simd_and(SIMD_INT const va, SIMD_INT const vb)
 { return _mm_and_si128(va, vb); }
 
+/*
+ *  Test if full-vector is zero 
+ */
+inline int simd_test_zero(SIMD_INT const va, SIMD_INT const vb)
+{ return _mm_test_all_zeros(va, vb); }
+
 
 /***********************
- *  Shuffle intrinsics 
+ *  Shift/Shuffle intrinsics 
  ***********************/
+/*
+ *  Shift left (logical) packed 32-bit integers
+ */
+inline SIMD_INT simd_sll_32(SIMD_INT const va, int const shft)
+{ return _mm_slli_epi32(va, shft); }
+
+/*
+ *  Shift right (logical) packed 32-bit integers
+ */
+inline SIMD_INT simd_srl_32(SIMD_INT const va, int const shft)
+{ return _mm_srli_epi32(va, shft); }
+
+/*
+ *  Shift left (logical) packed 64-bit integers
+ */
+inline SIMD_INT simd_sll_64(SIMD_INT const va, int const shft)
+{ return _mm_slli_epi64(va, shft); }
+
+/*
+ *  Shift right (logical) packed 64-bit integers
+ */
+inline SIMD_INT simd_srl_64(SIMD_INT const va, int const shft)
+{ return _mm_srli_epi64(va, shft); }
+
 /*
  *  Shuffle 32-bit integers using control value 
  */
@@ -80,6 +140,12 @@ inline SIMD_INT simd_shuffle_32(SIMD_INT const va, int const ctrl)
 /*******************
  *  Set intrinsics 
  *******************/
+/*
+ *  Set full-vector to zero 
+ */
+inline SIMD_INT simd_set_zero(void)
+{ return _mm_setzero_si128(); }
+
 /*
  *  Broadcast 64-bit integer to all vector elements
  */
@@ -93,47 +159,64 @@ inline SIMD_INT simd_set_64(int const sa1, int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 
+/***********************
+ *  Convert intrinsics 
+ ***********************/
+/*
+ *  Convert packed double-precision floating-point elements
+ *  to packed single-precision floating-point elements
+ */
+inline SIMD_SP simd_cvt_d2s(SIMD_DP const va)
+{ return _mm_cvtpd_ps(va); }
+
+
 /********************
  *  Load intrinsics 
  ********************/
-inline SIMD_INT vload(int const * const sa)
+inline SIMD_INT simd_load(int const * const sa)
 { return _mm_load_si128((__m128i *)sa); }
 
-inline SIMD_INT vload(unsigned int const * const sa)
+inline SIMD_INT simd_load(unsigned int const * const sa)
 { return _mm_load_si128((__m128i *)sa); }
 
-inline SIMD_INT vload(long int const * const sa)
+inline SIMD_INT simd_load(long int const * const sa)
 { return _mm_load_si128((__m128i *)sa); }
 
-inline SIMD_INT vload(unsigned long int const * const sa)
+inline SIMD_INT simd_load(unsigned long int const * const sa)
 { return _mm_load_si128((__m128i *)sa); }
 
-inline SIMD_SP vload(float const * const sa)
+inline SIMD_INT simd_load(unsigned long long int const * const sa)
+{ return _mm_load_si128((__m128i *)sa); }
+
+inline SIMD_SP simd_load(float const * const sa)
 { return _mm_load_ps((float *)sa); }
 
-inline SIMD_DP vload(double const * const sa)
+inline SIMD_DP simd_load(double const * const sa)
 { return _mm_load_pd((double *)sa); }
 
 
 /*******************************
  *  Store intrinsics 
  *******************************/
-inline void vstore(int * const sa, SIMD_INT const va)
+inline void simd_store(int * const sa, SIMD_INT const va)
 { _mm_store_si128((__m128i *)sa, va); }
 
-inline void vstore(unsigned int * const sa, SIMD_INT const va)
+inline void simd_store(unsigned int * const sa, SIMD_INT const va)
 { _mm_store_si128((__m128i *)sa, va); }
 
-inline void vstore(long int * const sa, SIMD_INT const va)
+inline void simd_store(long int * const sa, SIMD_INT const va)
 { _mm_store_si128((__m128i *)sa, va); }
 
-inline void vstore(unsigned long int * const sa, SIMD_INT const va)
+inline void simd_store(unsigned long int * const sa, SIMD_INT const va)
 { _mm_store_si128((__m128i *)sa, va); }
 
-inline void vstore(float * const sa, SIMD_SP const va)
+inline void simd_store(unsigned long long int * const sa, SIMD_INT const va)
+{ _mm_store_si128((__m128i *)sa, va); }
+
+inline void simd_store(float * const sa, SIMD_SP const va)
 { _mm_store_ps((float *)sa, va); }
 
-inline void vstore(double * const sa, SIMD_DP const va)
+inline void simd_store(double * const sa, SIMD_DP const va)
 { _mm_store_pd((double *)sa, va); }
 
 
@@ -161,7 +244,7 @@ void vprint(char const * const str, SIMD_INT const va)
 
     // int
     int itmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    vstore(itmp, va);
+    simd_store(itmp, va);
     printf("%s", str);
     for (i = 0; i < SIMD_NUM_32BIT; ++i)
       printf("%d\t", itmp[i]);
@@ -169,7 +252,7 @@ void vprint(char const * const str, SIMD_INT const va)
 
     // unsigned int
     unsigned int utmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    vstore(utmp, va);
+    simd_store(utmp, va);
     printf("%s", str);
     for (i = 0; i < SIMD_NUM_32BIT; ++i)
       printf("%u\t", utmp[i]);
@@ -177,7 +260,7 @@ void vprint(char const * const str, SIMD_INT const va)
 
     // unsigned long 
     unsigned long int lutmp[SIMD_NUM_64BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    vstore(lutmp, va);
+    simd_store(lutmp, va);
     printf("%s", str);
     for (i = 0; i < SIMD_NUM_64BIT; ++i)
       printf("%lu\t", lutmp[i]);
@@ -189,7 +272,7 @@ void vprint(char const * const str, SIMD_SP const va)
     unsigned int i;
 
     float tmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    vstore(tmp, va);
+    simd_store(tmp, va);
     printf("%s", str);
     for (i = 0; i < SIMD_NUM_32BIT; ++i)
       printf("%f\t", tmp[i]);
@@ -201,7 +284,7 @@ void vprint(char const * const str, SIMD_DP const va)
     unsigned int i;
 
     double tmp[SIMD_NUM_64BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    vstore(tmp, va);
+    simd_store(tmp, va);
     printf("%s", str);
     for (i = 0; i < SIMD_NUM_64BIT; ++i)
       printf("%f\t", tmp[i]);
