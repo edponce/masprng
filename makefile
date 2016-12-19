@@ -62,13 +62,13 @@ LIBDIR :=
 LIBS :=
 
 # Source files to compile
-SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/simd_utils.c #check/check.c
+SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check.c
 
 # Object files to link
 OBJECTS := $(SOURCES:.c=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.c=.h) masprng.h primes/primelist_32.h simd/sse.h
+HEADERS := $(SOURCES:.c=.h) masprng.h primes/primelist_32.h
 
 # Driver file
 LCG_DRIVER := drivers/driver.c

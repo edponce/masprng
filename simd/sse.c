@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "simd_utils.h"
+#include "sse.h"
 
 /*
  *  Optional support constants

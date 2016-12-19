@@ -298,6 +298,12 @@ inline void simd_store(double * const sa, SIMD_DP const va)
 { _mm_store_pd((double *)sa, va); }
 
 
+/**********************************
+ *  SIMD general helper functions
+ **********************************/
+void simd_print(char const * const, SIMD_INT const);
+void simd_print(char const * const, SIMD_SP const);
+void simd_print(char const * const, SIMD_DP const);
 
 //////////////////////////////////////////////////////////
 

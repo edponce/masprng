@@ -34,7 +34,7 @@
 #define get_vrn(...) get_vrn_flt(__VA_ARGS__)
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
-#define RNG_SHIFT 2
+#define RNG_SHIFT 1
 #else 
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
@@ -136,8 +136,6 @@ int run(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-    printf("RNG runs = %d\n", rng_lim);
-    printf("Number of streams = %d\n", nstrms);
     printf("Real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
@@ -166,9 +164,9 @@ int run(int rng_lim)
     for (i = 0; i < RNG_ELEMS; ++i)
         rngs2[i] = 0;
 
-    VRNG_TYPE vseeds = simd_load(seeds2);
-    VRNG_TYPE vmults = simd_load(mults2);
-    VRNG_TYPE vprimes = simd_load(primes2);
+    SIMD_INT vseeds = simd_load(seeds2);
+    SIMD_INT vmults = simd_load(mults2);
+    SIMD_INT vprimes = simd_load(primes2);
     VRNG_TYPE vrngs = simd_load(rngs2);
 
     // Initial RNG params 
@@ -194,7 +192,8 @@ int run(int rng_lim)
     printf("\n");
 
     // Info
-    printf("RNG nums = %d\n", rng_lim);
+    printf("RNG runs = %d\n", rng_lim);
+    printf("Number of streams = %d\n", nstrms);
 
     // Speedup
     if (t2 > 0)
