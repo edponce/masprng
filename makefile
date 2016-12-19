@@ -51,7 +51,7 @@ DEFINES := -DUSE_SSE -DLONG_SPRNG
 
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
-INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Isimd #-Icheck
+INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
 
 # Define library paths in addition to /usr/lib
 #LIBDIR := -L/dir1 -L/dir2

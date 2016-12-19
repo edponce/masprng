@@ -3,7 +3,7 @@
 #include "masprng.h"
 #include "timers.h"
 #include "utils.h"
-//#include "check.h"
+#include "check.h"
 
 
 // Run settings
@@ -15,7 +15,7 @@
 
 
 // Control type of test
-#define TEST 2
+#define TEST 0
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 
     if (rng_lim > 0)
         run(rng_lim);
- //   else
- //       check_errors();
+    else
+        check_errors();
 
     return 0;
 }
