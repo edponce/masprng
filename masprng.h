@@ -12,9 +12,6 @@
 #endif
 
 
-// Extras
-#define ARRAY_SIZE(x) (sizeof(x)/sizeof(*(x)))
- 
 #include "lcg.h"
 
 

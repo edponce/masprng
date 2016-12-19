@@ -1,17 +1,14 @@
 #ifndef __SSE_H
 #define __SSE_H
 
-// NOTE: find a way to not use this
-#if defined(USE_SSE)
 
 /*
  *  Include supporting header files based on compiler and architecture
+ *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
 #define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if (GNUC_VERSION > 40800 || defined(__INTEL_COMPILER)) && defined(__x86_64__)
 #include <x86intrin.h>
-#else
-// NOTE: currently only support x86_64
 #endif
 
 /*
@@ -25,11 +22,8 @@
 #define SIMD_SP __m128 /* floating-point single-precision */
 #define SIMD_DP __m128d /* floating-point double-precision */
 
-/*
- *  MASPRNG vector flag
- *  NOTE: find a way to not set this here
- */
-#define SIMD_MODE
+// NOTE: to improve this because depends on LONG_SPRNG
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS/64)  /* number of max streams supported per vector register */
 
 
 /**************************
@@ -159,76 +153,124 @@ inline void simd_set_zero(SIMD_DP * const va)
 { *va = _mm_setzero_pd(); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 32-bit integer
+ */
+inline SIMD_INT simd_set1(int const sa)
+{ return _mm_set1_epi32(sa); }
+
+/*
+ *  Broadcast 64-bit integer
  */
 inline SIMD_INT simd_set1_64(int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 32-bit integer
+ */
+inline SIMD_INT simd_set1(unsigned int const sa)
+{ return _mm_set1_epi32(sa); }
+
+/*
+ *  Broadcast 64-bit integer
  */
 inline SIMD_INT simd_set1_64(unsigned int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(long int const sa)
+inline SIMD_INT simd_set1(long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(unsigned long int const sa)
+inline SIMD_INT simd_set1(unsigned long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(long long int const sa)
+inline SIMD_INT simd_set1(long long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Broadcast 64-bit integer to all vector elements
+ *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(unsigned long long int const sa)
+inline SIMD_INT simd_set1(unsigned long long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Broadcast single-precision floating-point element
  */
-inline SIMD_INT simd_set_64(int const sa1, int const sa0)
+inline SIMD_SP simd_set1(float const sa)
+{ return _mm_set1_ps(sa); }
+
+/*
+ *  Broadcast double-precision floating-point element
+ */
+inline SIMD_DP simd_set1(double const sa)
+{ return _mm_set1_pd(sa); }
+
+/*
+ *  Set packed 32-bit integers
+ */
+inline SIMD_INT simd_set(int const sa3, int const sa2, int const sa1, int const sa0)
+{ return _mm_set_epi32(sa3, sa2, sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers
+ */
+inline SIMD_INT simd_set(int const sa1, int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Set packed 32-bit integers
  */
-inline SIMD_INT simd_set_64(unsigned int const sa1, unsigned int const sa0)
+inline SIMD_INT simd_set(unsigned int const sa3, unsigned int const sa2, unsigned int const sa1, unsigned int const sa0)
+{ return _mm_set_epi32(sa3, sa2, sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers
+ */
+inline SIMD_INT simd_set(unsigned int const sa1, unsigned int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Set packed 64-bit integers
  */
-inline SIMD_INT simd_set_64(long int const sa1, long int const sa0)
+inline SIMD_INT simd_set(long int const sa1, long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Set packed 64-bit integers
  */
-inline SIMD_INT simd_set_64(unsigned long int const sa1, unsigned long int const sa0)
+inline SIMD_INT simd_set(unsigned long int const sa1, unsigned long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Set packed 64-bit integers
  */
-inline SIMD_INT simd_set_64(long long int const sa1, long long int const sa0)
+inline SIMD_INT simd_set(long long int const sa1, long long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 /*
- *  Set packed 64-bit integers to corresponding vector elements
+ *  Set packed 64-bit integers
  */
-inline SIMD_INT simd_set_64(unsigned long long int const sa1, unsigned long long int const sa0)
+inline SIMD_INT simd_set(unsigned long long int const sa1, unsigned long long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed single-precision floating-point elements 
+ */
+inline SIMD_SP simd_set(float const sa3, float const sa2, float const sa1, float const sa0)
+{ return _mm_set_ps(sa3, sa2, sa1, sa0); }
+
+/*
+ *  Set packed double-precision floating-point elements 
+ */
+inline SIMD_DP simd_set(double const sa1, double const sa0)
+{ return _mm_set_pd(sa1, sa0); }
 
 
 /***********************
@@ -305,18 +347,6 @@ void simd_print(char const * const, SIMD_INT const);
 void simd_print(char const * const, SIMD_SP const);
 void simd_print(char const * const, SIMD_DP const);
 
-//////////////////////////////////////////////////////////
 
-// NOTE: need to refactor this
-#define LONG64 long 
-
-#if defined(LONG64) /* long [long] type for seeds */
-#define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS/(8 * sizeof(LONG64)))  /* number of max streams supported */
-#endif // LONG64
-
-
-#endif // USE_SSE
-
-
-#endif // __SSE_H
+#endif  // __SSE_H
 

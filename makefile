@@ -45,7 +45,7 @@ LFLAGS :=
 # -DOMP_NESTED=TRUE = enables nested parallelism
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
-DEFINES := -DUSE_SSE
+DEFINES := -DUSE_SSE -DLONG_SPRNG
 #DEFINES := -DUSE_AVX
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 

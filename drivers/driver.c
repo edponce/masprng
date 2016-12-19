@@ -15,7 +15,7 @@
 
 
 // Control type of test
-#define TEST 0
+#define TEST 2
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
