@@ -13,10 +13,10 @@
 
 
 // Extras
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
-
-#include "vutils.h"
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof(*(x)))
+ 
 #include "lcg.h"
+#include "simd_utils.h"
 
 
 #endif  // __MASPRNG_H

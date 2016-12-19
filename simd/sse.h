@@ -20,7 +20,7 @@
  *  Define some constants required for module to function properly.
  */
 #define SIMD_WIDTH_BITS 128 /* width in bits of SIMD vector units */
-#define SIMD_ALIGN (SIMD_WIDTH_BITS / 8) /* alignment in bytes */
+#define SIMD_ALIGN (SIMD_WIDTH_BITS/8) /* alignment in bytes */
 #define SIMD_INT __m128i /* integer */
 #define SIMD_SP __m128 /* floating-point single-precision */
 #define SIMD_DP __m128d /* floating-point double-precision */
@@ -103,9 +103,9 @@ inline int simd_test_zero(SIMD_INT const va, SIMD_INT const vb)
 { return _mm_test_all_zeros(va, vb); }
 
 
-/***********************
+/*****************************
  *  Shift/Shuffle intrinsics 
- ***********************/
+ *****************************/
 /*
  *  Shift left (logical) packed 32-bit integers
  */
@@ -141,10 +141,22 @@ inline SIMD_INT simd_shuffle_32(SIMD_INT const va, int const ctrl)
  *  Set intrinsics 
  *******************/
 /*
- *  Set full-vector to zero 
+ *  Set integer full-vector to zero 
  */
-inline SIMD_INT simd_set_zero(void)
-{ return _mm_setzero_si128(); }
+inline void simd_set_zero(SIMD_INT * const va)
+{ *va = _mm_setzero_si128(); }
+
+/*
+ *  Set single-precision floating-point full-vector to zero 
+ */
+inline void simd_set_zero(SIMD_SP * const va)
+{ *va = _mm_setzero_ps(); }
+
+/*
+ *  Set double-precision floating-point full-vector to zero 
+ */
+inline void simd_set_zero(SIMD_DP * const va)
+{ *va = _mm_setzero_pd(); }
 
 /*
  *  Broadcast 64-bit integer to all vector elements
@@ -153,9 +165,69 @@ inline SIMD_INT simd_set1_64(int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
+ *  Broadcast 64-bit integer to all vector elements
+ */
+inline SIMD_INT simd_set1_64(unsigned int const sa)
+{ return _mm_set1_epi64x(sa); }
+
+/*
+ *  Broadcast 64-bit integer to all vector elements
+ */
+inline SIMD_INT simd_set1_64(long int const sa)
+{ return _mm_set1_epi64x(sa); }
+
+/*
+ *  Broadcast 64-bit integer to all vector elements
+ */
+inline SIMD_INT simd_set1_64(unsigned long int const sa)
+{ return _mm_set1_epi64x(sa); }
+
+/*
+ *  Broadcast 64-bit integer to all vector elements
+ */
+inline SIMD_INT simd_set1_64(long long int const sa)
+{ return _mm_set1_epi64x(sa); }
+
+/*
+ *  Broadcast 64-bit integer to all vector elements
+ */
+inline SIMD_INT simd_set1_64(unsigned long long int const sa)
+{ return _mm_set1_epi64x(sa); }
+
+/*
  *  Set packed 64-bit integers to corresponding vector elements
  */
 inline SIMD_INT simd_set_64(int const sa1, int const sa0)
+{ return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers to corresponding vector elements
+ */
+inline SIMD_INT simd_set_64(unsigned int const sa1, unsigned int const sa0)
+{ return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers to corresponding vector elements
+ */
+inline SIMD_INT simd_set_64(long int const sa1, long int const sa0)
+{ return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers to corresponding vector elements
+ */
+inline SIMD_INT simd_set_64(unsigned long int const sa1, unsigned long int const sa0)
+{ return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers to corresponding vector elements
+ */
+inline SIMD_INT simd_set_64(long long int const sa1, long long int const sa0)
+{ return _mm_set_epi64x(sa1, sa0); }
+
+/*
+ *  Set packed 64-bit integers to corresponding vector elements
+ */
+inline SIMD_INT simd_set_64(unsigned long long int const sa1, unsigned long long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 
 
@@ -166,7 +238,7 @@ inline SIMD_INT simd_set_64(int const sa1, int const sa0)
  *  Convert packed double-precision floating-point elements
  *  to packed single-precision floating-point elements
  */
-inline SIMD_SP simd_cvt_d2s(SIMD_DP const va)
+inline SIMD_SP simd_cvt_pd2ps(SIMD_DP const va)
 { return _mm_cvtpd_ps(va); }
 
 
@@ -174,19 +246,22 @@ inline SIMD_SP simd_cvt_d2s(SIMD_DP const va)
  *  Load intrinsics 
  ********************/
 inline SIMD_INT simd_load(int const * const sa)
-{ return _mm_load_si128((__m128i *)sa); }
+{ return _mm_load_si128((SIMD_INT *)sa); }
 
 inline SIMD_INT simd_load(unsigned int const * const sa)
-{ return _mm_load_si128((__m128i *)sa); }
+{ return _mm_load_si128((SIMD_INT *)sa); }
 
 inline SIMD_INT simd_load(long int const * const sa)
-{ return _mm_load_si128((__m128i *)sa); }
+{ return _mm_load_si128((SIMD_INT *)sa); }
 
 inline SIMD_INT simd_load(unsigned long int const * const sa)
-{ return _mm_load_si128((__m128i *)sa); }
+{ return _mm_load_si128((SIMD_INT *)sa); }
+
+inline SIMD_INT simd_load(long long int const * const sa)
+{ return _mm_load_si128((SIMD_INT *)sa); }
 
 inline SIMD_INT simd_load(unsigned long long int const * const sa)
-{ return _mm_load_si128((__m128i *)sa); }
+{ return _mm_load_si128((SIMD_INT *)sa); }
 
 inline SIMD_SP simd_load(float const * const sa)
 { return _mm_load_ps((float *)sa); }
@@ -199,19 +274,22 @@ inline SIMD_DP simd_load(double const * const sa)
  *  Store intrinsics 
  *******************************/
 inline void simd_store(int * const sa, SIMD_INT const va)
-{ _mm_store_si128((__m128i *)sa, va); }
+{ _mm_store_si128((SIMD_INT *)sa, va); }
 
 inline void simd_store(unsigned int * const sa, SIMD_INT const va)
-{ _mm_store_si128((__m128i *)sa, va); }
+{ _mm_store_si128((SIMD_INT *)sa, va); }
 
 inline void simd_store(long int * const sa, SIMD_INT const va)
-{ _mm_store_si128((__m128i *)sa, va); }
+{ _mm_store_si128((SIMD_INT *)sa, va); }
 
 inline void simd_store(unsigned long int * const sa, SIMD_INT const va)
-{ _mm_store_si128((__m128i *)sa, va); }
+{ _mm_store_si128((SIMD_INT *)sa, va); }
+
+inline void simd_store(long long int * const sa, SIMD_INT const va)
+{ _mm_store_si128((SIMD_INT *)sa, va); }
 
 inline void simd_store(unsigned long long int * const sa, SIMD_INT const va)
-{ _mm_store_si128((__m128i *)sa, va); }
+{ _mm_store_si128((SIMD_INT *)sa, va); }
 
 inline void simd_store(float * const sa, SIMD_SP const va)
 { _mm_store_ps((float *)sa, va); }
@@ -223,76 +301,16 @@ inline void simd_store(double * const sa, SIMD_DP const va)
 
 //////////////////////////////////////////////////////////
 
+// NOTE: need to refactor this
+#define LONG64 long 
+
 #if defined(LONG64) /* long [long] type for seeds */
-#define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS / sizeof(LONG64))  /* number of max streams supported */
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS/(8 * sizeof(LONG64)))  /* number of max streams supported */
 #endif // LONG64
-
-/*
- *  Optional support constants
- */
-#define SIMD_NUM_32BIT SIMD_ALIGN/4 /* number of 32-bit values per vector register */
-#define SIMD_NUM_64BIT SIMD_ALIGN/8 /* number of 64-bit values per vector register */
-
-
-/**********************************
- *  SIMD general helper functions
- **********************************/
-#include <stdio.h>
-void vprint(char const * const str, SIMD_INT const va)
-{
-    unsigned int i;
-
-    // int
-    int itmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    simd_store(itmp, va);
-    printf("%s", str);
-    for (i = 0; i < SIMD_NUM_32BIT; ++i)
-      printf("%d\t", itmp[i]);
-    printf("\n");
-
-    // unsigned int
-    unsigned int utmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    simd_store(utmp, va);
-    printf("%s", str);
-    for (i = 0; i < SIMD_NUM_32BIT; ++i)
-      printf("%u\t", utmp[i]);
-    printf("\n");
-
-    // unsigned long 
-    unsigned long int lutmp[SIMD_NUM_64BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    simd_store(lutmp, va);
-    printf("%s", str);
-    for (i = 0; i < SIMD_NUM_64BIT; ++i)
-      printf("%lu\t", lutmp[i]);
-    printf("\n");
-}
-
-void vprint(char const * const str, SIMD_SP const va)
-{
-    unsigned int i;
-
-    float tmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    simd_store(tmp, va);
-    printf("%s", str);
-    for (i = 0; i < SIMD_NUM_32BIT; ++i)
-      printf("%f\t", tmp[i]);
-    printf("\n");
-}
-
-void vprint(char const * const str, SIMD_DP const va)
-{
-    unsigned int i;
-
-    double tmp[SIMD_NUM_64BIT] __attribute__ ((aligned(SIMD_ALIGN)));
-    simd_store(tmp, va);
-    printf("%s", str);
-    for (i = 0; i < SIMD_NUM_64BIT; ++i)
-      printf("%f\t", tmp[i]);
-    printf("\n");
-}
 
 
 #endif // USE_SSE
+
 
 #endif // __SSE_H
 

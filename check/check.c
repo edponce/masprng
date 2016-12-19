@@ -11,50 +11,50 @@ int check_errors(void)
     int i;  // iteration variables
     int rval;  // function return value
 
-    const int nstrms = NSTRMS;
+    const int nstrms = SIMD_NUM_STREAMS;
     const int nstrms32 = 2 * nstrms;
     const int nstrms64 = nstrms;
 
     // Initial seeds
     int *iseeds = NULL;
-    rval = posix_memalign((void **)&iseeds, VECTOR_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&iseeds, SIMD_ALIGN, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
     int *m = NULL;
-    rval = posix_memalign((void **)&m, VECTOR_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&m, SIMD_ALIGN, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
     // Scalar
     unsigned long int *seeds = NULL;
-    rval = posix_memalign((void **)&seeds, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         seeds[i] = 0;
 
     unsigned long int *mults = NULL;
-    rval = posix_memalign((void **)&mults, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         mults[i] = 0;
 
     unsigned int *primes = NULL;
-    rval = posix_memalign((void **)&primes, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
     for (i = 0; i < nstrms32; ++i)
         primes[i] = 0;
 
     int *irngs = NULL;
-    rval = posix_memalign((void **)&irngs, VECTOR_ALIGN, nstrms32 * sizeof(int));
+    rval = posix_memalign((void **)&irngs, SIMD_ALIGN, nstrms32 * sizeof(int));
     for (i = 0; i < nstrms32; ++i)
         irngs[i] = 0;
 
     float *frngs = NULL;
-    rval = posix_memalign((void **)&frngs, VECTOR_ALIGN, nstrms32 * sizeof(float));
+    rval = posix_memalign((void **)&frngs, SIMD_ALIGN, nstrms32 * sizeof(float));
     for (i = 0; i < nstrms32; ++i)
         frngs[i] = 0;
 
     double *drngs = NULL;
-    rval = posix_memalign((void **)&drngs, VECTOR_ALIGN, nstrms64 * sizeof(double));
+    rval = posix_memalign((void **)&drngs, SIMD_ALIGN, nstrms64 * sizeof(double));
     for (i = 0; i < nstrms64; ++i)
         drngs[i] = 0;
 
@@ -65,44 +65,44 @@ int check_errors(void)
 #if defined(SIMD_MODE)
     // SIMD
     unsigned long int *seeds2 = NULL;
-    rval = posix_memalign((void **)&seeds2, VECTOR_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
     for (i = 0; i < nstrms; ++i)
         seeds2[i] = 0;
 
     unsigned long int *mults2 = NULL;
-    rval = posix_memalign((void **)&mults2, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         mults2[i] = 0;
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
     for (i = 0; i < nstrms32; ++i)
         primes2[i] = 0;
 
     // Integer
     int *irngs2 = NULL;
-    rval = posix_memalign((void **)&irngs2, VECTOR_ALIGN, nstrms32 * sizeof(int));
+    rval = posix_memalign((void **)&irngs2, SIMD_ALIGN, nstrms32 * sizeof(int));
     for (i = 0; i < nstrms32; ++i)
         irngs2[i] = 0;
 
     // Float 
     float *frngs2 = NULL;
-    rval = posix_memalign((void **)&frngs2, VECTOR_ALIGN, nstrms32 * sizeof(float));
+    rval = posix_memalign((void **)&frngs2, SIMD_ALIGN, nstrms32 * sizeof(float));
     for (i = 0; i < nstrms32; ++i)
         frngs2[i] = 0;
 
     // Double 
     double *drngs2 = NULL;
-    rval = posix_memalign((void **)&drngs2, VECTOR_ALIGN, nstrms64 * sizeof(double));
+    rval = posix_memalign((void **)&drngs2, SIMD_ALIGN, nstrms64 * sizeof(double));
     for (i = 0; i < nstrms64; ++i)
         drngs2[i] = 0;
 
-    VECTOR_INT vseeds; rval = vload(&vseeds, seeds2);
-    VECTOR_INT vmults; rval = vload(&vmults, mults2);
-    VECTOR_INT vprimes; rval = vload(&vprimes, primes2);
-    VECTOR_INT ivrngs; rval = vload(&ivrngs, irngs2);
-    VECTOR_SP fvrngs; rval = vload(&fvrngs, frngs2);
-    VECTOR_DP dvrngs; rval = vload(&dvrngs, drngs2);
+    SIMD_INT vseeds = simd_load(seeds2);
+    SIMD_INT vmults = simd_load(mults2);
+    SIMD_INT vprimes = simd_load(primes2);
+    SIMD_INT ivrngs = simd_load(irngs2);
+    SIMD_SP fvrngs = simd_load(frngs2);
+    SIMD_DP dvrngs = simd_load(drngs2);
 
     // Initial RNG params 
     init_vrng(&vseeds, &vmults, &vprimes, iseeds, m);
@@ -120,8 +120,8 @@ int check_errors(void)
 
 #if defined(SIMD_MODE)
         ivrngs = get_vrn_int(&vseeds, vmults, vprimes);
-        vstore(seeds2, vseeds);
-        vstore(irngs2, ivrngs);
+        simd_store(seeds2, vseeds);
+        simd_store(irngs2, ivrngs);
 
         if ((rn != irngs[0]) || (irngs[0] != irngs2[0])) {
             valid = 0;
@@ -152,8 +152,8 @@ int check_errors(void)
 
 #if defined(SIMD_MODE)
         fvrngs = get_vrn_flt(&vseeds, vmults, vprimes);
-        vstore(seeds2, vseeds);
-        vstore(frngs2, fvrngs);
+        simd_store(seeds2, vseeds);
+        simd_store(frngs2, fvrngs);
 
         const int rn1 = rn >> 11;
         const int rn2 = (int)(frngs[0] * fltmult);
@@ -189,8 +189,8 @@ int check_errors(void)
 
 #if defined(SIMD_MODE)
         dvrngs = get_vrn_dbl(&vseeds, vmults, vprimes);
-        vstore(seeds2, vseeds);
-        vstore(drngs2, dvrngs);
+        simd_store(seeds2, vseeds);
+        simd_store(drngs2, dvrngs);
 
         int rn1 = rn >> 1;
         int rn2 = (int)(drngs[0] * dblmult);

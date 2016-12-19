@@ -3,7 +3,7 @@
 #include "masprng.h"
 #include "timers.h"
 #include "utils.h"
-#include "check.h"
+//#include "check.h"
 
 
 // Run settings
@@ -21,7 +21,7 @@
 #define RNG_TYPE_STR "Integer"
 #define RNG_TYPE int 
 #define get_rn(...) get_rn_int(__VA_ARGS__)
-#define VRNG_TYPE VECTOR_INT
+#define VRNG_TYPE SIMD_INT 
 #define get_vrn(...) get_vrn_int(__VA_ARGS__)
 #define RNG_FMT "%d"
 #define RNG_ELEMS nstrms32
@@ -30,7 +30,7 @@
 #define RNG_TYPE_STR "Float"
 #define RNG_TYPE float 
 #define get_rn(...) get_rn_flt(__VA_ARGS__)
-#define VRNG_TYPE VECTOR_SP 
+#define VRNG_TYPE SIMD_SP 
 #define get_vrn(...) get_vrn_flt(__VA_ARGS__)
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
@@ -39,7 +39,7 @@
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
 #define get_rn(...) get_rn_dbl(__VA_ARGS__)
-#define VRNG_TYPE VECTOR_DP 
+#define VRNG_TYPE SIMD_DP 
 #define get_vrn(...) get_vrn_dbl(__VA_ARGS__)
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms64
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 
     if (rng_lim > 0)
         run(rng_lim);
-    else
-        check_errors();
+ //   else
+ //       check_errors();
 
     return 0;
 }
@@ -85,40 +85,40 @@ int run(int rng_lim)
     long long int timers[2];
     double t1, t2;
 
-    const int nstrms = NSTRMS;
+    const int nstrms = SIMD_NUM_STREAMS;
     const int nstrms32 = 2 * nstrms;
     const int nstrms64 = nstrms;
 
     // Initial seeds
     int *iseeds = NULL;
-    rval = posix_memalign((void **)&iseeds, VECTOR_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&iseeds, SIMD_ALIGN, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
             iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
     int *m = NULL;
-    rval = posix_memalign((void **)&m, VECTOR_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&m, SIMD_ALIGN, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
     // Scalar
     unsigned long int *seeds = NULL;
-    rval = posix_memalign((void **)&seeds, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         seeds[i] = 0;
 
     unsigned long int *mults = NULL;
-    rval = posix_memalign((void **)&mults, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         mults[i] = 0;
 
     unsigned int *primes = NULL;
-    rval = posix_memalign((void **)&primes, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
     for (i = 0; i < nstrms32; ++i)
         primes[i] = 0;
 
     RNG_TYPE *rngs = NULL;
-    rval = posix_memalign((void **)&rngs, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    rval = posix_memalign((void **)&rngs, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
     for (i = 0; i < RNG_ELEMS; ++i)
         rngs[i] = 0;
 
@@ -136,6 +136,8 @@ int run(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
+    printf("RNG runs = %d\n", rng_lim);
+    printf("Number of streams = %d\n", nstrms);
     printf("Real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
@@ -145,34 +147,29 @@ int run(int rng_lim)
 #if defined(SIMD_MODE)
     // SIMD
     unsigned long int *seeds2 = NULL;
-    rval = posix_memalign((void **)&seeds2, VECTOR_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
     for (i = 0; i < nstrms; ++i)
         seeds2[i] = 0;
 
     unsigned long int *mults2 = NULL;
-    rval = posix_memalign((void **)&mults2, VECTOR_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
     for (i = 0; i < nstrms64; ++i)
         mults2[i] = 0;
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, VECTOR_ALIGN, nstrms32 * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
     for (i = 0; i < nstrms32; ++i)
         primes2[i] = 0;
 
     RNG_TYPE *rngs2 = NULL;
-    rval = posix_memalign((void **)&rngs2, VECTOR_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    rval = posix_memalign((void **)&rngs2, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
     for (i = 0; i < RNG_ELEMS; ++i)
         rngs2[i] = 0;
 
-    VECTOR_INT vseeds;
-    VECTOR_INT vmults;
-    VECTOR_INT vprimes;
-    VRNG_TYPE vrngs;
-
-    rval = vload(&vseeds, seeds2);
-    rval = vload(&vmults, mults2);
-    rval = vload(&vprimes, primes2);
-    rval = vload(&vrngs, rngs2);
+    VRNG_TYPE vseeds = simd_load(seeds2);
+    VRNG_TYPE vmults = simd_load(mults2);
+    VRNG_TYPE vprimes = simd_load(primes2);
+    VRNG_TYPE vrngs = simd_load(rngs2);
 
     // Initial RNG params 
     init_vrng(&vseeds, &vmults, &vprimes, iseeds, m);
@@ -186,10 +183,10 @@ int run(int rng_lim)
     t2 = stopTime(timers);
 
     // Print results 
-    vstore(seeds2, vseeds);
-    vstore(mults2, vmults);
-    vstore(primes2, vprimes);
-    vstore(rngs2, vrngs);
+    simd_store(seeds2, vseeds);
+    simd_store(mults2, vmults);
+    simd_store(primes2, vprimes);
+    simd_store(rngs2, vrngs);
 
     printf("Real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
