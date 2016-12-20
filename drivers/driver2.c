@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "masprng.h"
+#include "masprng2.h"
 #include "timers.h"
 #include "utils.h"
-#include "check.h"
+#include "check2.h"
 
 
 // Run settings
@@ -15,7 +15,7 @@
 
 
 // Control type of test
-#define TEST 1
+#define TEST 0
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -78,9 +78,6 @@ int run(int rng_lim)
     int i, j; // iteration variables
     int rval; // function return value
 
-    // Configure OpenMP environment
-    setOmpEnv(NULL);
-
     // Timers
     long long int timers[2];
     double t1, t2;
@@ -112,8 +109,8 @@ int run(int rng_lim)
     for (i = 0; i < nstrms64; ++i)
         mults[i] = 0;
 
-    unsigned int *primes = NULL;
-    rval = posix_memalign((void **)&primes, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
+    int *primes = NULL;
+    rval = posix_memalign((void **)&primes, SIMD_ALIGN, nstrms32 * sizeof(int));
     for (i = 0; i < nstrms32; ++i)
         primes[i] = 0;
 
@@ -122,23 +119,31 @@ int run(int rng_lim)
     for (i = 0; i < RNG_ELEMS; ++i)
         rngs[i] = 0;
 
+    // LCG RNG object
+    LCG rng;
+
     // Initialize RNG params
     for (i = 0; i < nstrms; ++i)
-        init_rng(&seeds[i], &mults[i], &primes[i], iseeds[i], m[i]);
+        rng.init_rng(iseeds[i], m[i]);
 
     // Run kernel
     startTime(timers);
-    #pragma omp parallel for ordered default(shared) firstprivate(rngs) lastprivate(rngs) schedule(SCHED_OMP)
-    for (i = 0; i < rng_lim; ++i)
-        #pragma omp ordered
-        for (j = 0; j < nstrms; ++j)
-            rngs[j] = get_rn(&seeds[j], mults[j], primes[j]);
+    for (i = 0; i < rng_lim; ++i) {
+        for (j = 0; j < nstrms; ++j) {
+            rngs[j] = rng.get_rn();
+
+            // NOTE: debug
+            seeds[j] = rng.get_seed();
+            primes[j] = rng.get_prime();
+            mults[j] = rng.get_multiplier();
+        }
+    }
     t1 = stopTime(timers);
 
     // Print results 
     printf("Real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
-        printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
+        printf("scalar = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs[i], seeds[i], mults[i], primes[i]);
     printf("\n");
 
 
@@ -174,9 +179,7 @@ int run(int rng_lim)
 
     // Run kernel
     startTime(timers);
-    #pragma omp parallel for ordered default(shared) firstprivate(vrngs) lastprivate(vrngs) schedule(SCHED_OMP)
     for (i = 0; i < rng_lim; ++i)
-        #pragma omp ordered
         vrngs = get_vrn(&vseeds, vmults, vprimes);
     t2 = stopTime(timers);
 

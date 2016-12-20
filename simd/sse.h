@@ -17,12 +17,12 @@
  *  Define some constants required for module to function properly.
  */
 #define SIMD_WIDTH_BITS 128 /* width in bits of SIMD vector units */
-#define SIMD_ALIGN (SIMD_WIDTH_BITS/8) /* alignment in bytes */
 #define SIMD_INT __m128i /* integer */
 #define SIMD_SP __m128 /* floating-point single-precision */
 #define SIMD_DP __m128d /* floating-point double-precision */
 
 // NOTE: to improve this because depends on LONG_SPRNG
+#define SIMD_ALIGN (SIMD_WIDTH_BITS/8) /* alignment in bytes */
 #define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS/64)  /* number of max streams supported per vector register */
 
 
