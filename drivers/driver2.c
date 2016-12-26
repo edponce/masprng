@@ -3,7 +3,7 @@
 #include "masprng2.h"
 #include "timers.h"
 #include "utils.h"
-//#include "check2.h"
+#include "check2.h"
 
 
 // Run settings
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 
     if (rng_lim > 0)
         run(rng_lim);
- //   else
- //       check_errors();
+    else
+        check_errors();
 
     return 0;
 }
@@ -80,7 +80,7 @@ int run(int rng_lim)
 
     // Timers
     long long int timers[2];
-    double t1, t2;
+    double t1;
 
     const int nstrms = SIMD_NUM_STREAMS;
     const int nstrms32 = 2 * nstrms;
@@ -141,6 +141,8 @@ int run(int rng_lim)
 
 
 #if defined(SIMD_MODE)
+    double t2;
+
     // SIMD
     unsigned long int *seeds2 = NULL;
     rval = posix_memalign((void **)&seeds2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));

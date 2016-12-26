@@ -45,7 +45,8 @@ LFLAGS :=
 # -DOMP_NESTED=TRUE = enables nested parallelism
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
-DEFINES := -DUSE_SSE -DLONG_SPRNG
+DEFINES := -DLONG_SPRNG
+#DEFINES := -DUSE_SSE -DLONG_SPRNG
 #DEFINES := -DUSE_AVX
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
@@ -62,7 +63,7 @@ LIBDIR :=
 LIBS :=
 
 # Source files to compile
-SOURCES := lcg/lcg2.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c #check/check2.c
+SOURCES := lcg/lcg2.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check2.c
 
 # Object files to link
 OBJECTS := $(SOURCES:.c=.o)

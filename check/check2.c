@@ -8,12 +8,10 @@
 // Check errors with SPRNG data output
 int check_errors(void)
 {
-    int i, j;  // iteration variables
+    int i;  // iteration variables
     int rval;  // function return value
 
     const int nstrms = SIMD_NUM_STREAMS;
-    const int nstrms32 = 2 * nstrms;
-    const int nstrms64 = nstrms;
 
     // Initial seeds
     int *iseeds = NULL;
@@ -29,25 +27,24 @@ int check_errors(void)
 
     // Scalar
     // Integer
-    int *irngs = NULL;
-    rval = posix_memalign((void **)&irngs, SIMD_ALIGN, nstrms32 * sizeof(int));
+    int irngs;
 
     // Float 
-    float *frngs = NULL;
-    rval = posix_memalign((void **)&frngs, SIMD_ALIGN, nstrms32 * sizeof(float));
+    float frngs;
 
     // Double 
-    double *drngs = NULL;
-    rval = posix_memalign((void **)&drngs, SIMD_ALIGN, nstrms64 * sizeof(double));
+    double drngs;
 
     // LCG RNG object
     LCG rng;
 
     // Initialize RNG params
-    for (i = 0; i < nstrms; ++i)
-        rng.init_rng(iseeds[i], m[i]);
+    rng.init_rng(iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
+    const int nstrms32 = 2 * nstrms;
+    const int nstrms64 = nstrms;
+
     // SIMD
     // Integer
     int *irngs2 = NULL;
@@ -65,38 +62,35 @@ int check_errors(void)
     SIMD_SP fvrngs;
     SIMD_DP dvrngs;
 
+    // LCG RNG object
+    VLCG vrng;
+
     // Initial RNG params 
-    rng.init_vrng(iseeds, m);
+    vrng.init_vrng(iseeds, m);
 #endif
 
     // Validate run
     const unsigned int fltmult = 1 << 20, dblmult = 1 << 30; // NOTE: from SPRNG LCG
     int rn = 0;
-    int k; // index for scalar array
 
     // Integer generator
     int valid = 1;
     for (i = 0; i < 200; ++i) {
         rval = scanf("%d\n", &rn);
-        k = i % nstrms;
-        irngs[k] = rng.get_rn_int();
+        irngs = rng.get_rn_int();
 
-        if (rn != irngs[k]) {
+        if (rn != irngs) {
             valid = 0;
-            printf("File,scalar\t%d\t%d\n", rn, irngs[k]);
+            printf("File,scalar\t%d\t%d\n", rn, irngs);
         }
 
 #if defined(SIMD_MODE)
-        if ((k+1) == nstrms) {
-            ivrngs = rng.get_vrn_int();
-            simd_store(irngs2, ivrngs);
+        ivrngs = vrng.get_vrn_int();
+        simd_store(irngs2, ivrngs);
 
-            for (j = 0; j < nstrms; ++j) {
-                if (irngs[j] != irngs2[j]) {
-                    valid = 0;
-                    printf("Scalar,vector\t%d\t%d\n", irngs[j], irngs2[j]);
-                }
-            }
+        if (irngs != irngs2[0]) {
+            valid = 0;
+            printf("Scalar,vector\t%d\t%d\n", irngs, irngs2[0]);
         }
 #endif
     }
@@ -112,30 +106,23 @@ int check_errors(void)
     valid = 1;
     for (i = 0; i < 50; ++i) {
         rval = scanf("%d\n", &rn);
-        k = i % nstrms;
-        frngs[k] = rng.get_rn_flt();
+        frngs = rng.get_rn_flt();
 
         int rn1 = rn >> 11;
-        int rn2 = (int)(frngs[k] * fltmult);
+        int rn2 = (int)(frngs * fltmult);
         if (abs(rn1 - rn2) > 1) {
             valid = 0;
             printf("File,scalar\t%d\t%d\n", rn1, rn2);
         }
 
 #if defined(SIMD_MODE)
-        if ((k+1) == nstrms) {
-            fvrngs = rng.get_vrn_flt();
-            simd_store(frngs2, fvrngs);
+        fvrngs = vrng.get_vrn_flt();
+        simd_store(frngs2, fvrngs);
 
-            int rn3;
-            for (j = 0; j < nstrms; ++j) {
-                rn2 = (int)(frngs[j] * fltmult);
-                rn3 = (int)(frngs2[j] * fltmult);
-                if (rn2 != rn3) {
-                    valid = 0;
-                    printf("Scalar,vector\t%d\t%d\n", rn2, rn3);
-                }
-            }
+        int rn3 = (int)(frngs2[0] * fltmult);
+        if (rn2 != rn3) {
+            valid = 0;
+            printf("Scalar,vector\t%d\t%d\n", rn2, rn3);
         }
 #endif
     }
@@ -146,31 +133,27 @@ int check_errors(void)
         printf("FAILED: Float generator does not reproduce correct stream.\n");
     printf("\n");
 
-/*
     // Double generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
         rval = scanf("%d\n", &rn);
-        drngs[0] = rng.get_rn_dbl();
-
-#if defined(SIMD_MODE)
-        dvrngs = rng.get_vrn_dbl();
-        simd_store(seeds2, vseeds);
-        simd_store(drngs2, dvrngs);
+        drngs = rng.get_rn_dbl();
 
         int rn1 = rn >> 1;
-        int rn2 = (int)(drngs[0] * dblmult);
-        int rn3 = (int)(drngs2[0] * dblmult);
-        if ((abs(rn1 - rn2) > 1) || (rn2 != rn3)) {
-            valid = 0;
-            printf("%d\t%d\t%d\t%lu\n", rn1, rn2, rn3, seeds[0]);
-        }
-#else
-        int rn1 = rn >> 1;
-        int rn2 = (int)(drngs[0] * dblmult);
+        int rn2 = (int)(drngs * dblmult);
         if (abs(rn1 - rn2) > 1) {
             valid = 0;
-            printf("%d\t%d\t%lu\n", rn1, rn2, rng.get_seed());
+            printf("File,scalar\t%d\t%d\n", rn1, rn2);
+        }
+
+#if defined(SIMD_MODE)
+        dvrngs = vrng.get_vrn_dbl();
+        simd_store(drngs2, dvrngs);
+
+        int rn3 = (int)(drngs2[0] * dblmult);
+        if (rn2 != rn3) {
+            valid = 0;
+            printf("Scalar,vector\t%d\t%d\n", rn2, rn3);
         }
 #endif
     }
@@ -180,7 +163,6 @@ int check_errors(void)
     else
         printf("FAILED: Double generator does not reproduce correct stream.\n");
     printf("\n");
-*/
 
 
 #if defined(SIMD_MODE)
@@ -193,9 +175,6 @@ int check_errors(void)
     // Deallocate memory
     free(iseeds);
     free(m);
-    free(irngs);
-    free(frngs);
-    free(drngs);
  
     return 0;
 }
