@@ -27,15 +27,16 @@ class LCG: public SPRNG
 
   private:
     int rng_type;  /*!< Unique ID for RNG */
-#ifdef LONG_SPRNG
-    unsigned long int seed;  /*!< Seed values calculated using initial seed value */
     int init_seed;  /*!< Initial seed value */
     int prime;  /*!< Storage for a prime number */
+    int prime_position;  /*!< Storage for position of prime number */
+    int parameter;
+
+#ifdef LONG_SPRNG
+    unsigned long int seed;  /*!< Seed values calculated using initial seed value */
     unsigned long int multiplier;  /*!< Array for multiplier values */
 #else
     int seed[2];  /*!< Pair of seed values calculated using initial seed value */
-    int init_seed;  /*!< Initial seed value */
-    int prime;  /*!< Storage for a prime number */
     int *multiplier;  /*!< Array for multiplier values */
 #endif
 };
@@ -52,23 +53,24 @@ class VLCG: public VSPRNG
   public:
     VLCG();
     ~VLCG();
-    int init_vrng(int *, int *); // NOTE: initialize using SIMD types?
-    SIMD_INT get_vrn_int();
-    SIMD_SP get_vrn_flt();
-    SIMD_DP get_vrn_dbl();
+    int init_rng(int *, int *); // NOTE: initialize using SIMD types?
+    SIMD_INT get_rn_int();
+    SIMD_SP get_rn_flt();
+    SIMD_DP get_rn_dbl();
 
     // NOTE: for debug purposes
-    SIMD_INT get_vseed();
-    SIMD_INT get_vprime();
-    SIMD_INT get_vmultiplier();
+    SIMD_INT get_seed();
+    SIMD_INT get_prime();
+    SIMD_INT get_multiplier();
 
   private:
     int rng_type;  /*!< Unique ID for RNG */
-#ifdef LONG_SPRNG
-    SIMD_INT vseed;  /*!< Seed values calculated using initial seed value */
-    SIMD_INT vprime;  /*!< Storage for a prime number */
-    SIMD_INT vmultiplier;  /*!< Array for multiplier values */
-#endif
+    SIMD_INT init_seed;  /*!< Initial seed value */
+    SIMD_INT prime;  /*!< Storage for a prime number */
+    SIMD_INT prime_position;  /*!< Storage for position of prime number */
+    SIMD_INT parameter;
+    SIMD_INT seed;  /*!< Seed values calculated using initial seed value */
+    SIMD_INT multiplier;  /*!< Array for multiplier values */
 };
 #endif
 

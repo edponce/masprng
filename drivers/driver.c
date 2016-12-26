@@ -163,18 +163,18 @@ int run(int rng_lim)
     VLCG vrng;
 
     // Initial RNG params 
-    vrng.init_vrng(iseeds, m);
+    vrng.init_rng(iseeds, m);
 
     // Run kernel
     startTime(timers);
     for (i = 0; i < rng_lim; ++i)
-        vrngs = vrng.get_vrn();
+        vrngs = vrng.get_rn();
     t2 = stopTime(timers);
 
     // Print results 
-    simd_store(seeds2, vrng.get_vseed());
-    simd_store(mults2, vrng.get_vmultiplier());
-    simd_store(primes2, vrng.get_vprime());
+    simd_store(seeds2, vrng.get_seed());
+    simd_store(mults2, vrng.get_multiplier());
+    simd_store(primes2, vrng.get_prime());
     simd_store(rngs2, vrngs);
 
     printf("Vector real time = %.16f sec\n", t2);

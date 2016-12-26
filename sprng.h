@@ -18,6 +18,17 @@
 #endif
 
 
+/*
+ *  RNG identifiers
+ */
+#define SPRNG_LFG   0
+#define SPRNG_LCG   1
+#define SPRNG_LCG64 2
+#define SPRNG_CMRG  3
+#define SPRNG_MLFG  4
+#define SPRNG_PMLCG 5
+
+
 /*! \class SPRNG
  *  \brief Interface (abstract base class) for RNG types. 
  *
@@ -44,10 +55,10 @@ class VSPRNG
 {
   public:
     virtual ~VSPRNG() {} /* virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_vrng(int *, int *) = 0;
-    virtual SIMD_INT get_vrn_int() = 0;
-    virtual SIMD_SP get_vrn_flt() = 0;
-    virtual SIMD_DP get_vrn_dbl() = 0;
+    virtual int init_rng(int *, int *) = 0;
+    virtual SIMD_INT get_rn_int() = 0;
+    virtual SIMD_SP get_rn_flt() = 0;
+    virtual SIMD_DP get_rn_dbl() = 0;
 };
 #endif
 

@@ -66,7 +66,7 @@ int check_errors(void)
     VLCG vrng;
 
     // Initial RNG params 
-    vrng.init_vrng(iseeds, m);
+    vrng.init_rng(iseeds, m);
 #endif
 
     // Validate run
@@ -85,7 +85,7 @@ int check_errors(void)
         }
 
 #if defined(SIMD_MODE)
-        ivrngs = vrng.get_vrn_int();
+        ivrngs = vrng.get_rn_int();
         simd_store(irngs2, ivrngs);
 
         if (irngs != irngs2[0]) {
@@ -116,7 +116,7 @@ int check_errors(void)
         }
 
 #if defined(SIMD_MODE)
-        fvrngs = vrng.get_vrn_flt();
+        fvrngs = vrng.get_rn_flt();
         simd_store(frngs2, fvrngs);
 
         int rn3 = (int)(frngs2[0] * fltmult);
@@ -147,7 +147,7 @@ int check_errors(void)
         }
 
 #if defined(SIMD_MODE)
-        dvrngs = vrng.get_vrn_dbl();
+        dvrngs = vrng.get_rn_dbl();
         simd_store(drngs2, dvrngs);
 
         int rn3 = (int)(drngs2[0] * dblmult);

@@ -21,7 +21,6 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++0x -O3 -march=native -funroll-loops
 CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
@@ -37,7 +36,6 @@ LFLAGS :=
 # Preprocessor definitions
 # -DUSE_AVX, -DUSE_SSE = select SPRNG vector mode
 # -DDEBUG = enable debugging
-# -DCHECK = store results and validate 
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
 #
@@ -45,9 +43,9 @@ LFLAGS :=
 # -DOMP_NESTED=TRUE = enables nested parallelism
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
-DEFINES := -DLONG_SPRNG
-#DEFINES := -DUSE_SSE -DLONG_SPRNG
-#DEFINES := -DUSE_AVX
+#DEFINES := -DLONG_SPRNG
+DEFINES := -DUSE_SSE -DLONG_SPRNG
+#DEFINES := -DUSE_AVX -DLONG_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
@@ -69,7 +67,7 @@ SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c
 OBJECTS := $(SOURCES:.c=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.c=.h) masprng2.h primes/primelist_32.h sprng.h
+HEADERS := $(SOURCES:.c=.h) masprng.h primes/primelist_32.h sprng.h
 
 # Driver file
 LCG_DRIVER := drivers/driver.c

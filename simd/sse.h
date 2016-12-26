@@ -155,61 +155,61 @@ inline void simd_set_zero(SIMD_DP * const va)
 /*
  *  Broadcast 32-bit integer
  */
-inline SIMD_INT simd_set1(int const sa)
+inline SIMD_INT simd_set(int const sa)
 { return _mm_set1_epi32(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(int const sa)
+inline SIMD_INT simd_set_64(int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast 32-bit integer
  */
-inline SIMD_INT simd_set1(unsigned int const sa)
+inline SIMD_INT simd_set(unsigned int const sa)
 { return _mm_set1_epi32(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1_64(unsigned int const sa)
+inline SIMD_INT simd_set_64(unsigned int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1(long int const sa)
+inline SIMD_INT simd_set(long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1(unsigned long int const sa)
+inline SIMD_INT simd_set(unsigned long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1(long long int const sa)
+inline SIMD_INT simd_set(long long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast 64-bit integer
  */
-inline SIMD_INT simd_set1(unsigned long long int const sa)
+inline SIMD_INT simd_set(unsigned long long int const sa)
 { return _mm_set1_epi64x(sa); }
 
 /*
  *  Broadcast single-precision floating-point element
  */
-inline SIMD_SP simd_set1(float const sa)
+inline SIMD_SP simd_set(float const sa)
 { return _mm_set1_ps(sa); }
 
 /*
  *  Broadcast double-precision floating-point element
  */
-inline SIMD_DP simd_set1(double const sa)
+inline SIMD_DP simd_set(double const sa)
 { return _mm_set1_pd(sa); }
 
 /*
