@@ -1,14 +1,13 @@
 MASPRNG - Intel MIC (vector) accelerated SPRNG library
 
 For GNU compilers, require 4.8 or greater
-C++ - function overloading
-C++11 - variadic macros
+C++11 - variadic macros, OOP
 
 SIMD requirements:
-SSE - need SSE4.1
+SSE - at least SSE4.1 for simd_mullo_epi32() and simd_test_zero()
 AVX - need AVX2
 
-Only a single SIMD technology is allowed per program.
+Only a single SIMD technology is allowed per SPRNG object.
 All SIMD macro decisions are ordered from most recent technology backwards.
 This allows the use of best available technology without the user having to specify.
 Note that the user is allowed to decide on a specific technology using a macro define.

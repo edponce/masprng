@@ -21,7 +21,6 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++0x -O3 -march=native -funroll-loops
 CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
@@ -37,7 +36,6 @@ LFLAGS :=
 # Preprocessor definitions
 # -DUSE_AVX, -DUSE_SSE = select SPRNG vector mode
 # -DDEBUG = enable debugging
-# -DCHECK = store results and validate 
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
 #
@@ -45,12 +43,14 @@ LFLAGS :=
 # -DOMP_NESTED=TRUE = enables nested parallelism
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
+#DEFINES := -DLONG_SPRNG
 DEFINES := -DUSE_SSE -DLONG_SPRNG
-#DEFINES := -DUSE_AVX
+#DEFINES := -DUSE_AVX -DLONG_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
+#INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Icheck
 INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
 
 # Define library paths in addition to /usr/lib
@@ -62,16 +62,17 @@ LIBDIR :=
 LIBS :=
 
 # Source files to compile
-SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check.c
+#SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
+SOURCES := lcg/lcg.cpp lcg/lcg_simd.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse.cpp check/check.cpp
 
 # Object files to link
-OBJECTS := $(SOURCES:.c=.o)
+OBJECTS := $(SOURCES:.cpp=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.c=.h) masprng.h primes/primelist_32.h
+HEADERS := $(SOURCES:.cpp=.h) masprng.h sprng.h primes/primelist_32.h lcg/lcg_config.h
 
 # Driver file
-LCG_DRIVER := drivers/driver.c
+LCG_DRIVER := drivers/driver.cpp
 
 # Executable
 LCG_EXE := rng
@@ -93,7 +94,7 @@ debug:
 	@$(MAKE) force DEFINES="-DDEBUG $(DEFINES)" -f $(MKFILE)
 
 # Compile sources into object files
-%.o: %.c $(LCG_DRIVER) $(HEADERS) $(MKFILE) 
+%.o: %.cpp $(LCG_DRIVER) $(HEADERS) $(MKFILE) 
 	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS) 
 
 # Link object files
