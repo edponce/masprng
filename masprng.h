@@ -3,6 +3,7 @@
 
 
 #include "lcg.h"
+#include "lcg_simd.h"
 
 
 #endif  // __MASPRNG_H

@@ -50,7 +50,7 @@ class SPRNG
  *
  *  Methods that are virtual require each class for RNG types to define these methods.
  */
-#ifdef SIMD_MODE
+#if defined(SIMD_MODE)
 class VSPRNG
 {
   public:

@@ -50,6 +50,7 @@ DEFINES := -DUSE_SSE -DLONG_SPRNG
 
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
+#INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Icheck
 INCDIR := -I. -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
 
 # Define library paths in addition to /usr/lib
@@ -61,7 +62,8 @@ LIBDIR :=
 LIBS :=
 
 # Source files to compile
-SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check.c
+#SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c check/check.c
+SOURCES := lcg/lcg.c lcg/lcg_simd.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check.c
 
 # Object files to link
 OBJECTS := $(SOURCES:.c=.o)
