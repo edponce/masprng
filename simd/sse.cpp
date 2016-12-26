@@ -33,7 +33,7 @@ void simd_print(char const * const str, SIMD_INT const va)
 }
 
 
-void simd_print(char const * const str, SIMD_SP const va)
+void simd_print(char const * const str, SIMD_FLT const va)
 {
     unsigned int i;
 
@@ -46,7 +46,7 @@ void simd_print(char const * const str, SIMD_SP const va)
 }
 
 
-void simd_print(char const * const str, SIMD_DP const va)
+void simd_print(char const * const str, SIMD_DBL const va)
 {
     unsigned int i;
 

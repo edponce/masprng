@@ -30,7 +30,7 @@
 #define RNG_TYPE_STR "Float"
 #define RNG_TYPE float 
 #define get_rn() get_rn_flt()
-#define VRNG_TYPE SIMD_SP 
+#define VRNG_TYPE SIMD_FLT 
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
@@ -39,7 +39,7 @@
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
 #define get_rn() get_rn_dbl()
-#define VRNG_TYPE SIMD_DP 
+#define VRNG_TYPE SIMD_DBL 
 #define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms64

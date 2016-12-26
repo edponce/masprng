@@ -150,12 +150,12 @@ SIMD_INT VLCG::get_rn_int()
 }
 
 
-SIMD_DP VLCG::get_rn_dbl()
+SIMD_DBL VLCG::get_rn_dbl()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
-    SIMD_DP vseedd;
-    SIMD_DP vrng = simd_set(RNG_LONG64_DBL);
+    SIMD_DBL vseedd;
+    SIMD_DBL vrng = simd_set(RNG_LONG64_DBL);
 
     multiply_64w32(&seed, multiplier, prime);
 
@@ -169,12 +169,12 @@ SIMD_DP VLCG::get_rn_dbl()
 }
 
 
-SIMD_SP VLCG::get_rn_flt()
+SIMD_FLT VLCG::get_rn_flt()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     float seedd[4] __attribute__ ((aligned(SIMD_ALIGN)));
-    SIMD_SP vseedd;
-    SIMD_SP vrng = simd_set((float)RNG_LONG64_DBL);
+    SIMD_FLT vseedd;
+    SIMD_FLT vrng = simd_set((float)RNG_LONG64_DBL);
 
     multiply_64w32(&seed, multiplier, prime);
 

@@ -59,8 +59,8 @@ int check_errors(void)
     rval = posix_memalign((void **)&drngs2, SIMD_ALIGN, nstrms64 * sizeof(double));
 
     SIMD_INT ivrngs;
-    SIMD_SP fvrngs;
-    SIMD_DP dvrngs;
+    SIMD_FLT fvrngs;
+    SIMD_DBL dvrngs;
 
     // LCG RNG object
     VLCG vrng;

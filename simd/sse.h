@@ -18,8 +18,8 @@
  */
 #define SIMD_WIDTH_BITS 128
 #define SIMD_INT __m128i
-#define SIMD_SP __m128
-#define SIMD_DP __m128d
+#define SIMD_FLT __m128
+#define SIMD_DBL __m128d
 
 // NOTE: to improve this because depends on LONG_SPRNG
 #define SIMD_ALIGN (SIMD_WIDTH_BITS/8) /*!< alignment in bytes */
@@ -48,9 +48,9 @@ inline SIMD_INT simd_mul_u32(SIMD_INT const va, SIMD_INT const vb)
  */
 inline SIMD_INT simd_mullo_32(SIMD_INT const va, SIMD_INT const vb)
 { return _mm_mullo_epi32(va, vb); }
-inline SIMD_SP simd_mul_ps(SIMD_SP const va, SIMD_SP const vb)
+inline SIMD_FLT simd_mul_ps(SIMD_FLT const va, SIMD_FLT const vb)
 { return _mm_mul_ps(va, vb); }
-inline SIMD_DP simd_mul_pd(SIMD_DP const va, SIMD_DP const vb)
+inline SIMD_DBL simd_mul_pd(SIMD_DBL const va, SIMD_DBL const vb)
 { return _mm_mul_pd(va, vb); }
 
 
@@ -96,9 +96,9 @@ inline SIMD_INT simd_shuffle_32(SIMD_INT const va, int const ctrl)
  */
 inline void simd_set_zero(SIMD_INT * const va)
 { *va = _mm_setzero_si128(); }
-inline void simd_set_zero(SIMD_SP * const va)
+inline void simd_set_zero(SIMD_FLT * const va)
 { *va = _mm_setzero_ps(); }
-inline void simd_set_zero(SIMD_DP * const va)
+inline void simd_set_zero(SIMD_DBL * const va)
 { *va = _mm_setzero_pd(); }
 inline SIMD_INT simd_set(int const sa)
 { return _mm_set1_epi32(sa); }
@@ -116,9 +116,9 @@ inline SIMD_INT simd_set(long long int const sa)
 { return _mm_set1_epi64x(sa); }
 inline SIMD_INT simd_set(unsigned long long int const sa)
 { return _mm_set1_epi64x(sa); }
-inline SIMD_SP simd_set(float const sa)
+inline SIMD_FLT simd_set(float const sa)
 { return _mm_set1_ps(sa); }
-inline SIMD_DP simd_set(double const sa)
+inline SIMD_DBL simd_set(double const sa)
 { return _mm_set1_pd(sa); }
 inline SIMD_INT simd_set(int const sa3, int const sa2, int const sa1, int const sa0)
 { return _mm_set_epi32(sa3, sa2, sa1, sa0); }
@@ -136,9 +136,9 @@ inline SIMD_INT simd_set(long long int const sa1, long long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
 inline SIMD_INT simd_set(unsigned long long int const sa1, unsigned long long int const sa0)
 { return _mm_set_epi64x(sa1, sa0); }
-inline SIMD_SP simd_set(float const sa3, float const sa2, float const sa1, float const sa0)
+inline SIMD_FLT simd_set(float const sa3, float const sa2, float const sa1, float const sa0)
 { return _mm_set_ps(sa3, sa2, sa1, sa0); }
-inline SIMD_DP simd_set(double const sa1, double const sa0)
+inline SIMD_DBL simd_set(double const sa1, double const sa0)
 { return _mm_set_pd(sa1, sa0); }
 
 
@@ -149,7 +149,7 @@ inline SIMD_DP simd_set(double const sa1, double const sa0)
  *  Convert packed double-precision floating-point elements
  *  to packed single-precision floating-point elements
  */
-inline SIMD_SP simd_cvt_pd2ps(SIMD_DP const va)
+inline SIMD_FLT simd_cvt_pd2ps(SIMD_DBL const va)
 { return _mm_cvtpd_ps(va); }
 
 
@@ -168,9 +168,9 @@ inline SIMD_INT simd_load(long long int const * const sa)
 { return _mm_load_si128((SIMD_INT *)sa); }
 inline SIMD_INT simd_load(unsigned long long int const * const sa)
 { return _mm_load_si128((SIMD_INT *)sa); }
-inline SIMD_SP simd_load(float const * const sa)
+inline SIMD_FLT simd_load(float const * const sa)
 { return _mm_load_ps((float *)sa); }
-inline SIMD_DP simd_load(double const * const sa)
+inline SIMD_DBL simd_load(double const * const sa)
 { return _mm_load_pd((double *)sa); }
 
 
@@ -189,9 +189,9 @@ inline void simd_store(long long int * const sa, SIMD_INT const va)
 { _mm_store_si128((SIMD_INT *)sa, va); }
 inline void simd_store(unsigned long long int * const sa, SIMD_INT const va)
 { _mm_store_si128((SIMD_INT *)sa, va); }
-inline void simd_store(float * const sa, SIMD_SP const va)
+inline void simd_store(float * const sa, SIMD_FLT const va)
 { _mm_store_ps((float *)sa, va); }
-inline void simd_store(double * const sa, SIMD_DP const va)
+inline void simd_store(double * const sa, SIMD_DBL const va)
 { _mm_store_pd((double *)sa, va); }
 
 
@@ -199,8 +199,8 @@ inline void simd_store(double * const sa, SIMD_DP const va)
  *  SIMD general helper functions
  **********************************/
 void simd_print(char const * const, SIMD_INT const);
-void simd_print(char const * const, SIMD_SP const);
-void simd_print(char const * const, SIMD_DP const);
+void simd_print(char const * const, SIMD_FLT const);
+void simd_print(char const * const, SIMD_DBL const);
 
 
 #endif  // __SSE_H
