@@ -113,22 +113,22 @@ int run(int rng_lim)
     rval = posix_memalign((void **)&rngs, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
 
     // LCG RNG object
-    LCG rng;
+    LCG rng[SIMD_NUM_STREAMS];
 
     // Initialize RNG params
     for (i = 0; i < nstrms; ++i)
-        rng.init_rng(iseeds[i], m[i]);
+        rng[i].init_rng(iseeds[i], m[i]);
 
     // Run kernel
     startTime(timers);
     for (i = 0; i < rng_lim; ++i) {
         for (j = 0; j < nstrms; ++j) {
-            rngs[j] = rng.get_rn();
+            rngs[j] = rng[j].get_rn();
 
             // NOTE: debug
-            seeds[j] = rng.get_seed();
-            primes[j] = rng.get_prime();
-            mults[j] = rng.get_multiplier();
+            seeds[j] = rng[j].get_seed();
+            primes[j] = rng[j].get_prime();
+            mults[j] = rng[j].get_multiplier();
         }
     }
     t1 = stopTime(timers);
@@ -136,7 +136,7 @@ int run(int rng_lim)
     // Print results 
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
-        printf("scalar = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs[i], seeds[i], mults[i], primes[i]);
+        printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
     printf("\n");
 
 
