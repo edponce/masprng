@@ -1,0 +1,25 @@
+select stream config
+port to POWER9 SO arch
+output interface return primitive types instead of SIMD? 
+batch mode?
+
+
+
+
+
+
+
+check/check.c:    const unsigned int fltmult = 1 << 20, dblmult = 1 << 30; // NOTE: from SPRNG LCG
+drivers/driver.c:            // NOTE: debug
+sprng.h: *  NOTE: need to rework this, rename macros
+simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
+simd/sse.h:// NOTE: to improve this because depends on LONG_SPRNG
+utils/vutils.h:// NOTE: currently only support x86_64
+lcg/lcg.c:    int offs = 0; // NOTE: gn
+lcg/lcg.c:// NOTE: debug purposes
+lcg/lcg.c:    // NOTE: casting done with CPU, bad!!
+lcg/lcg.c:    // NOTE: casting done with CPU, bad!!
+lcg/lcg.c:// NOTE: debug purposes
+lcg/lcg.h:    // NOTE: for debug purposes
+lcg/lcg.h:    int init_vrng(int *, int *); // NOTE: initialize using SIMD types?
+lcg/lcg.h:    // NOTE: for debug purposes
