@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include "primes_32.h"
-#include "lcg2.h"
+#include "lcg.h"
 
 
 #ifdef LONG_SPRNG

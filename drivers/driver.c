@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "masprng2.h"
+#include "masprng.h"
 #include "timers.h"
 #include "utils.h"
-#include "check2.h"
+#include "check.h"
 
 
 // Run settings

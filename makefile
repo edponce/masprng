@@ -63,7 +63,7 @@ LIBDIR :=
 LIBS :=
 
 # Source files to compile
-SOURCES := lcg/lcg2.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check2.c
+SOURCES := lcg/lcg.c primes/primes_32.c timers/timers.c utils/utils.c simd/sse.c check/check.c
 
 # Object files to link
 OBJECTS := $(SOURCES:.c=.o)
@@ -72,10 +72,10 @@ OBJECTS := $(SOURCES:.c=.o)
 HEADERS := $(SOURCES:.c=.h) masprng2.h primes/primelist_32.h sprng.h
 
 # Driver file
-LCG_DRIVER := drivers/driver2.c
+LCG_DRIVER := drivers/driver.c
 
 # Executable
-LCG_EXE := rng2
+LCG_EXE := rng
 
 #######################################
 

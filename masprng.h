@@ -2,7 +2,7 @@
 #define __MASPRNG_H
 
 
-#include "lcg2.h"
+#include "lcg.h"
 
 
 #endif  // __MASPRNG_H
