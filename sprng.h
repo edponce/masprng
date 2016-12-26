@@ -31,14 +31,25 @@ class SPRNG
     virtual int get_rn_int() = 0;
     virtual float get_rn_flt() = 0;
     virtual double get_rn_dbl() = 0;
-
-#ifdef SIMD_MODE
-    virtual int init_vrng(int, int) = 0;
-    virtual int get_vrn_int() = 0;
-    virtual float get_vrn_flt() = 0;
-    virtual double get_vrn_dbl() = 0;
-#endif
 };
+
+
+/*! \class VSPRNG
+ *  \brief Interface (abstract base class) for SIMD RNG types. 
+ *
+ *  Methods that are virtual require each class for RNG types to define these methods.
+ */
+#ifdef SIMD_MODE
+class VSPRNG
+{
+  public:
+    virtual ~VSPRNG() {} /* virtual destructor allows polymorphism to invoke derived destructors */
+    virtual int init_vrng(int *, int *) = 0;
+    virtual SIMD_INT get_vrn_int() = 0;
+    virtual SIMD_SP get_vrn_flt() = 0;
+    virtual SIMD_DP get_vrn_dbl() = 0;
+};
+#endif
 
 
 #endif  // __SPRNG_H

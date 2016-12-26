@@ -10,8 +10,9 @@
  */
 class LCG: public SPRNG
 {
+  static unsigned int LCG_NGENS;
+
   public:
-    static unsigned int LCG_NGENS;
     LCG();
     ~LCG();
     int init_rng(int, int);
@@ -23,13 +24,6 @@ class LCG: public SPRNG
     unsigned long int get_seed();
     int get_prime();
     unsigned long int get_multiplier();
-
-#ifdef SIMD_MODE
-    int init_vrng(int, int);
-    SIMD_INT get_vrn_int();
-    SIMD_SP get_vrn_flt();
-    SIMD_DP get_vrn_dbl();
-#endif
 
   private:
     int rng_type;  /*!< Unique ID for RNG */
@@ -44,13 +38,39 @@ class LCG: public SPRNG
     int prime;  /*!< Storage for a prime number */
     int *multiplier;  /*!< Array for multiplier values */
 #endif
+};
 
+
+/*! \class VLCG 
+ *  \brief Class for SIMD linear congruential RNG. 
+ */
 #ifdef SIMD_MODE
-    SIMD_INT seed;  /*!< Seed values calculated using initial seed value */
-    SIMD_INT prime;  /*!< Storage for a prime number */
-    SIMD_INT multiplier;  /*!< Array for multiplier values */
+class VLCG: public VSPRNG
+{
+  static unsigned int LCG_NGENS;
+
+  public:
+    VLCG();
+    ~VLCG();
+    int init_vrng(int *, int *); // NOTE: initialize using SIMD types?
+    SIMD_INT get_vrn_int();
+    SIMD_SP get_vrn_flt();
+    SIMD_DP get_vrn_dbl();
+
+    // NOTE: for debug purposes
+    SIMD_INT get_vseed();
+    SIMD_INT get_vprime();
+    SIMD_INT get_vmultiplier();
+
+  private:
+    int rng_type;  /*!< Unique ID for RNG */
+#ifdef LONG_SPRNG
+    SIMD_INT vseed;  /*!< Seed values calculated using initial seed value */
+    SIMD_INT vprime;  /*!< Storage for a prime number */
+    SIMD_INT vmultiplier;  /*!< Array for multiplier values */
 #endif
 };
+#endif
 
 
 #endif  // __LCG_H

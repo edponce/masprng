@@ -73,6 +73,7 @@ unsigned int LCG::LCG_NGENS = 0;
 
 LCG::LCG()
 {
+// NOTE: init_seed not used
 #ifdef LONG_SPRNG
     seed = INIT_SEED;
     init_seed = 0;
@@ -97,11 +98,11 @@ LCG::~LCG()
 
 
 #ifdef LONG_SPRNG
-static void multiply(unsigned long int * const seed, unsigned long int const multiplier, int const prime)
+static void multiply(unsigned long int * const c, unsigned long int const a, int const b)
 {
-    *seed *= multiplier; //mult_48_64(&seed,&multiplier,&seed);
-    *seed += prime;
-    *seed &= LSB48;
+    *c *= a; //mult_48_64(&seed,&multiplier,&seed);
+    *c += b;
+    *c &= LSB48;
 }
 #endif
 
@@ -165,7 +166,35 @@ int LCG::get_prime() {return prime;}
 unsigned long int LCG::get_multiplier() {return multiplier;}
 
 
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+/////////////       SIMD CLASS         /////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+
 #if defined(SIMD_MODE)
+unsigned int VLCG::LCG_NGENS = 0;
+
+
+VLCG::VLCG()
+{
+#ifdef LONG_SPRNG
+    vseed = simd_set(INIT_SEED, INIT_SEED);
+    simd_set_zero(&vprime);
+    simd_set_zero(&vmultiplier);
+#endif
+
+    ++LCG_NGENS;
+}
+
+
+VLCG::~VLCG()
+{
+    --LCG_NGENS;
+}
+
+
 #if defined(USE_SSE)
 
 // Global constants
@@ -181,30 +210,26 @@ static SIMD_INT vmult_shf;
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  x64 * y64 = (xl32 * yl32) + (xl32 * yh32 + xh32 * yl32) * 2^32
  */
-static void multiply(SIMD_INT * const vseed, const SIMD_INT vmult, const SIMD_INT vprime)
+static void multiply(SIMD_INT * const c, const SIMD_INT a, const SIMD_INT b)
 {
-#if defined(__SSE4_1__)
+    // NOTE: require at least SSE 4.1 for simd_mullo_epi32()
     SIMD_INT st, vtmp, u;
 
-    vmult_shf = simd_shuffle_32(vmult, 0xb1); // shuffle multiplier 
-    st = simd_mullo_32(*vseed, vmult_shf); // xl * yh, xh * yl
+    vmult_shf = simd_shuffle_32(a, 0xb1); // shuffle multiplier 
+    st = simd_mullo_32(*c, vmult_shf); // xl * yh, xh * yl
     vtmp = simd_sll_64(st, 0x20); // shift << 32 
     st = simd_add_64(st, vtmp); // s + t 
     st = simd_and(st, vmsk_hi64); // (s + t) & 0xFFFFFFFF00000000
-    u = simd_mul_u32(*vseed, vmult); // xl * yl
-    *vseed = simd_add_64(u, st); // u + s + t 
-    *vseed = simd_add_64(*vseed, vprime);    // seed += prime
-    *vseed = simd_and(*vseed, vmsk_lsb48); // seed &= LSB48
-#else
-    printf("ERROR: require at least SSE4.1\n");
-    simd_set_zero(vseed);
-#endif
+    u = simd_mul_u32(*c, a); // xl * yl
+    *c = simd_add_64(u, st); // u + s + t 
+    *c = simd_add_64(*c, b);    // seed += prime
+    *c = simd_and(*c, vmsk_lsb48); // seed &= LSB48
 }
 #endif // LONG_SPRNG
 
 
 // Initialize SIMD RNG
-int init_vrng(SIMD_INT *vseed, SIMD_INT *vmult, SIMD_INT *vprime, int *s, int *m)
+int VLCG::init_vrng(int *s, int *m)
 {
     // Set vector masks
     vmsk_lsb1[0] = simd_set1(0x1UL); // all 
@@ -230,56 +255,51 @@ int init_vrng(SIMD_INT *vseed, SIMD_INT *vmult, SIMD_INT *vprime, int *s, int *m
     getprime_32(need, &prime, offs);
 
     // NOTE: need to allow different value for streams
-    *vprime = simd_set(prime, prime);
+    vprime = simd_set(prime, prime);
 
 #ifdef LONG_SPRNG
-    *vseed = simd_set(INIT_SEED, INIT_SEED);
     vs = simd_sll_64(vs, 0x10); // seed << 16
-    *vseed = simd_xor(*vseed, vs); // seed ^= (s << 16)
-    *vmult = simd_set(mults_g[m[1]], mults_g[m[0]]); // NOTE: parameterize
-    vmult_shf = simd_shuffle_32(*vmult, 0xB1); // shuffle multiplier 
+    vseed = simd_xor(vseed, vs); // seed ^= (s << 16)
+    vmultiplier = simd_set(mults_g[m[1]], mults_g[m[0]]); // NOTE: parameterize
+    vmult_shf = simd_shuffle_32(vmultiplier, 0xB1); // shuffle multiplier 
 
-#if defined(__SSE4_1__)
-    if (simd_test_zero(*vprime, vmsk_lh64[0]) == 1) // all streams have prime = 0
-        *vseed = simd_or(*vseed, vmsk_lsb1[0]);
-    else if (simd_test_zero(*vprime, vmsk_lh64[1]) == 1) // first stream has prime = 0
-        *vseed = simd_or(*vseed, vmsk_lsb1[1]);
-    else if (simd_test_zero(*vprime, vmsk_lh64[2]) == 1) // second stream has prime = 0
-        *vseed = simd_or(*vseed, vmsk_lsb1[2]);
-#else
-    printf("ERROR: require at least SSE4.1\n");
-    return -1;
-#endif
+    // NOTE: require at least SSE 4.1 for simd_test_zero()
+    if (simd_test_zero(vprime, vmsk_lh64[0]) == 1) // all streams have prime = 0
+        vseed = simd_or(vseed, vmsk_lsb1[0]);
+    else if (simd_test_zero(vprime, vmsk_lh64[1]) == 1) // first stream has prime = 0
+        vseed = simd_or(vseed, vmsk_lsb1[1]);
+    else if (simd_test_zero(vprime, vmsk_lh64[2]) == 1) // second stream has prime = 0
+        vseed = simd_or(vseed, vmsk_lsb1[2]);
 #endif // LONG_SPRNG
 
     // Run generator
     for (i = 0; i < (LCG_RUNUP * prime_position); ++i)
-        get_vrn_dbl(vseed, *vmult, *vprime);
+        get_vrn_dbl();
  
     return 0;
 }
 
 
 // SIMD multiply and new seed
-SIMD_INT get_vrn_int(SIMD_INT *vseed, const SIMD_INT vmult, const SIMD_INT vprime)
+SIMD_INT VLCG::get_vrn_int()
 {
-    multiply(vseed, vmult, vprime);
-    return simd_srl_64(*vseed, 0x11); // seed >> 17
+    multiply(&vseed, vmultiplier, vprime);
+    return simd_srl_64(vseed, 0x11); // seed >> 17
 }
 
 
 // SIMD multiply and new seed
-SIMD_DP get_vrn_dbl(SIMD_INT *vseed, const SIMD_INT vmult, const SIMD_INT vprime)
+SIMD_DP VLCG::get_vrn_dbl()
 {
     unsigned long int seed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     double seedd[2];
     SIMD_DP vseedd;
     SIMD_DP vrng = simd_set1(RNG_LONG64_DBL);
 
-    multiply(vseed, vmult, vprime);
+    multiply(&vseed, vmultiplier, vprime);
 
     // NOTE: casting done with CPU, bad!!
-    simd_store(seed, *vseed);
+    simd_store(seed, vseed);
     seedd[0] = seed[0];
     seedd[1] = seed[1];
     vseedd = simd_load(seedd);
@@ -289,24 +309,31 @@ SIMD_DP get_vrn_dbl(SIMD_INT *vseed, const SIMD_INT vmult, const SIMD_INT vprime
 
 
 // SIMD multiply and new seed
-SIMD_SP get_vrn_flt(SIMD_INT *vseed, const SIMD_INT vmult, const SIMD_INT vprime)
+SIMD_SP VLCG::get_vrn_flt()
 {
     unsigned long int seed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     float seedd[2];
     SIMD_SP vseedd;
     SIMD_SP vrng = simd_set1((float)RNG_LONG64_DBL);
 
-    multiply(vseed, vmult, vprime);
+    multiply(&vseed, vmultiplier, vprime);
 
     // NOTE: casting done with CPU, bad!!
-    simd_store(seed, *vseed);
+    simd_store(seed, vseed);
     seedd[0] = seed[0];
     seedd[1] = seed[1];
     vseedd = simd_load(seedd);
 
     return simd_mul_ps(vseedd, vrng); // seed * constant
-    //return simd_cvt_pd2ps(get_vrn_dbl(vseed, vmult, vprime));
+    //return simd_cvt_pd2ps(get_vrn_dbl());
 }
+
+
+// NOTE: debug purposes
+SIMD_INT VLCG::get_vseed() {return vseed;}
+SIMD_INT VLCG::get_vprime() {return vprime;}
+SIMD_INT VLCG::get_vmultiplier() {return vmultiplier;}
+
 #endif // USE_SSE
 #endif // SIMD_MODE
 
