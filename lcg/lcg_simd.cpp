@@ -106,7 +106,7 @@ int VLCG::init_rng(int *s, int *m)
 
     int gn = 0;
     getprime_32(need, primes, gn);
-    prime = simd_set(primes[1], primes[0]);
+    prime = simd_set(primes[0], primes[0]);
     prime_position = simd_set(gn, gn);
 
     for (i = 0; i < SIMD_NUM_STREAMS; ++i)
