@@ -69,7 +69,7 @@ SOURCES := lcg/lcg.c lcg/lcg_simd.c primes/primes_32.c timers/timers.c utils/uti
 OBJECTS := $(SOURCES:.c=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.c=.h) masprng.h primes/primelist_32.h sprng.h
+HEADERS := $(SOURCES:.c=.h) masprng.h sprng.h primes/primelist_32.h lcg/lcg_config.h
 
 # Driver file
 LCG_DRIVER := drivers/driver.c

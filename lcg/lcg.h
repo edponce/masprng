@@ -3,6 +3,7 @@
 
 
 #include "sprng.h"
+#include "lcg_config.h"
 
 
 /*! \class LCG 

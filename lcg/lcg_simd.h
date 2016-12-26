@@ -1,8 +1,9 @@
-#ifndef __LCG_H
-#define __LCG_H
+#ifndef __LCG_SIMD_H
+#define __LCG_SIMD_H
 
 
 #include "sprng.h"
+#include "lcg_config.h"
 
 
 /*! \class VLCG 
@@ -38,5 +39,5 @@ class VLCG: public VSPRNG
 #endif
 
 
-#endif  // __LCG_H
+#endif  // __LCG_SIMD_H
 
