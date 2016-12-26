@@ -10,10 +10,7 @@ static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5
 static unsigned long int multiplier_g = 0;
 #else
 
-static int mults_g[MAX_MULTS][4] = {{0x175,0xe7b,0x5a2,0x287},{0x66d,0xece,0x5de,0x000},
-	                         {0x265,0x605,0xc44,0x3ea},{0x9f5,0x9cc,0x142,0x1ee},
-	                         {0xbbd,0xeb4,0xb38,0x275},{0x605,0xb08,0xa9c,0x739},
-	                         {0x5f5,0xcc2,0x8d7,0x322}};
+static int mults_g[MAX_MULTS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static int *multiplier_g = NULL;
 #endif
 
@@ -114,6 +111,10 @@ double LCG::get_rn_dbl()
     multiply(&seed, multiplier, prime);
     return (double)seed * RNG_LONG64_DBL;
 }
+
+
+// Accessor method for initial seed
+int LCG::get_seed_rng() {return init_seed;}
 
 
 // NOTE: debug purposes

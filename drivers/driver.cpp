@@ -34,7 +34,7 @@
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
-#define RNG_SHIFT 1
+#define RNG_SHIFT 2
 #else 
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double

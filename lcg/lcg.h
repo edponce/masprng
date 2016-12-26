@@ -20,6 +20,7 @@ class LCG: public SPRNG
     int get_rn_int();
     float get_rn_flt();
     double get_rn_dbl();
+    int get_seed_rng();
 
     // NOTE: for debug purposes
     unsigned long int get_seed();

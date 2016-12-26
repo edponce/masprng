@@ -32,6 +32,19 @@
 #define MULT5 0x1ee1429cc9f5L   /* 33952834046453  */
 #define MULT6 0x739a9cb08605L   /* 127107890972165 */
 #define MULT7 0x3228d7cc25f5L   /* 55151000561141  */
+
+#else
+/*
+ *  Multiplier factors
+ */
+#define MAX_MULTS 7 /* max number of multiplier factors */
+#define MULT1 {0x175,0xe7b,0x5a2,0x287}
+#define MULT2 {0x66d,0xece,0x5de,0x000}
+#define MULT3 {0x265,0x605,0xc44,0x3ea}
+#define MULT4 {0x9f5,0x9cc,0x142,0x1ee}
+#define MULT5 {0xbbd,0xeb4,0xb38,0x275}
+#define MULT6 {0x605,0xb08,0xa9c,0x739}
+#define MULT7 {0x5f5,0xcc2,0x8d7,0x322}
 #endif
 
 #define TWO_M24 5.96046447753906234e-8

@@ -21,6 +21,7 @@ class VLCG: public VSPRNG
     SIMD_INT get_rn_int();
     SIMD_SP get_rn_flt();
     SIMD_DP get_rn_dbl();
+    SIMD_INT get_seed_rng();
 
     // NOTE: for debug purposes
     SIMD_INT get_seed();

@@ -9,11 +9,7 @@
 static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static unsigned long int multiplier_g = 0;
 #else
-
-static int mults_g[MAX_MULTS][4] = {{0x175,0xe7b,0x5a2,0x287},{0x66d,0xece,0x5de,0x000},
-	                         {0x265,0x605,0xc44,0x3ea},{0x9f5,0x9cc,0x142,0x1ee},
-	                         {0xbbd,0xeb4,0xb38,0x275},{0x605,0xb08,0xa9c,0x739},
-	                         {0x5f5,0xcc2,0x8d7,0x322}};
+static int mults_g[MAX_MULTS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static int *multiplier_g = NULL;
 #endif
 
@@ -63,7 +59,7 @@ static SIMD_INT vmult_shf;
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  x64 * y64 = (xl32 * yl32) + (xl32 * yh32 + xh32 * yl32) * 2^32
  */
-static inline void multiply(SIMD_INT * const c, const SIMD_INT a, const SIMD_INT b)
+static inline void multiply_64w32(SIMD_INT * const c, const SIMD_INT a, const SIMD_INT b)
 {
     // NOTE: require at least SSE 4.1 for simd_mullo_epi32()
     SIMD_INT st, vtmp, u;
@@ -106,7 +102,7 @@ int VLCG::init_rng(int *s, int *m)
 
     int gn = 0;
     getprime_32(need, primes, gn);
-    prime = simd_set(primes[1], primes[0]);
+    prime = simd_set(primes[0], primes[0]);
     prime_position = simd_set(gn, gn);
 
     for (i = 0; i < SIMD_NUM_STREAMS; ++i)
@@ -144,7 +140,7 @@ int VLCG::init_rng(int *s, int *m)
 // SIMD multiply and new seed
 SIMD_INT VLCG::get_rn_int()
 {
-    multiply(&seed, multiplier, prime);
+    multiply_64w32(&seed, multiplier, prime);
     return simd_srl_64(seed, 0x11); // seed >> 17
 }
 
@@ -153,11 +149,11 @@ SIMD_INT VLCG::get_rn_int()
 SIMD_DP VLCG::get_rn_dbl()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
-    double seedd[2];
+    double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
     SIMD_DP vseedd;
     SIMD_DP vrng = simd_set(RNG_LONG64_DBL);
 
-    multiply(&seed, multiplier, prime);
+    multiply_64w32(&seed, multiplier, prime);
 
     // NOTE: casting done with CPU, bad!!
     simd_store(lseed, seed);
@@ -173,21 +169,27 @@ SIMD_DP VLCG::get_rn_dbl()
 SIMD_SP VLCG::get_rn_flt()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
-    float seedd[2];
+    float seedd[4] __attribute__ ((aligned(SIMD_ALIGN)));
     SIMD_SP vseedd;
     SIMD_SP vrng = simd_set((float)RNG_LONG64_DBL);
 
-    multiply(&seed, multiplier, prime);
+    multiply_64w32(&seed, multiplier, prime);
 
     // NOTE: casting done with CPU, bad!!
     simd_store(lseed, seed);
     seedd[0] = lseed[0];
-    seedd[1] = lseed[1];
+    seedd[1] = 0.0;
+    seedd[2] = lseed[1];
+    seedd[3] = 0.0;
     vseedd = simd_load(seedd);
 
     return simd_mul_ps(vseedd, vrng); // seed * constant
     //return simd_cvt_pd2ps(get_rn_dbl());
 }
+
+
+// Accessor method for initial seed
+SIMD_INT VLCG::get_seed_rng() {return init_seed;}
 
 
 // NOTE: debug purposes

@@ -42,6 +42,7 @@ class SPRNG
     virtual int get_rn_int() = 0;
     virtual float get_rn_flt() = 0;
     virtual double get_rn_dbl() = 0;
+    virtual int get_seed_rng() = 0;
 };
 
 
@@ -59,6 +60,7 @@ class VSPRNG
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_SP get_rn_flt() = 0;
     virtual SIMD_DP get_rn_dbl() = 0;
+    virtual SIMD_INT get_seed_rng() = 0;
 };
 #endif
 
