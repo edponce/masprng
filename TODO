@@ -7,8 +7,6 @@ batch mode?
 
 
 
-
-
 check/check.c:    const unsigned int fltmult = 1 << 20, dblmult = 1 << 30; // NOTE: from SPRNG LCG
 drivers/driver.c:            // NOTE: debug
 sprng.h: *  NOTE: need to rework this, rename macros

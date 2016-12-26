@@ -3,7 +3,7 @@
 
 
 /*
- *  SIMD mode
+ *  Check for SIMD mode
  */
 #if defined(USE_SSE)
 #include "sse.h"
@@ -37,7 +37,7 @@
 class SPRNG
 {
   public:
-    virtual ~SPRNG() {} /* virtual destructor allows polymorphism to invoke derived destructors */
+    virtual ~SPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
     virtual int init_rng(int, int) = 0;
     virtual int get_rn_int() = 0;
     virtual float get_rn_flt() = 0;
@@ -55,7 +55,7 @@ class SPRNG
 class VSPRNG
 {
   public:
-    virtual ~VSPRNG() {} /* virtual destructor allows polymorphism to invoke derived destructors */
+    virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
     virtual int init_rng(int *, int *) = 0;
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_SP get_rn_flt() = 0;

@@ -4,7 +4,6 @@
 #include "lcg.h"
 
 
-// Global variables
 #if defined(LONG_SPRNG)
 static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static unsigned long int multiplier_g = 0;
@@ -30,8 +29,9 @@ LCG::LCG()
     seed = INIT_SEED;
     multiplier = 0;
 #else
-    seed[0] = 2868876;  // 0
-    seed[1] = 16651885; // 1
+    // NOTE: original version sets to 0 and 1 but they are overwritten.
+    seed[0] = INIT_SEED1;
+    seed[1] = INIT_SEED2;
     multiplier = NULL;
 #endif
 
@@ -48,14 +48,13 @@ LCG::~LCG()
 #if defined(LONG_SPRNG)
 static inline void multiply(unsigned long int * const c, unsigned long int const a, int const b)
 {
-    *c *= a; //mult_48_64(&seed,&multiplier,&seed);
+    *c *= a;
     *c += b;
     *c &= LSB48;
 }
 #endif
 
 
-// Initialize RNG
 int LCG::init_rng(int s, int m)
 {
     int i;
@@ -90,7 +89,6 @@ int LCG::init_rng(int s, int m)
 }
 
 
-// Multiply and new seed
 int LCG::get_rn_int()
 {
     multiply(&seed, multiplier, prime);
@@ -98,14 +96,12 @@ int LCG::get_rn_int()
 }
 
 
-// Multiply and new seed
 float LCG::get_rn_flt()
 {
     return (float)get_rn_dbl();
 }
 
 
-// Multiply and new seed
 double LCG::get_rn_dbl()
 {
     multiply(&seed, multiplier, prime);
@@ -113,7 +109,6 @@ double LCG::get_rn_dbl()
 }
 
 
-// Accessor method for initial seed
 int LCG::get_seed_rng() {return init_seed;}
 
 

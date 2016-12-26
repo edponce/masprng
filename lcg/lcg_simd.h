@@ -7,7 +7,7 @@
 
 
 /*! \class VLCG 
- *  \brief Class for SIMD linear congruential RNG. 
+ *  \brief Class for SIMD linear congruential RNG.
  */
 #if defined(SIMD_MODE)
 class VLCG: public VSPRNG
@@ -29,13 +29,15 @@ class VLCG: public VSPRNG
     SIMD_INT get_multiplier();
 
   private:
-    int rng_type;  /*!< Unique ID for RNG */
-    SIMD_INT init_seed;  /*!< Initial seed value */
-    SIMD_INT prime;  /*!< Storage for a prime number */
-    SIMD_INT prime_position;  /*!< Storage for position of prime number */
+    int rng_type;
+    SIMD_INT init_seed;
+    SIMD_INT prime;
+    SIMD_INT prime_position;
     SIMD_INT parameter;
-    SIMD_INT seed;  /*!< Seed values calculated using initial seed value */
-    SIMD_INT multiplier;  /*!< Array for multiplier values */
+    SIMD_INT seed;
+    SIMD_INT multiplier;
+
+    void init_simd_masks();
 };
 #endif
 

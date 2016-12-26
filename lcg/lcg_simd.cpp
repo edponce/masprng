@@ -4,7 +4,6 @@
 #include "lcg_simd.h"
 
 
-// Global variables
 #if defined(LONG_SPRNG)
 static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static unsigned long int multiplier_g = 0;
@@ -30,7 +29,7 @@ VLCG::VLCG()
     seed = simd_set(INIT_SEED, INIT_SEED);
     simd_set_zero(&multiplier);
 #else
-    seed = simd_set(16651885L, 2868876L);
+    seed = simd_set(INIT_SEED2, INIT_SEED1);
     multiplier = simd_set_64(NULL);
 #endif
 
@@ -46,16 +45,32 @@ VLCG::~VLCG()
 
 #if defined(USE_SSE)
 
-// Global constants
+/*!
+ *  Initialize global SIMD masks
+ */
 static SIMD_INT vmsk_lsb1[3];
 static SIMD_INT vmsk_lh64[3];
 static SIMD_INT vmsk_hi64;
 static SIMD_INT vmsk_lsb48;
 static SIMD_INT vmsk_seed;
 static SIMD_INT vmult_shf;
+void VLCG::init_simd_masks()
+{
+    // Set vector masks
+    vmsk_lsb1[0] = simd_set(0x1UL); // all 
+    vmsk_lsb1[1] = simd_set(0x0ULL, 0x1ULL); // first
+    vmsk_lsb1[2] = simd_set(0x1ULL, 0x0ULL); // second
+    vmsk_lh64[0] = simd_set(0xFFFFFFFFFFFFFFFFULL); // all 
+    vmsk_lh64[1] = simd_set(0x0ULL, 0xFFFFFFFFFFFFFFFFULL); // first
+    vmsk_lh64[2] = simd_set(0xFFFFFFFFFFFFFFFFULL, 0x0ULL); // second
+    vmsk_hi64 = simd_set(0xFFFFFFFF00000000ULL); // all
+    vmsk_lsb48 = simd_set(LSB48); // all
+    vmsk_seed = simd_set(0x7FFFFFFFULL); // only 31 LSB of seed considered
+}
+
 
 #if defined(LONG_SPRNG)
-/*
+/*!
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  x64 * y64 = (xl32 * yl32) + (xl32 * yh32 + xh32 * yl32) * 2^32
  */
@@ -80,24 +95,15 @@ static inline void multiply_64w32(SIMD_INT * const c, const SIMD_INT a, const SI
 // Initialize SIMD RNG
 int VLCG::init_rng(int *s, int *m)
 {
-    // Set vector masks
-    vmsk_lsb1[0] = simd_set(0x1UL); // all 
-    vmsk_lsb1[1] = simd_set(0x0ULL, 0x1ULL); // first
-    vmsk_lsb1[2] = simd_set(0x1ULL, 0x0ULL); // second
-    vmsk_lh64[0] = simd_set(0xFFFFFFFFFFFFFFFFULL); // all 
-    vmsk_lh64[1] = simd_set(0x0ULL, 0xFFFFFFFFFFFFFFFFULL); // first
-    vmsk_lh64[2] = simd_set(0xFFFFFFFFFFFFFFFFULL, 0x0ULL); // second
-    vmsk_hi64 = simd_set(0xFFFFFFFF00000000ULL); // all
-    vmsk_lsb48 = simd_set(LSB48); // all
-    vmsk_seed = simd_set(0x7FFFFFFFULL); // only 31 LSB of seed considered
-
     int i;
     int need = SIMD_NUM_STREAMS;
     int primes[SIMD_NUM_STREAMS];
     SIMD_INT vs;
 
+    init_simd_masks();
+
     vs = simd_set(s[1], s[0]);
-    vs = simd_and(vs, vmsk_seed); // s &= 0x7FFFFFFF
+    vs = simd_and(vs, vmsk_seed);
     init_seed = vs;
 
     int gn = 0;
@@ -116,8 +122,8 @@ int VLCG::init_rng(int *s, int *m)
         vmult_shf = simd_shuffle_32(multiplier, 0xB1); // shuffle multiplier 
     }
 
-    vs = simd_sll_64(vs, 0x10); // seed << 16
-    seed = simd_xor(seed, vs); // seed ^= (s << 16)
+    vs = simd_sll_64(vs, 0x10);
+    seed = simd_xor(seed, vs);
 
     // NOTE: require at least SSE 4.1 for simd_test_zero()
     if (simd_test_zero(prime, vmsk_lh64[0]) == 1) // all streams have prime = 0
@@ -137,15 +143,13 @@ int VLCG::init_rng(int *s, int *m)
 }
 
 
-// SIMD multiply and new seed
 SIMD_INT VLCG::get_rn_int()
 {
     multiply_64w32(&seed, multiplier, prime);
-    return simd_srl_64(seed, 0x11); // seed >> 17
+    return simd_srl_64(seed, 0x11);
 }
 
 
-// SIMD multiply and new seed
 SIMD_DP VLCG::get_rn_dbl()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
@@ -161,11 +165,10 @@ SIMD_DP VLCG::get_rn_dbl()
     seedd[1] = lseed[1];
     vseedd = simd_load(seedd);
 
-    return simd_mul_pd(vseedd, vrng); // seed * constant
+    return simd_mul_pd(vseedd, vrng);
 }
 
 
-// SIMD multiply and new seed
 SIMD_SP VLCG::get_rn_flt()
 {
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
@@ -183,12 +186,11 @@ SIMD_SP VLCG::get_rn_flt()
     seedd[3] = 0.0;
     vseedd = simd_load(seedd);
 
-    return simd_mul_ps(vseedd, vrng); // seed * constant
+    return simd_mul_ps(vseedd, vrng);
     //return simd_cvt_pd2ps(get_rn_dbl());
 }
 
 
-// Accessor method for initial seed
 SIMD_INT VLCG::get_seed_rng() {return init_seed;}
 
 

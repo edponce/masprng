@@ -1,18 +1,15 @@
 #include <stdio.h>
 #include "sse.h"
 
-/*
- *  Optional support constants
- */
-#define SIMD_NUM_32BIT (SIMD_ALIGN/4) /* number of 32-bit values per vector register */
-#define SIMD_NUM_64BIT (SIMD_ALIGN/8) /* number of 64-bit values per vector register */
+
+#define SIMD_NUM_32BIT (SIMD_ALIGN/4) /*!< number of 32-bit values per vector register */
+#define SIMD_NUM_64BIT (SIMD_ALIGN/8) /*!< number of 64-bit values per vector register */
 
 
 void simd_print(char const * const str, SIMD_INT const va)
 {
     unsigned int i;
 
-    // int
     int itmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
     simd_store(itmp, va);
     printf("%s", str);
@@ -20,7 +17,6 @@ void simd_print(char const * const str, SIMD_INT const va)
       printf("%d\t", itmp[i]);
     printf("\n");
 
-    // unsigned int
     unsigned int utmp[SIMD_NUM_32BIT] __attribute__ ((aligned(SIMD_ALIGN)));
     simd_store(utmp, va);
     printf("%s", str);
@@ -28,7 +24,6 @@ void simd_print(char const * const str, SIMD_INT const va)
       printf("%u\t", utmp[i]);
     printf("\n");
 
-    // unsigned long 
     unsigned long int lutmp[SIMD_NUM_64BIT] __attribute__ ((aligned(SIMD_ALIGN)));
     simd_store(lutmp, va);
     printf("%s", str);
@@ -36,6 +31,7 @@ void simd_print(char const * const str, SIMD_INT const va)
       printf("%lu\t", lutmp[i]);
     printf("\n");
 }
+
 
 void simd_print(char const * const str, SIMD_SP const va)
 {
@@ -48,6 +44,7 @@ void simd_print(char const * const str, SIMD_SP const va)
       printf("%f\t", tmp[i]);
     printf("\n");
 }
+
 
 void simd_print(char const * const str, SIMD_DP const va)
 {
