@@ -5,11 +5,13 @@
 #include "check.h"
 
 
-// Check errors with SPRNG data output
+/*!
+ *  Check errors with SPRNG data output found in file
+ */
 int check_errors(void)
 {
-    int i;  // iteration variables
-    int rval;  // function return value
+    int i;
+    int rval;
 
     const int nstrms = SIMD_NUM_STREAMS;
 
@@ -26,19 +28,12 @@ int check_errors(void)
         m[i] = 0;
 
     // Scalar
-    // Integer
     int irngs;
-
-    // Float 
     float frngs;
-
-    // Double 
     double drngs;
 
     // LCG RNG object
     LCG rng;
-
-    // Initialize RNG params
     rng.init_rng(iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
@@ -46,15 +41,10 @@ int check_errors(void)
     const int nstrms64 = nstrms;
 
     // SIMD
-    // Integer
     int *irngs2 = NULL;
     rval = posix_memalign((void **)&irngs2, SIMD_ALIGN, nstrms32 * sizeof(int));
-
-    // Float 
     float *frngs2 = NULL;
     rval = posix_memalign((void **)&frngs2, SIMD_ALIGN, nstrms32 * sizeof(float));
-
-    // Double 
     double *drngs2 = NULL;
     rval = posix_memalign((void **)&drngs2, SIMD_ALIGN, nstrms64 * sizeof(double));
 
@@ -64,13 +54,11 @@ int check_errors(void)
 
     // LCG RNG object
     VLCG vrng;
-
-    // Initial RNG params 
     vrng.init_rng(iseeds, m);
 #endif
 
-    // Validate run
-    const unsigned int fltmult = 1 << 20, dblmult = 1 << 30; // NOTE: from SPRNG LCG
+
+    const unsigned int fltmult = 1 << 20, dblmult = 1 << 30;
     int rn = 0;
 
     // Integer generator
@@ -133,6 +121,7 @@ int check_errors(void)
         printf("FAILED: Float generator does not reproduce correct stream.\n");
     printf("\n");
 
+
     // Double generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
@@ -166,13 +155,11 @@ int check_errors(void)
 
 
 #if defined(SIMD_MODE)
-    // Deallocate memory
     free(irngs2);
     free(frngs2);
     free(drngs2);
 #endif
-    
-    // Deallocate memory
+
     free(iseeds);
     free(m);
  

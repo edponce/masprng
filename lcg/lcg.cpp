@@ -113,7 +113,12 @@ int LCG::get_seed_rng() {return init_seed;}
 
 
 // NOTE: debug purposes
-unsigned long int LCG::get_seed() {return seed;}
 int LCG::get_prime() {return prime;}
+#if defined(LONG_SPRNG)
+unsigned long int LCG::get_seed() {return seed;}
 unsigned long int LCG::get_multiplier() {return multiplier;}
+#else
+int LCG::get_seed() {return seed[0];}
+int LCG::get_multiplier() {return *multiplier;}
+#endif
 

@@ -23,9 +23,14 @@ class LCG: public SPRNG
     int get_seed_rng();
 
     // NOTE: for debug purposes
-    unsigned long int get_seed();
     int get_prime();
+#if defined(LONG_SPRNG)
+    unsigned long int get_seed();
     unsigned long int get_multiplier();
+#else
+    int get_seed();
+    int get_multiplier();
+#endif
 
   private:
     int rng_type;
