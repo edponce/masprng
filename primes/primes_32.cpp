@@ -12,10 +12,10 @@
 #define primes primes32
 
 
-int primes[NPRIMES];
+static int primes[NPRIMES];
 
 
-int init_prime_32(void)
+static int init_prime_32()
 {
     int i, j, obtained = 0, isprime;
     

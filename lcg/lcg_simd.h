@@ -12,16 +12,17 @@
 #if defined(SIMD_MODE)
 class VLCG: public VSPRNG
 {
-  static unsigned int LCG_NGENS;
+  static unsigned long int LCG_NGENS;
 
   public:
     VLCG();
     ~VLCG();
-    int init_rng(int *, int *); // NOTE: initialize using SIMD types?
+    int init_rng(int, int, int *, int *); // NOTE: initialize using SIMD types?
     SIMD_INT get_rn_int();
     SIMD_FLT get_rn_flt();
     SIMD_DBL get_rn_dbl();
     SIMD_INT get_seed_rng();
+    unsigned long int get_ngens();
 
     // NOTE: for debug purposes
     SIMD_INT get_seed();
@@ -33,9 +34,11 @@ class VLCG: public VSPRNG
     SIMD_INT init_seed;
     SIMD_INT prime;
     SIMD_INT prime_position;
+    SIMD_INT prime_next;
     SIMD_INT parameter;
     SIMD_INT seed;
     SIMD_INT multiplier;
+    char *gentype;
 
     void init_simd_masks();
 };

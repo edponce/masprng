@@ -14,7 +14,7 @@
 
 
 // Control type of test
-#define RNG_TYPE_NUM 1
+#define RNG_TYPE_NUM SPRNG_LCG
 #define TEST 0
 
 #if TEST == 0
@@ -112,7 +112,7 @@ int run(int rng_lim)
     SPRNG *rng[SIMD_NUM_STREAMS];
     for (i = 0; i < nstrms; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
-        rng[i]->init_rng(iseeds[i], m[i]);
+        rng[i]->init_rng(0, 1, iseeds[i], m[i]);
     }
 
     // Run kernel
@@ -120,16 +120,18 @@ int run(int rng_lim)
     for (i = 0; i < rng_lim; ++i) {
         for (j = 0; j < nstrms; ++j) {
             rngs[j] = rng[j]->get_rn();
-
+/*
             // NOTE: debug
             seeds[j] = rng[j]->get_seed();
             primes[j] = rng[j]->get_prime();
             mults[j] = rng[j]->get_multiplier();
+*/
         }
     }
     t1 = stopTime(timers);
 
     // Print results 
+    printf("gen nums %lu\n", rng[SIMD_NUM_STREAMS-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
@@ -157,7 +159,7 @@ int run(int rng_lim)
 
     // RNG object
     VSPRNG *vrng = selectVType(RNG_TYPE_NUM);
-    vrng->init_rng(iseeds, m);
+    vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel
     startTime(timers);
@@ -171,6 +173,7 @@ int run(int rng_lim)
     simd_store(primes2, vrng->get_prime());
     simd_store(rngs2, vrngs);
 
+    printf("gen nums %lu\n", vrng->get_ngens());
     printf("Vector real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);

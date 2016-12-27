@@ -2,6 +2,8 @@
 #define __LCG_CONFIG_H
 
 
+#define GENTYPE "48 bit Linear Congruential Generator with Prime Addend"
+
 #if defined(LONG_SPRNG)
 #define INIT_SEED 0x2bc68cfe166dL
 #define MSB_SET 0x3ff0000000000000L
@@ -20,7 +22,7 @@
 #define PMULT5 0x11bdbe700000L
 #define PMULT6 0xb0f0e9f00000L
 #define PMULT7 0x6407de700000L
-#define MAX_MULTS 7
+#define NPARAMS 7
 #define MULT1 0x2875a2e7b175L
 #define MULT2 0x5deece66dL
 #define MULT3 0x3eac44605265L
@@ -32,7 +34,8 @@
 #else
 #define INIT_SEED1 2868876L
 #define INIT_SEED2 16651885L
-#define MAX_MULTS 7
+#define NPARAMS 7
+// The following is done since the multiplier is stored in pieces of 12 bits each
 #define MULT1 {0x175,0xe7b,0x5a2,0x287}
 #define MULT2 {0x66d,0xece,0x5de,0x000}
 #define MULT3 {0x265,0x605,0xc44,0x3ea}
@@ -46,6 +49,7 @@
 #define TWO_M48 3.5527136788005008323e-15
 
 #define LCG_RUNUP 29
+#define LCG_MAX_STREAMS (1<<19)
 
 #if defined(LittleEndian)
 #define MSB 1

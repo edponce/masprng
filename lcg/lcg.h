@@ -11,16 +11,17 @@
  */
 class LCG: public SPRNG
 {
-  static unsigned int LCG_NGENS;
+  static unsigned long int LCG_NGENS;
 
   public:
     LCG();
     ~LCG();
-    int init_rng(int, int);
+    int init_rng(int, int, int, int);
     int get_rn_int();
     float get_rn_flt();
     double get_rn_dbl();
     int get_seed_rng();
+    unsigned long int get_ngens();
 
     // NOTE: for debug purposes
     int get_prime();
@@ -37,7 +38,9 @@ class LCG: public SPRNG
     int init_seed;
     int prime;
     int prime_position;
+    int prime_next;
     int parameter;
+    char *gentype;
 
 #if defined(LONG_SPRNG)
     unsigned long int seed;

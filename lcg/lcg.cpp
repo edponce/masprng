@@ -1,20 +1,37 @@
-#include <stdio.h>
+/*************************************************************************/
+/*************************************************************************/
+/*             Parallel 48 bit Linear Congruential Generator             */
+/*                                                                       */ 
+/* Modified by: Eduardo Ponce                                            */
+/*             The University of Tennessee, Knoxville                    */
+/*             Email: eponcemo@utk.edu (Jan 2017)                        */
+/*                                                                       */
+/* Modified by: J. Ren                                                   */
+/*             Florida State University                                  */
+/*             Email: ren@csit.fsu.edu                                   */
+/*                                                                       */
+/* Based on the implementation by:                                       */
+/*             Ashok Srinivasan (Apr 13, 1998)                           */
+/*************************************************************************/
+/*************************************************************************/
+
+
+#include <cstdio>
 #include <limits.h>
 #include "primes_32.h"
 #include "lcg.h"
 
 
 #if defined(LONG_SPRNG)
-static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
+static unsigned long int mults_g[NPARAMS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static unsigned long int multiplier_g = 0;
 #else
-
-static int mults_g[MAX_MULTS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
+static int mults_g[NPARAMS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static int *multiplier_g = NULL;
 #endif
 
 
-unsigned int LCG::LCG_NGENS = 0;
+unsigned long int LCG::LCG_NGENS = 0;
 
 
 LCG::LCG()
@@ -23,7 +40,9 @@ LCG::LCG()
     init_seed = 0;
     prime = 0;
     prime_position = 0;
+    prime_next = 0;
     parameter = 0;
+    gentype = (char *)GENTYPE;
 
 #if defined(LONG_SPRNG)
     seed = INIT_SEED;
@@ -55,7 +74,12 @@ static inline void multiply(unsigned long int * const c, unsigned long int const
 #endif
 
 
-int LCG::init_rng(int s, int m)
+/*!
+ *  Gives back one generator (node gennum) with updated spawning info.
+ *  Should be called total_gen times, with different value
+ *  of gennum in [0,total_gen) each call
+ */
+int LCG::init_rng(int gn, int tg, int s, int m)
 {
     int i;
     int need = 1;
@@ -63,13 +87,25 @@ int LCG::init_rng(int s, int m)
     s &= 0x7fffffff; // only 31 LSB of seed considered
     init_seed = s;
 
-    // NOTE: parameterized, the prime offset value needs to change
-    int gn = 0;
-    getprime_32(need, &prime, gn);
+    if (tg <= 0) {
+        printf("ERROR: total_gen out of range, %d\n", tg);
+        tg = 1;
+    }
+    prime_next = tg;
+
+    if (gn < 0 || gn >= tg || gn >= LCG_MAX_STREAMS) {
+        printf("ERROR: gennum out of range, %d\n", gn);
+        return -1;
+    }
     prime_position = gn;
 
-    if (m < 0 || m >= MAX_MULTS)
+    getprime_32(need, &prime, gn);
+    getprime_32(need, &prime, gn);
+
+    if (m < 0 || m >= NPARAMS) {
+        printf("ERROR: multiplier out of range, %d\n", m);
         m = 0;
+    }
     parameter = m;
 
 #if defined(LONG_SPRNG)
@@ -82,13 +118,20 @@ int LCG::init_rng(int s, int m)
         seed |= 1;
 #endif
 
-    for (i = 0; i < (LCG_RUNUP * prime_position); ++i)
+    for (i = 0; i < (LCG_RUNUP * gn); ++i)
         get_rn_dbl();
  
     return 0;
 }
 
 
+/*!
+ *  On machines with 32 bit integers, the Cray's 48 bit integer math
+ *  is duplicated by breaking the problem into steps.
+ *  The algorithm is linear congruential.
+ *  M is the multiplier and S is the current seed.
+ *  The 31 High order bits out of the 48 bits are returned.
+ */
 int LCG::get_rn_int()
 {
     multiply(&seed, multiplier, prime);
@@ -109,16 +152,29 @@ double LCG::get_rn_dbl()
 }
 
 
-int LCG::get_seed_rng() {return init_seed;}
+int LCG::get_seed_rng() { return init_seed; }
+
+unsigned long int LCG::get_ngens() { return LCG_NGENS; }
 
 
 // NOTE: debug purposes
-int LCG::get_prime() {return prime;}
+int LCG::get_prime() { return prime;}
 #if defined(LONG_SPRNG)
-unsigned long int LCG::get_seed() {return seed;}
-unsigned long int LCG::get_multiplier() {return multiplier;}
+unsigned long int LCG::get_seed() { return seed; }
+unsigned long int LCG::get_multiplier() { return multiplier; }
 #else
-int LCG::get_seed() {return seed[0];}
-int LCG::get_multiplier() {return *multiplier;}
+int LCG::get_seed() { return seed[0]; }
+int LCG::get_multiplier() { return *multiplier; }
 #endif
+
+
+/***********************************************************************************
+* SPRNG (c) 2014 by Florida State University                                       *
+*                                                                                  *
+* SPRNG is licensed under a                                                        *
+* Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. *
+*                                                                                  *
+* You should have received a copy of the license along with this                   *
+* work. If not, see <http://creativecommons.org/licenses/by-nc-sa/4.0/>.           *
+************************************************************************************/
 
