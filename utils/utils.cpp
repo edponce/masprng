@@ -4,13 +4,10 @@
 
 
 #if defined(_OPENMP)
-#include <omp.h> // OpenMP
+#include <omp.h>
 #endif
 
 
-/*
- *  Configure OpenMP environment
- */
 int setOmpEnv(int *num_threads)
 {
     int nt;
@@ -29,10 +26,8 @@ int setOmpEnv(int *num_threads)
     return nt;
 }
 
-/*
- *  Detect CPU SIMD features
- */
-int printSIMDconf(void)
+
+int printSIMDconf()
 {
 #if GNUC_VERSION > 40800
     if (__builtin_cpu_supports("sse"))
@@ -58,10 +53,8 @@ int printSIMDconf(void)
     return 0;
 }
 
-/*
- *  Print some system configurations
- */
-void printSysconf(void)
+
+void printSysconf()
 {
     printf("Number of processors online = %ld\n", getNumProcOnline());
     printf("Page size = %ld\n", getPageSz());
@@ -83,93 +76,39 @@ void printSysconf(void)
 #endif
 }
 
-/*
- *  Get the number of processors currently online (available)
- */
+
 long int getNumProcOnline()
-{
-    return sysconf(_SC_NPROCESSORS_ONLN);
-    //return sysconf(_SC_NPROCESSORS_CONF); // number of processors configured
-}
+{ return sysconf(_SC_NPROCESSORS_ONLN); }
+//{ return sysconf(_SC_NPROCESSORS_CONF); }
 
-/*
- *  Get the size of page in bytes
- */
 long int getPageSz()
-{
-    return sysconf(_SC_PAGESIZE);
-    //return sysconf(_SC_PAGE_SIZE);
-}
+{ return sysconf(_SC_PAGESIZE); }
+//{ return sysconf(_SC_PAGE_SIZE); }
 
-/*
- *  Get the size in bytes of L1 data cache 
- */
 long int getL1Sz()
-{
-    return sysconf(_SC_LEVEL1_DCACHE_SIZE);
-}
+{ return sysconf(_SC_LEVEL1_DCACHE_SIZE); }
 
-/*
- *  Get the line size in bytes of L1 data cache
- */
 long int getL1LineSz()
-{
-    return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-}
+{ return sysconf(_SC_LEVEL1_DCACHE_LINESIZE); }
 
-/*
- *  Get the associativity of L1 data cache 
- */
 long int getL1Assoc()
-{
-    return sysconf(_SC_LEVEL1_DCACHE_ASSOC);
-}
+{ return sysconf(_SC_LEVEL1_DCACHE_ASSOC); }
 
-/*
- *  Get the size in bytes of L2 cache 
- */
 long int getL2Sz()
-{
-    return sysconf(_SC_LEVEL2_CACHE_SIZE);
-}
+{ return sysconf(_SC_LEVEL2_CACHE_SIZE); }
 
-/*
- *  Get the line size in bytes of L2 cache
- */
 long int getL2LineSz()
-{
-    return sysconf(_SC_LEVEL2_CACHE_LINESIZE);
-}
+{ return sysconf(_SC_LEVEL2_CACHE_LINESIZE); }
 
-/*
- *  Get the associativity of L2 cache 
- */
 long int getL2Assoc()
-{
-    return sysconf(_SC_LEVEL2_CACHE_ASSOC);
-}
+{ return sysconf(_SC_LEVEL2_CACHE_ASSOC); }
 
-/*
- *  Get the size in bytes of L3 cache 
- */
 long int getL3Sz()
-{
-    return sysconf(_SC_LEVEL3_CACHE_SIZE);
-}
+{ return sysconf(_SC_LEVEL3_CACHE_SIZE); }
 
-/*
- *  Get the line size in bytes of L3 cache
- */
 long int getL3LineSz()
-{
-    return sysconf(_SC_LEVEL3_CACHE_LINESIZE);
-}
+{ return sysconf(_SC_LEVEL3_CACHE_LINESIZE); }
 
-/*
- *  Get the associativity of L3 cache 
- */
 long int getL3Assoc()
-{
-    return sysconf(_SC_LEVEL3_CACHE_ASSOC);
-}
+{ return sysconf(_SC_LEVEL3_CACHE_ASSOC); }
 

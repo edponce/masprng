@@ -2,75 +2,75 @@
 #define __UTILS_H
 
 
-/*
+/*!
  *  Configure OpenMP environment
  */
 int setOmpEnv(int *);
 
-/*
+/*!
  *  Detect CPU SIMD features
  */
-int printSIMDconf(void);
+int printSIMDconf();
 
-/*
+/*!
  *  Print some system configurations
  */
-void printSysconf(void);
+void printSysconf();
 
-/*
+/*!
  *  Get the number of processors currently online (available)
  */
-long int getNumProcOnline(void);
+long int getNumProcOnline();
 
-/*
+/*!
  *  Get the size of page in bytes
  */
-long int getPageSz(void);
+long int getPageSz();
 
-/*
+/*!
  *  Get the size in bytes of L1 data cache 
  */
-long int getL1Sz(void);
+long int getL1Sz();
 
-/*
+/*!
  *  Get the line size in bytes of L1 data cache
  */
-long int getL1LineSz(void);
+long int getL1LineSz();
 
-/*
+/*!
  *  Get the associativity of L1 data cache 
  */
-long int getL1Assoc(void);
+long int getL1Assoc();
 
-/*
+/*!
  *  Get the size in bytes of L2 cache 
  */
-long int getL2Sz(void);
+long int getL2Sz();
 
-/*
+/*!
  *  Get the line size in bytes of L2 cache
  */
-long int getL2LineSz(void);
+long int getL2LineSz();
 
-/*
+/*!
  *  Get the associativity of L2 cache 
  */
-long int getL2Assoc(void);
+long int getL2Assoc();
 
-/*
+/*!
  *  Get the size in bytes of L3 cache 
  */
-long int getL3Sz(void);
+long int getL3Sz();
 
-/*
+/*!
  *  Get the line size in bytes of L3 cache
  */
-long int getL3LineSz(void);
+long int getL3LineSz();
 
-/*
+/*!
  *  Get the associativity of L3 cache 
  */
-long int getL3Assoc(void);
+long int getL3Assoc();
 
 
 #endif // __UTILS_H

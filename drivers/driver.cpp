@@ -6,7 +6,6 @@
 #include "check.h"
 
 
-// Run settings
 #if defined(DEBUG)
 #define RNG_LIM 1 
 #else
@@ -15,7 +14,8 @@
 
 
 // Control type of test
-#define TEST 1
+#define RNG_TYPE_NUM 1
+#define TEST 0
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -30,16 +30,16 @@
 #define RNG_TYPE_STR "Float"
 #define RNG_TYPE float 
 #define get_rn() get_rn_flt()
-#define VRNG_TYPE SIMD_SP 
+#define VRNG_TYPE SIMD_FLT 
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
-#define RNG_SHIFT 1
+#define RNG_SHIFT 2
 #else 
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
 #define get_rn() get_rn_dbl()
-#define VRNG_TYPE SIMD_DP 
+#define VRNG_TYPE SIMD_DBL 
 #define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms64
@@ -50,19 +50,16 @@
 int run(int);
 
 
-// Driver
 int main(int argc, char **argv)
 {
-    // Parse CLI args
     int rng_lim = RNG_LIM;
 
-    // Print system info
     printSysconf();
     printSIMDconf();
     printf("\n");
 
     if (argc > 1)
-        rng_lim = atoi(argv[1]); // get number of iterations
+        rng_lim = atoi(argv[1]);
 
     if (rng_lim > 0)
         run(rng_lim);
@@ -75,10 +72,9 @@ int main(int argc, char **argv)
 
 int run(int rng_lim)
 {
-    int i, j; // iteration variables
-    int rval; // function return value
+    int i, j;
+    int rval;
 
-    // Timers
     long long int timers[2];
     double t1;
 
@@ -112,23 +108,23 @@ int run(int rng_lim)
     RNG_TYPE *rngs = NULL;
     rval = posix_memalign((void **)&rngs, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
 
-    // LCG RNG object
-    LCG rng[SIMD_NUM_STREAMS];
-
-    // Initialize RNG params
-    for (i = 0; i < nstrms; ++i)
-        rng[i].init_rng(iseeds[i], m[i]);
+    // RNG object
+    SPRNG *rng[SIMD_NUM_STREAMS];
+    for (i = 0; i < nstrms; ++i) {
+        rng[i] = selectType(RNG_TYPE_NUM);
+        rng[i]->init_rng(iseeds[i], m[i]);
+    }
 
     // Run kernel
     startTime(timers);
     for (i = 0; i < rng_lim; ++i) {
         for (j = 0; j < nstrms; ++j) {
-            rngs[j] = rng[j].get_rn();
+            rngs[j] = rng[j]->get_rn();
 
             // NOTE: debug
-            seeds[j] = rng[j].get_seed();
-            primes[j] = rng[j].get_prime();
-            mults[j] = rng[j].get_multiplier();
+            seeds[j] = rng[j]->get_seed();
+            primes[j] = rng[j]->get_prime();
+            mults[j] = rng[j]->get_multiplier();
         }
     }
     t1 = stopTime(timers);
@@ -159,22 +155,20 @@ int run(int rng_lim)
 
     VRNG_TYPE vrngs;
 
-    // LCG RNG object
-    VLCG vrng;
-
-    // Initial RNG params 
-    vrng.init_rng(iseeds, m);
+    // RNG object
+    VSPRNG *vrng = selectVType(RNG_TYPE_NUM);
+    vrng->init_rng(iseeds, m);
 
     // Run kernel
     startTime(timers);
     for (i = 0; i < rng_lim; ++i)
-        vrngs = vrng.get_rn();
+        vrngs = vrng->get_rn();
     t2 = stopTime(timers);
 
     // Print results 
-    simd_store(seeds2, vrng.get_seed());
-    simd_store(mults2, vrng.get_multiplier());
-    simd_store(primes2, vrng.get_prime());
+    simd_store(seeds2, vrng->get_seed());
+    simd_store(mults2, vrng->get_multiplier());
+    simd_store(primes2, vrng->get_prime());
     simd_store(rngs2, vrngs);
 
     printf("Vector real time = %.16f sec\n", t2);
@@ -182,11 +176,10 @@ int run(int rng_lim)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
     printf("\n");
 
-    // Info
+    // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
     printf("Number of streams = %d\n", nstrms);
 
-    // Speedup
     if (t2 > 0)
         printf("speedup = scalar/vector = %g\n", t1 / t2);
     else
@@ -207,20 +200,21 @@ int run(int rng_lim)
         printf("FAILED: " RNG_TYPE_STR " generator does not reproduce correct stream.\n");
     printf("\n");
 
-    // Deallocate memory
     free(seeds2);
     free(mults2);
     free(primes2);
     free(rngs2);
+    delete vrng;
 #endif
-    
-    // Deallocate memory
+
     free(iseeds);
     free(m);
     free(seeds);
     free(mults);
     free(primes);
     free(rngs);
+    for (i = 0; i < nstrms; ++i)
+        delete rng[i];
  
     return 0;
 }

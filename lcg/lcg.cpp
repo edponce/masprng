@@ -4,16 +4,12 @@
 #include "lcg.h"
 
 
-// Global variables
 #if defined(LONG_SPRNG)
 static unsigned long int mults_g[MAX_MULTS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static unsigned long int multiplier_g = 0;
 #else
 
-static int mults_g[MAX_MULTS][4] = {{0x175,0xe7b,0x5a2,0x287},{0x66d,0xece,0x5de,0x000},
-	                         {0x265,0x605,0xc44,0x3ea},{0x9f5,0x9cc,0x142,0x1ee},
-	                         {0xbbd,0xeb4,0xb38,0x275},{0x605,0xb08,0xa9c,0x739},
-	                         {0x5f5,0xcc2,0x8d7,0x322}};
+static int mults_g[MAX_MULTS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
 static int *multiplier_g = NULL;
 #endif
 
@@ -33,8 +29,9 @@ LCG::LCG()
     seed = INIT_SEED;
     multiplier = 0;
 #else
-    seed[0] = 2868876;  // 0
-    seed[1] = 16651885; // 1
+    // NOTE: original version sets to 0 and 1 but they are overwritten.
+    seed[0] = INIT_SEED1;
+    seed[1] = INIT_SEED2;
     multiplier = NULL;
 #endif
 
@@ -51,14 +48,13 @@ LCG::~LCG()
 #if defined(LONG_SPRNG)
 static inline void multiply(unsigned long int * const c, unsigned long int const a, int const b)
 {
-    *c *= a; //mult_48_64(&seed,&multiplier,&seed);
+    *c *= a;
     *c += b;
     *c &= LSB48;
 }
 #endif
 
 
-// Initialize RNG
 int LCG::init_rng(int s, int m)
 {
     int i;
@@ -93,7 +89,6 @@ int LCG::init_rng(int s, int m)
 }
 
 
-// Multiply and new seed
 int LCG::get_rn_int()
 {
     multiply(&seed, multiplier, prime);
@@ -101,14 +96,12 @@ int LCG::get_rn_int()
 }
 
 
-// Multiply and new seed
 float LCG::get_rn_flt()
 {
     return (float)get_rn_dbl();
 }
 
 
-// Multiply and new seed
 double LCG::get_rn_dbl()
 {
     multiply(&seed, multiplier, prime);
@@ -116,8 +109,16 @@ double LCG::get_rn_dbl()
 }
 
 
+int LCG::get_seed_rng() {return init_seed;}
+
+
 // NOTE: debug purposes
-unsigned long int LCG::get_seed() {return seed;}
 int LCG::get_prime() {return prime;}
+#if defined(LONG_SPRNG)
+unsigned long int LCG::get_seed() {return seed;}
 unsigned long int LCG::get_multiplier() {return multiplier;}
+#else
+int LCG::get_seed() {return seed[0];}
+int LCG::get_multiplier() {return *multiplier;}
+#endif
 

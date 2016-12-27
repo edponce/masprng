@@ -20,25 +20,31 @@ class LCG: public SPRNG
     int get_rn_int();
     float get_rn_flt();
     double get_rn_dbl();
+    int get_seed_rng();
 
     // NOTE: for debug purposes
-    unsigned long int get_seed();
     int get_prime();
+#if defined(LONG_SPRNG)
+    unsigned long int get_seed();
     unsigned long int get_multiplier();
+#else
+    int get_seed();
+    int get_multiplier();
+#endif
 
   private:
-    int rng_type;  /*!< Unique ID for RNG */
-    int init_seed;  /*!< Initial seed value */
-    int prime;  /*!< Storage for a prime number */
-    int prime_position;  /*!< Storage for position of prime number */
+    int rng_type;
+    int init_seed;
+    int prime;
+    int prime_position;
     int parameter;
 
 #if defined(LONG_SPRNG)
-    unsigned long int seed;  /*!< Seed values calculated using initial seed value */
-    unsigned long int multiplier;  /*!< Array for multiplier values */
+    unsigned long int seed;
+    unsigned long int multiplier;
 #else
-    int seed[2];  /*!< Pair of seed values calculated using initial seed value */
-    int *multiplier;  /*!< Array for multiplier values */
+    int seed[2];
+    int *multiplier;
 #endif
 };
 

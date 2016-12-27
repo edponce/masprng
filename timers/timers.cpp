@@ -3,9 +3,6 @@
 #include "timers.h"
 
 
-/*
- *  Start timer
- */
 void startTime(long long int *timers)
 {
     struct timeval tv;
@@ -16,9 +13,6 @@ void startTime(long long int *timers)
 }
 
 
-/*
- *  Stop timer
- */
 double stopTime(long long int *timers)
 {
     double rtime;
