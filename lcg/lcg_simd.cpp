@@ -87,7 +87,7 @@ void VLCG::init_simd_masks()
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  x64 * y64 = (xl32 * yl32) + (xl32 * yh32 + xh32 * yl32) * 2^32
  */
-inline SIMD_INT VLCG::multiply_48_64(const SIMD_INT a, const SIMD_INT b)
+SIMD_INT VLCG::multiply_48_64(SIMD_INT a, SIMD_INT b) const
 {
     SIMD_INT st, vtmp, u, c = seed;
 
@@ -220,8 +220,8 @@ SIMD_FLT VLCG::get_rn_flt()
 }
 
 
-SIMD_INT VLCG::get_seed_rng() { return init_seed; }
-unsigned long int VLCG::get_ngens() { return LCG_NGENS; }
+SIMD_INT VLCG::get_seed_rng() const { return init_seed; }
+unsigned long int VLCG::get_ngens() const { return LCG_NGENS; }
 
 
 // NOTE: debug purposes

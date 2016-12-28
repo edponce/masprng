@@ -22,8 +22,8 @@ class VLCG: public VSPRNG
     SIMD_INT get_rn_int();
     SIMD_FLT get_rn_flt();
     SIMD_DBL get_rn_dbl();
-    SIMD_INT get_seed_rng();
-    unsigned long int get_ngens();
+    SIMD_INT get_seed_rng() const;
+    unsigned long int get_ngens() const;
 
     // NOTE: for debug purposes
     SIMD_INT get_seed();
@@ -59,7 +59,7 @@ class VLCG: public VSPRNG
     SIMD_INT vmult_shf;
     void init_simd_masks();
 
-    inline SIMD_INT multiply_48_64(SIMD_INT, SIMD_INT);
+    SIMD_INT multiply_48_64(SIMD_INT, SIMD_INT) const;
 };
 #endif
 

@@ -20,8 +20,8 @@ class LCG: public SPRNG
     int get_rn_int();
     float get_rn_flt();
     double get_rn_dbl();
-    int get_seed_rng();
-    unsigned long int get_ngens();
+    int get_seed_rng() const;
+    unsigned long int get_ngens() const;
 
     // NOTE: for debug purposes
     int get_prime();
@@ -56,7 +56,7 @@ class LCG: public SPRNG
     int *multiplier_g;
 #endif
 
-    inline unsigned long int multiply_48_64(unsigned long int, int);
+    unsigned long int multiply_48_64(unsigned long int, int) const;
 };
 
 

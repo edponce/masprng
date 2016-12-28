@@ -59,7 +59,7 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
-inline unsigned long int LCG::multiply_48_64(unsigned long int a, int b)
+unsigned long int LCG::multiply_48_64(unsigned long int a, int b) const
 {
     unsigned long int c = seed;
 
@@ -150,9 +150,9 @@ double LCG::get_rn_dbl()
 }
 
 
-int LCG::get_seed_rng() { return init_seed; }
+int LCG::get_seed_rng() const { return init_seed; }
 
-unsigned long int LCG::get_ngens() { return LCG_NGENS; }
+unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
 
 
 // NOTE: debug purposes

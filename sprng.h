@@ -47,8 +47,8 @@ class SPRNG
     virtual int get_rn_int() = 0;
     virtual float get_rn_flt() = 0;
     virtual double get_rn_dbl() = 0;
-    virtual int get_seed_rng() = 0;
-    virtual unsigned long int get_ngens() = 0;
+    virtual int get_seed_rng() const = 0;
+    virtual unsigned long int get_ngens() const = 0;
 
     // NOTE: for debug purposes
     virtual int get_prime() = 0;
@@ -76,8 +76,8 @@ class VSPRNG
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;
-    virtual SIMD_INT get_seed_rng() = 0;
-    virtual unsigned long int get_ngens() = 0;
+    virtual SIMD_INT get_seed_rng() const = 0;
+    virtual unsigned long int get_ngens() const = 0;
 
     // NOTE: for debug purposes
     virtual SIMD_INT get_seed() = 0;
