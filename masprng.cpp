@@ -1,10 +1,16 @@
 #include <cstdio>
 #include "masprng.h"
 
+#include "lcg.h"
 
-SPRNG * MASPRNG::selectType(int typenum)
+#if defined(SIMD_MODE)
+#include "lcg_simd.h"
+#endif
+
+
+SPRNG * selectType(int typenum)
 {
-    SPRNG * rng = NULL;
+    SPRNG *rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new LFG();
@@ -27,9 +33,9 @@ SPRNG * MASPRNG::selectType(int typenum)
 
 
 #if defined(SIMD_MODE)
-VSPRNG * MASPRNG::selectTypeSIMD(int typenum)
+VSPRNG * selectTypeSIMD(int typenum)
 {
-    VSPRNG * rng = NULL;
+    VSPRNG *rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new VLFG();

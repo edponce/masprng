@@ -22,6 +22,7 @@ CC := g++
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
 CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options

@@ -3,17 +3,25 @@ port to POWER9 SO arch
 output interface return primitive types instead of SIMD? 
 batch mode?
 
+change datatypes to int64_t standard conventions
+remove all "long long" types
+add const everywhere
 
-sprng.h: *  NOTE: need to rework this, rename macros
+
+drivers/driver.cpp:        // NOTE: can move into general error function in check.h/cpp
+sprng.h:#define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
 simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
-simd/sse.h:// NOTE: to improve this because depends on LONG_SPRNG
+simd/sse.h: *  NOTE: these defines are mandatory to interface correctly with MASPRNG
 utils/vutils.h:// NOTE: currently only support x86_64
+lcg/lcg_simd.cpp:// NOTE: can we remove these guards?
+lcg/lcg_simd.cpp:    gentype = CONFIG.GENTYPE; // NOTE: refactor this
 lcg/lcg_simd.cpp:    // NOTE: require at least SSE 4.1 for simd_mullo_epi32()
 lcg/lcg_simd.cpp:    // NOTE: require at least SSE 4.1 for simd_test_zero()
+lcg/lcg_simd.cpp:    // NOTE: the factor is not gn, but prime_position. How to do with vector?
 lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
 lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
 lcg/lcg.cpp:    // NOTE: original version sets to 0 and 1 but they are overwritten.
-lcg/lcg_simd.h:    int init_rng(int *, int *); // NOTE: initialize using SIMD types?
-
-lcg/lcg_simd.cpp:    // NOTE: the factor is not gn, but prime_position. How to do with vector?
-lcg/lcg.cpp:    // NOTE: parameterized, the prime offset value needs to change
+lcg/lcg_simd.h:  // NOTE: not thread-safe
+lcg/lcg_simd.h:    int init_rng(int, int, int *, int *); // NOTE: initialize using SIMD types?
+lcg/lcg_simd.h:    // NOTE: need to rename
+lcg/lcg.h:    // NOTE: need to rename
