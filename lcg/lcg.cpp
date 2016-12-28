@@ -22,15 +22,6 @@
 #include "lcg.h"
 
 
-#if defined(LONG_SPRNG)
-static unsigned long int mults_g[NPARAMS] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
-static unsigned long int multiplier_g = 0;
-#else
-static int mults_g[NPARAMS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
-static int *multiplier_g = NULL;
-#endif
-
-
 unsigned long int LCG::LCG_NGENS = 0;
 
 
@@ -42,15 +33,18 @@ LCG::LCG()
     prime_position = 0;
     prime_next = 0;
     parameter = 0;
-    gentype = (char *)GENTYPE;
+    gentype = CONFIG.GENTYPE;
 
 #if defined(LONG_SPRNG)
-    seed = INIT_SEED;
+    seed = CONFIG.INIT_SEED;
     multiplier = 0;
+    for (int i = 0; i < CONFIG.NPARAMS; ++i)
+        mults_g[i] = CONFIG.MULT[i];
+    multiplier_g = 0;
 #else
     // NOTE: original version sets to 0 and 1 but they are overwritten.
-    seed[0] = INIT_SEED1;
-    seed[1] = INIT_SEED2;
+    seed[0] = CONFIG.INIT_SEED1;
+    seed[1] = CONFIG.INIT_SEED2;
     multiplier = NULL;
 #endif
 
@@ -65,11 +59,15 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
-static inline void multiply(unsigned long int * const c, unsigned long int const a, int const b)
+inline unsigned long int LCG::multiply_48_64(unsigned long int a, int b)
 {
-    *c *= a;
-    *c += b;
-    *c &= LSB48;
+    unsigned long int c = seed;
+
+    c *= a;
+    c += b;
+    c &= CONFIG.LSB48;
+
+    return c;
 }
 #endif
 
@@ -93,7 +91,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     prime_next = tg;
 
-    if (gn < 0 || gn >= tg || gn >= LCG_MAX_STREAMS) {
+    if (gn < 0 || gn >= tg || gn >= CONFIG.LCG_MAX_STREAMS) {
         printf("ERROR: gennum out of range, %d\n", gn);
         return -1;
     }
@@ -102,7 +100,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     getprime_32(need, &prime, gn);
     getprime_32(need, &prime, gn);
 
-    if (m < 0 || m >= NPARAMS) {
+    if (m < 0 || m >= CONFIG.NPARAMS) {
         printf("ERROR: multiplier out of range, %d\n", m);
         m = 0;
     }
@@ -118,7 +116,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
         seed |= 1;
 #endif
 
-    for (i = 0; i < (LCG_RUNUP * gn); ++i)
+    for (i = 0; i < (CONFIG.LCG_RUNUP * gn); ++i)
         get_rn_dbl();
  
     return 0;
@@ -134,7 +132,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
  */
 int LCG::get_rn_int()
 {
-    multiply(&seed, multiplier, prime);
+    seed = multiply_48_64(multiplier, prime);
     return (int)(seed >> 17);
 }
 
@@ -147,8 +145,8 @@ float LCG::get_rn_flt()
 
 double LCG::get_rn_dbl()
 {
-    multiply(&seed, multiplier, prime);
-    return (double)seed * RNG_LONG64_DBL;
+    seed = multiply_48_64(multiplier, prime);
+    return (double)seed * CONFIG.RNG_LONG64_DBL;
 }
 
 

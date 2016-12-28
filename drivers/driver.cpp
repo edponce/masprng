@@ -120,12 +120,12 @@ int run(int rng_lim)
     for (i = 0; i < rng_lim; ++i) {
         for (j = 0; j < nstrms; ++j) {
             rngs[j] = rng[j]->get_rn();
-/*
+
             // NOTE: debug
             seeds[j] = rng[j]->get_seed();
             primes[j] = rng[j]->get_prime();
             mults[j] = rng[j]->get_multiplier();
-*/
+
         }
     }
     t1 = stopTime(timers);
