@@ -3,15 +3,25 @@
 
 
 #include "lcg.h"
-#include "lcg_simd.h"
 
-
-// To select RNG type require SPRNG base and derived classes
-#include "sprng.h"
-SPRNG * selectType(const int);
 #if defined(SIMD_MODE)
-VSPRNG * selectVType(const int);
+#include "lcg_simd.h"
 #endif
+
+
+#include "sprng.h"
+/*! \class MASPRNG
+ *  \brief Interface (abstract class) used to create SPRNG instances.
+ */
+class MASPRNG
+{
+    public:
+        virtual ~MASPRNG() = 0; /*!< virtual destructor makes class abstract */
+        static SPRNG * selectType(int);
+#if defined(SIMD_MODE)
+        static VSPRNG * selectTypeSIMD(int);
+#endif
+};
 
 
 #endif  // __MASPRNG_H

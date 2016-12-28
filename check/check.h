@@ -2,7 +2,7 @@
 #define __CHECK_H
 
 
-int check_errors(void);
+#include "lcg_check.h"
 
 
 #endif  // __CHECK_H

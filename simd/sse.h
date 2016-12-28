@@ -15,15 +15,12 @@
  *  SSE2 128-bit wide vector units 
  *
  *  Define some constants required for module to function properly.
+ *  NOTE: these defines are mandatory to interface correctly with MASPRNG
  */
-#define SIMD_WIDTH_BITS 128
 #define SIMD_INT __m128i
 #define SIMD_FLT __m128
 #define SIMD_DBL __m128d
-
-// NOTE: to improve this because depends on LONG_SPRNG
-#define SIMD_ALIGN (SIMD_WIDTH_BITS/8) /*!< alignment in bytes */
-#define SIMD_NUM_STREAMS (SIMD_WIDTH_BITS/64)  /*!< number of max streams supported per vector register */
+#define SIMD_WIDTH_BYTES 16 
 
 
 /**************************

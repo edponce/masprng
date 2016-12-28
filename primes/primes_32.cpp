@@ -12,10 +12,10 @@
 #define primes primes32
 
 
-int primes[NPRIMES];
+static int primes[NPRIMES];
 
 
-int init_prime_32(void)
+static int init_prime_32()
 {
     int i, j, obtained = 0, isprime;
     
@@ -69,7 +69,7 @@ int getprime_32(int need, int *prime_array, int offset)
     }
     
     if (offset > MAXPRIMEOFFSET) {
-        fprintf(stderr, "WARNING: generator has branched maximum number of times;\nindependence of generators no longer guaranteed");
+        fprintf(stderr, "WARNING: generator has branched maximum number of times, independence of generators no longer guaranteed");
         offset = offset % MAXPRIMEOFFSET;
     }
     

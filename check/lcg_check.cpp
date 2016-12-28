@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "masprng.h"
 #include "utils.h"
-#include "check.h"
+#include "lcg_check.h"
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_errors(void)
+int lcg_check_errors()
 {
     int i;
     int rval;
@@ -34,7 +34,7 @@ int check_errors(void)
 
     // LCG RNG object
     LCG rng;
-    rng.init_rng(iseeds[0], m[0]);
+    rng.init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
     const int nstrms32 = 2 * nstrms;
@@ -54,7 +54,7 @@ int check_errors(void)
 
     // LCG RNG object
     VLCG vrng;
-    vrng.init_rng(iseeds, m);
+    vrng.init_rng(0, 1, iseeds, m);
 #endif
 
 

@@ -6,43 +6,49 @@
  *  Check for SIMD mode
  */
 #if defined(USE_SSE)
+#define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
 #include "sse.h"
-#define SIMD_MODE /* MASPRNG vector flag */
+
 #else
 /*
  *  Scalar mode
- *  NOTE: need to rework this, rename macros
  */
-#define SIMD_NUM_STREAMS 1
-#define SIMD_ALIGN 8
+#if defined(LONG_SPRNG)
+#define SIMD_WIDTH_BYTES 8
+#else
+#define SIMD_WIDTH_BYTES 4
+#endif
+#endif
+
+#define SIMD_ALIGN SIMD_WIDTH_BYTES
+#if defined(LONG_SPRNG)
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/8)
+#else
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/4)
 #endif
 
 
-/*
+/*!
  *  RNG identifiers
  */
-#define SPRNG_LFG   0
-#define SPRNG_LCG   1
-#define SPRNG_LCG64 2
-#define SPRNG_CMRG  3
-#define SPRNG_MLFG  4
-#define SPRNG_PMLCG 5
+enum SPRNG_TYPES {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
 
 
 /*! \class SPRNG
- *  \brief Interface (abstract base class) for RNG types. 
+ *  \brief Interface (pure abstract class) used as base class for RNG types. 
  *
- *  Methods that are virtual require each class for RNG types to define these methods.
+ *  Methods that are virtual require each derived class to define these methods.
  */
 class SPRNG
 {
   public:
     virtual ~SPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_rng(int, int) = 0;
+    virtual int init_rng(int, int, int, int) = 0;
     virtual int get_rn_int() = 0;
     virtual float get_rn_flt() = 0;
     virtual double get_rn_dbl() = 0;
-    virtual int get_seed_rng() = 0;
+    virtual int get_seed_rng() const = 0;
+    virtual unsigned long int get_ngens() const = 0;
 
     // NOTE: for debug purposes
     virtual int get_prime() = 0;
@@ -56,21 +62,22 @@ class SPRNG
 };
 
 
+#if defined(SIMD_MODE)
 /*! \class VSPRNG
  *  \brief Interface (abstract base class) for SIMD RNG types. 
  *
  *  Methods that are virtual require each class for RNG types to define these methods.
  */
-#if defined(SIMD_MODE)
 class VSPRNG
 {
   public:
     virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_rng(int *, int *) = 0;
+    virtual int init_rng(int, int, int *, int *) = 0;
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;
-    virtual SIMD_INT get_seed_rng() = 0;
+    virtual SIMD_INT get_seed_rng() const = 0;
+    virtual unsigned long int get_ngens() const = 0;
 
     // NOTE: for debug purposes
     virtual SIMD_INT get_seed() = 0;

@@ -1,19 +1,25 @@
-#include <stdio.h>
+#include <cstdio>
 #include "masprng.h"
 
 
-SPRNG * selectType(const int typenum)
+SPRNG * MASPRNG::selectType(int typenum)
 {
     SPRNG * rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new LFG();
+        //    break;
         case SPRNG_LCG: rng = new LCG();
+            break;
         //case SPRNG_LCG64: rng = new LCG64();
+        //    break;
         //case SPRNG_CMRG: rng = new CMRG();
+        //    break;
         //case SPRNG_MLFG: rng = new MLFG();
+        //    break;
         //case SPRNG_PMLCG: rng = new PMLCG();
-        default: printf("Invalid generator type selected.\n");
+        //    break;
+        default: printf("ERROR: invalid RNG generator type.\n");
     }
 
     return rng;
@@ -21,18 +27,24 @@ SPRNG * selectType(const int typenum)
 
 
 #if defined(SIMD_MODE)
-VSPRNG * selectVType(const int typenum)
+VSPRNG * MASPRNG::selectTypeSIMD(int typenum)
 {
     VSPRNG * rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new VLFG();
+        //    break;
         case SPRNG_LCG: rng = new VLCG();
+            break;
         //case SPRNG_LCG64: rng = new VLCG64();
+        //    break;
         //case SPRNG_CMRG: rng = new VCMRG();
+        //    break;
         //case SPRNG_MLFG: rng = new VMLFG();
+        //    break;
         //case SPRNG_PMLCG: rng = new VPMLCG();
-        default: printf("Invalid generator type selected.\n");
+        //    break;
+        default: printf("ERROR: invalid RNG generator type.\n");
     }
 
     return rng;
