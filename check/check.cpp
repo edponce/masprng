@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "masprng.h"
 #include "utils.h"
-#include "lcg_check.h"
+#include "check.h"
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int lcg_check_errors()
+int check_errors(int rng_type)
 {
     int i;
     int rval;
@@ -33,7 +33,7 @@ int lcg_check_errors()
     double drngs;
 
     // RNG object
-    SPRNG *rng = selectType(SPRNG_LCG);
+    SPRNG *rng = selectType(rng_type);
     rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
@@ -53,7 +53,7 @@ int lcg_check_errors()
     SIMD_DBL dvrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(SPRNG_LCG);
+    VSPRNG *vrng = selectTypeSIMD(rng_type);
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 

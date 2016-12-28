@@ -13,14 +13,13 @@
 /*************************************************************************/
 
 
+#include "lcg_simd.h"
+#if defined(SIMD_MODE)
+
+
 #include <stdio.h>
 #include <limits.h>
 #include "primes_32.h"
-#include "lcg_simd.h"
-
-
-// NOTE: can we remove these guards?
-#if defined(USE_SSE)
 
 
 unsigned long int VLCG::LCG_NGENS = 0;
@@ -43,8 +42,10 @@ VLCG::VLCG()
         mults_g[i] = CONFIG.MULT[i];
     multiplier_g = 0;
 #else
-    seed = simd_set(INIT_SEED2, INIT_SEED1);
-    //mults_g[NPARAMS][4] = {MULT1, MULT2, MULT3, MULT4, MULT5, MULT6, MULT7};
+    seed = simd_set(CONFIG.INIT_SEED[1], CONFIG.INIT_SEED[0]);
+    for (int i = 0; i < CONFIG.NPARAMS; ++i)
+        for (int j = 0; j < 4; ++j)
+            mults_g[i][j] = CONFIG.MULT[i][j];
     multiplier_g = NULL;
 #endif
 
@@ -230,7 +231,7 @@ SIMD_INT VLCG::get_prime() { return prime; }
 SIMD_INT VLCG::get_multiplier() { return multiplier; }
 
 
-#endif // USE_SSE
+#endif // SIMD_MODE
 
 
 /***********************************************************************************

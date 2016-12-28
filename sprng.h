@@ -5,7 +5,7 @@
 /*
  *  Check for SIMD mode
  */
-#if defined(USE_SSE)
+#if defined(SSE_SPRNG)
 #define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
 #include "sse.h"
 

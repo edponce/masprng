@@ -8,11 +8,7 @@
 #include "check.h"
 
 
-#if defined(DEBUG)
-#define RNG_LIM 1 
-#else
 #define RNG_LIM 100
-#endif
 
 
 // Control type of test
@@ -57,26 +53,22 @@ int run(int);
 
 int main(int argc, char **argv)
 {
-    int rng_lim = RNG_LIM;
-
+/*
+    printf("\n");
     printSysconf();
     printSIMDconf();
     printf("\n");
+*/
+
+    int rng_lim = RNG_LIM;
 
     if (argc > 1)
         rng_lim = atoi(argv[1]);
 
     if (rng_lim > 0)
         run(rng_lim);
-    else {
-        // NOTE: can move into general error function in check.h/cpp
-        switch (RNG_TYPE_NUM) {
-            case SPRNG_LCG: lcg_check_errors();
-                break;
-            default: printf("ERROR: invalid RNG type\n");
-                return -1;
-        }
-    }
+    else
+       check_errors(RNG_TYPE_NUM);
 
     return 0;
 }
@@ -93,6 +85,10 @@ int run(int rng_lim)
     const int nstrms = SIMD_NUM_STREAMS;
     const int nstrms32 = 2 * nstrms;
     const int nstrms64 = nstrms;
+
+    // Info/speedup
+    printf("RNG runs = %d\n", rng_lim);
+    printf("Number of streams = %d\n\n", nstrms);
 
     // Initial seeds
     int *iseeds = NULL;
@@ -190,10 +186,6 @@ int run(int rng_lim)
     for (i = 0; i < nstrms; ++i)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
     printf("\n");
-
-    // Info/speedup
-    printf("RNG runs = %d\n", rng_lim);
-    printf("Number of streams = %d\n", nstrms);
 
     if (t2 > 0)
         printf("speedup = scalar/vector = %g\n", t1 / t2);

@@ -3,6 +3,9 @@
 #include "utils.h"
 
 
+#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+
 #if defined(_OPENMP)
 #include <omp.h>
 #endif

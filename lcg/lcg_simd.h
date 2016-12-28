@@ -2,14 +2,16 @@
 #define __LCG_SIMD_H
 
 
-#include "lcg_config.h"
 #include "sprng.h"
+
+
+#if defined(SIMD_MODE)
+#include "lcg_config.h"
 
 
 /*! \class VLCG 
  *  \brief Class for SIMD linear congruential RNG.
  */
-#if defined(SIMD_MODE)
 class VLCG: public VSPRNG
 {
   // NOTE: not thread-safe
@@ -61,7 +63,7 @@ class VLCG: public VSPRNG
 
     SIMD_INT multiply_48_64(SIMD_INT, SIMD_INT) const;
 };
-#endif
+#endif  // SIMD_MODE
 
 
 #endif  // __LCG_SIMD_H
