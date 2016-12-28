@@ -184,7 +184,7 @@ SIMD_DBL VLCG::get_rn_dbl()
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
     SIMD_DBL vseedd;
-    SIMD_DBL vrng = simd_set(CONFIG.RNG_LONG64_DBL);
+    SIMD_DBL vrng = simd_set(CONFIG.TWO_M48);
 
     seed = multiply_48_64(multiplier, prime);
 
@@ -203,7 +203,7 @@ SIMD_FLT VLCG::get_rn_flt()
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     float seedd[4] __attribute__ ((aligned(SIMD_ALIGN)));
     SIMD_FLT vseedd;
-    SIMD_FLT vrng = simd_set((float)CONFIG.RNG_LONG64_DBL);
+    SIMD_FLT vrng = simd_set((float)CONFIG.TWO_M48);
 
     seed = multiply_48_64(multiplier, prime);
 

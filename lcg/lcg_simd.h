@@ -2,8 +2,8 @@
 #define __LCG_SIMD_H
 
 
-#include "sprng.h"
 #include "lcg_config.h"
+#include "sprng.h"
 
 
 /*! \class VLCG 

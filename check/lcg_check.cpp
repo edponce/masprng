@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "masprng.h"
 #include "utils.h"
-#include "check.h"
+#include "lcg_check.h"
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_errors(void)
+int lcg_check_errors()
 {
     int i;
     int rval;

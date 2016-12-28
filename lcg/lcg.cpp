@@ -146,7 +146,7 @@ float LCG::get_rn_flt()
 double LCG::get_rn_dbl()
 {
     seed = multiply_48_64(multiplier, prime);
-    return (double)seed * CONFIG.RNG_LONG64_DBL;
+    return (double)seed * CONFIG.TWO_M48;
 }
 
 

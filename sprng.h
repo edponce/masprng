@@ -6,28 +6,32 @@
  *  Check for SIMD mode
  */
 #if defined(USE_SSE)
+#define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
 #include "sse.h"
-#define SIMD_MODE /* MASPRNG vector flag */
+
 #else
 /*
  *  Scalar mode
- *  NOTE: need to rework this, rename macros
  */
-#define SIMD_NUM_STREAMS 1
-#define SIMD_ALIGN 8
+#if defined(LONG_SPRNG)
+#define SIMD_WIDTH_BYTES 8
+#else
+#define SIMD_WIDTH_BYTES 4
+#endif
+#endif
+
+#define SIMD_ALIGN SIMD_WIDTH_BYTES
+#if defined(LONG_SPRNG)
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/8)
+#else
+#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/4)
 #endif
 
 
-/*
+/*!
  *  RNG identifiers
  */
-// NOTE: put into enum
-#define SPRNG_LFG   0
-#define SPRNG_LCG   1
-#define SPRNG_LCG64 2
-#define SPRNG_CMRG  3
-#define SPRNG_MLFG  4
-#define SPRNG_PMLCG 5
+enum SPRNG_CONFIG {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
 
 
 /*! \class SPRNG
@@ -58,12 +62,12 @@ class SPRNG
 };
 
 
+#if defined(SIMD_MODE)
 /*! \class VSPRNG
  *  \brief Interface (abstract base class) for SIMD RNG types. 
  *
  *  Methods that are virtual require each class for RNG types to define these methods.
  */
-#if defined(SIMD_MODE)
 class VSPRNG
 {
   public:

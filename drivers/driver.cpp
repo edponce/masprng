@@ -1,5 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <cfloat>
 #include "masprng.h"
 #include "timers.h"
 #include "utils.h"
@@ -26,6 +28,7 @@
 #define RNG_FMT "%d"
 #define RNG_ELEMS nstrms32
 #define RNG_SHIFT 2
+#define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
 #define RNG_TYPE_STR "Float"
 #define RNG_TYPE float 
@@ -35,6 +38,7 @@
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms32
 #define RNG_SHIFT 2
+#define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
@@ -44,6 +48,7 @@
 #define RNG_FMT "%f"
 #define RNG_ELEMS nstrms64
 #define RNG_SHIFT 1
+#define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif
 
 
@@ -63,8 +68,14 @@ int main(int argc, char **argv)
 
     if (rng_lim > 0)
         run(rng_lim);
-    else
-        check_errors();
+    else {
+        switch (RNG_TYPE_NUM) {
+            case SPRNG_LCG: lcg_check_errors();
+                break;
+            default: printf("ERROR: invalid RNG type\n");
+                return -1;
+        }
+    }
 
     return 0;
 }
@@ -111,7 +122,7 @@ int run(int rng_lim)
     // RNG object
     SPRNG *rng[SIMD_NUM_STREAMS];
     for (i = 0; i < nstrms; ++i) {
-        rng[i] = selectType(RNG_TYPE_NUM);
+        rng[i] = MASPRNG::selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
     }
 
@@ -158,7 +169,7 @@ int run(int rng_lim)
     VRNG_TYPE vrngs;
 
     // RNG object
-    VSPRNG *vrng = selectVType(RNG_TYPE_NUM);
+    VSPRNG *vrng = MASPRNG::selectTypeSIMD(RNG_TYPE_NUM);
     vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel
@@ -191,7 +202,7 @@ int run(int rng_lim)
     // Validate run
     int valid = 1;
     for (i = 0; i < nstrms; ++i) { 
-        if (rngs[i] != rngs2[i*RNG_SHIFT] || seeds[i] != seeds2[i]) {
+        if (RNG_NEQ(rngs[i], rngs2[i*RNG_SHIFT]) || RNG_NEQ(seeds[i], seeds2[i])) {
             valid = 0;
             break;
         }

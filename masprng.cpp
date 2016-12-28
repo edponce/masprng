@@ -2,7 +2,7 @@
 #include "masprng.h"
 
 
-SPRNG * selectType(const int typenum)
+SPRNG * MASPRNG::selectType(int typenum)
 {
     SPRNG * rng = NULL;
 
@@ -27,7 +27,7 @@ SPRNG * selectType(const int typenum)
 
 
 #if defined(SIMD_MODE)
-VSPRNG * selectVType(const int typenum)
+VSPRNG * MASPRNG::selectTypeSIMD(int typenum)
 {
     VSPRNG * rng = NULL;
 
