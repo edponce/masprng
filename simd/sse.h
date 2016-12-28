@@ -6,21 +6,19 @@
  *  Include supporting header files based on compiler and architecture
  *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
-#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#if (GNUC_VERSION > 40800 || defined(__INTEL_COMPILER)) && defined(__x86_64__)
 #include <x86intrin.h>
-#endif
+
 
 /*
  *  SSE2 128-bit wide vector units 
  *
- *  Define some constants required for module to function properly.
+ *  Define some constants required for SIMD module to function properly.
  *  NOTE: these defines are mandatory to interface correctly with MASPRNG
  */
+#define SIMD_WIDTH_BYTES 16 
 #define SIMD_INT __m128i
 #define SIMD_FLT __m128
 #define SIMD_DBL __m128d
-#define SIMD_WIDTH_BYTES 16 
 
 
 /**************************
@@ -39,9 +37,30 @@ inline SIMD_INT simd_mul_u32(SIMD_INT const va, SIMD_INT const vb)
 { return _mm_mul_epu32(va, vb); }
 
 /*!
- *  Multiply packed 32-bit integers,
- *  produce intermediate 64-bit integers, 
+ *  Perform 64-bit integer multiplication using 32-bit integers
+ *  since SSE does not supports 64-bit integer multiplication.
+ *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ *  NOTE: requires at least SSE 4.1 for simd_mullo_epi32()
+ */
+inline SIMD_INT simd_mul_u64(SIMD_INT const va, SIMD_INT const vb)
+{
+    SIMD_INT vshf, vh, vl;
+
+    vshf = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier 
+    vh = _mm_mullo_epi32(va, vshf);     // xl * yh, xh * yl
+    vshf = _mm_slli_epi64(vh, 0x20);    // shift << 32 
+    vh = _mm_add_epi64(vh, vshf);       // h = h1 + h2 
+    vshf = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    vh = _mm_and_si128(vh, vshf);       // h & 0xFFFFFFFF00000000
+    vl = _mm_mul_epu32(va, vb);         // l = xl * yl
+
+    return _mm_add_epi64(vl, vh);       // l + h
+}
+
+/*!
+ *  Multiply packed 32-bit integers, produce intermediate 64-bit integers, 
  *  and store the low 32-bit results
+ *  NOTE: requires at least SSE 4.1 for simd_mullo_epi32()
  */
 inline SIMD_INT simd_mullo_32(SIMD_INT const va, SIMD_INT const vb)
 { return _mm_mullo_epi32(va, vb); }

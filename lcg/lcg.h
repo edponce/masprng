@@ -2,7 +2,6 @@
 #define __LCG_H
 
 
-#include "lcg_config.h"
 #include "sprng.h"
 
 
@@ -22,7 +21,6 @@ class LCG: public SPRNG
     double get_rn_dbl();
     int get_seed_rng() const;
     unsigned long int get_ngens() const;
-
     // NOTE: for debug purposes
     int get_prime();
 #if defined(LONG_SPRNG)
@@ -41,22 +39,22 @@ class LCG: public SPRNG
     int prime_next;
     int parameter;
     const char *gentype;
-
 #if defined(LONG_SPRNG)
     unsigned long int seed;
     unsigned long int multiplier;
-
     // NOTE: need to rename
     unsigned long int mults_g[7];
     unsigned long int multiplier_g;
+
+    unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
 #else
     int seed[2];
     int *multiplier;
     int mults_g[7][4];
     int *multiplier_g;
-#endif
 
-    unsigned long int multiply_48_64(unsigned long int, int) const;
+    unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
+#endif
 };
 
 

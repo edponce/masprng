@@ -20,6 +20,7 @@
 #include <limits.h>
 #include "primes_32.h"
 #include "lcg.h"
+#include "lcg_config.h"
 
 
 unsigned long int LCG::LCG_NGENS = 0;
@@ -43,8 +44,11 @@ LCG::LCG()
     multiplier_g = 0;
 #else
     // NOTE: original version sets to 0 and 1 but they are overwritten.
-    seed[0] = CONFIG.INIT_SEED1;
-    seed[1] = CONFIG.INIT_SEED2;
+    seed[0] = CONFIG.INIT_SEED[0];
+    seed[1] = CONFIG.INIT_SEED[1];
+    for (int i = 0; i < CONFIG.NPARAMS; ++i)
+        for (int j = 0; j < 4; ++j)
+            mults_g[i][j] = CONFIG.MULT[i][j];
     multiplier = NULL;
 #endif
 
@@ -59,15 +63,22 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
-unsigned long int LCG::multiply_48_64(unsigned long int a, int b) const
+unsigned long int LCG::multiply(unsigned long int a, unsigned long int b, unsigned long int c) const
 {
-    unsigned long int c = seed;
+    a *= b;
+    a += c;
+    a &= CONFIG.LSB48;
 
-    c *= a;
-    c += b;
-    c &= CONFIG.LSB48;
+    return a;
+}
+#else
+unsigned long int LCG::multiply(unsigned long int a, unsigned long int b, unsigned long int c) const
+{
+    a *= b;
+    a += c;
+    a &= CONFIG.LSB48;
 
-    return c;
+    return a;
 }
 #endif
 
@@ -132,7 +143,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
  */
 int LCG::get_rn_int()
 {
-    seed = multiply_48_64(multiplier, prime);
+    seed = multiply(seed, multiplier, prime);
     return (int)(seed >> 17);
 }
 
@@ -145,7 +156,7 @@ float LCG::get_rn_flt()
 
 double LCG::get_rn_dbl()
 {
-    seed = multiply_48_64(multiplier, prime);
+    seed = multiply(seed, multiplier, prime);
     return (double)seed * CONFIG.TWO_M48;
 }
 

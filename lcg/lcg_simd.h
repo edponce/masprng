@@ -6,9 +6,6 @@
 
 
 #if defined(SIMD_MODE)
-#include "lcg_config.h"
-
-
 /*! \class VLCG 
  *  \brief Class for SIMD linear congruential RNG.
  */
@@ -26,7 +23,6 @@ class VLCG: public VSPRNG
     SIMD_DBL get_rn_dbl();
     SIMD_INT get_seed_rng() const;
     unsigned long int get_ngens() const;
-
     // NOTE: for debug purposes
     SIMD_INT get_seed();
     SIMD_INT get_prime();
@@ -42,7 +38,6 @@ class VLCG: public VSPRNG
     SIMD_INT seed;
     SIMD_INT multiplier;
     const char *gentype;
-
 #if defined(LONG_SPRNG)
     // NOTE: need to rename
     unsigned long int mults_g[7];
@@ -51,17 +46,15 @@ class VLCG: public VSPRNG
     int mults_g[7][4];
     int *multiplier_g;
 #endif
-
     // SIMD masks
     SIMD_INT vmsk_lsb1[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_lh64[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_hi64;
     SIMD_INT vmsk_lsb48;
     SIMD_INT vmsk_seed;
-    SIMD_INT vmult_shf;
-    void init_simd_masks();
 
-    SIMD_INT multiply_48_64(SIMD_INT, SIMD_INT) const;
+    void init_simd_masks();
+    SIMD_INT multiply(SIMD_INT, SIMD_INT, SIMD_INT) const;
 };
 #endif  // SIMD_MODE
 
