@@ -31,13 +31,13 @@
 /*!
  *  RNG identifiers
  */
-enum SPRNG_CONFIG {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
+enum SPRNG_TYPES {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
 
 
 /*! \class SPRNG
- *  \brief Interface (abstract base class) for RNG types. 
+ *  \brief Interface (pure abstract class) used as base class for RNG types. 
  *
- *  Methods that are virtual require each class for RNG types to define these methods.
+ *  Methods that are virtual require each derived class to define these methods.
  */
 class SPRNG
 {

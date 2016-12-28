@@ -123,7 +123,7 @@ int run(int rng_lim)
     // RNG object
     SPRNG *rng[SIMD_NUM_STREAMS];
     for (i = 0; i < nstrms; ++i) {
-        rng[i] = selectType(RNG_TYPE_NUM);
+        rng[i] = MASPRNG::selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
     }
 
@@ -170,7 +170,7 @@ int run(int rng_lim)
     VRNG_TYPE vrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
+    VSPRNG *vrng = MASPRNG::selectTypeSIMD(RNG_TYPE_NUM);
     vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel

@@ -10,10 +10,18 @@
 
 
 #include "sprng.h"
-SPRNG * selectType(int); 
+/*! \class MASPRNG
+ *  \brief Interface (abstract class) used to create SPRNG instances.
+ */
+class MASPRNG
+{
+    public:
+        virtual ~MASPRNG() = 0; /*!< virtual destructor makes class abstract */
+        static SPRNG * selectType(int);
 #if defined(SIMD_MODE)
-VSPRNG * selectTypeSIMD(int); 
+        static VSPRNG * selectTypeSIMD(int);
 #endif
+};
 
 
 #endif  // __MASPRNG_H
