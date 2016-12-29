@@ -11,6 +11,7 @@
 #endif
 
 
+// NOTE: change to not require pointer parameter
 int setOmpEnv(int * const num_threads)
 {
     int nt;
