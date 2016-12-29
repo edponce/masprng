@@ -28,6 +28,10 @@ inline SIMD_INT simd_add_32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi32(va, vb); }
 inline SIMD_INT simd_add_64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi64(va, vb); }
+inline SIMD_FLT simd_add_ps(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_add_ps(va, vb); }
+inline SIMD_DBL simd_add_pd(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_add_pd(va, vb); }
 
 /*!
  *  Multiply low unsigned 32-bit integers from each packed 64-bit elements

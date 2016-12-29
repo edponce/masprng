@@ -72,7 +72,7 @@ class VSPRNG
 {
   public:
     virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_rng(int, int, int *, int *) = 0;
+    virtual int init_rng(int, int, int * const , int * const) = 0;
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;
