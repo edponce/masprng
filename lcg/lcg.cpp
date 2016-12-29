@@ -137,6 +137,9 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     seed[0] = CONFIG.INIT_SEED[0] ^ (((unsigned long int)init_seed >> 8) & 0xffffff);
     seed[1] = CONFIG.INIT_SEED[1] ^ (((unsigned long int)init_seed << 16) & 0xff0000);
 
+    printf("seed[0]\t%d\n", seed[0]);
+    printf("seed[1]\t%d\n", seed[1]);
+
     if (prime == 0)
         seed[1] |= 1;
 #endif

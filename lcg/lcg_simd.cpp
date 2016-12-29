@@ -165,13 +165,11 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
         printf("ERROR: total_gen out of range, %d\n", tg);
         tg = 1;
     }
-    prime_next = simd_set(tg, tg);
 
     if (gn < 0 || gn >= tg || gn >= CONFIG.LCG_MAX_STREAMS) {
         printf("ERROR: gennum out of range, %d\n", gn);
         return -1;
     }
-    prime_position = simd_set(gn, gn);
     getprime_32(need, &lprime, gn);
 
     for (i = 0; i < SIMD_NUM_STREAMS; ++i) {
@@ -180,23 +178,33 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
             m[i] = 0;
         }
     }
-    prime = simd_set(lprime, lprime);
-    parameter = simd_set(m[1], m[0]);
 
+#if defined(LONG_SPRNG)
+    parameter = simd_set(m[1], m[0]);
     vs = simd_set(s[1], s[0]);
     init_seed = simd_and(vs, vmsk_lsb31);
 
-#if defined(LONG_SPRNG)
+    prime_next = simd_set_64(tg);
+    prime_position = simd_set_64(gn);
+
     multiplier = simd_set(CONFIG.MULT[m[1]], CONFIG.MULT[m[0]]);
 
     vs = simd_sll_64(init_seed, 0x10);
     seed = simd_set(CONFIG.INIT_SEED);
     seed = simd_xor(seed, vs);
 
+    prime = simd_set_64(lprime);
     for (i = 0; i < SIMD_NUM_STREAMS; ++i)
         if (simd_test_zero(prime, vmsk_lh64[i]) == 1)
             seed = simd_or(seed, vmsk_lsb1[i]);
 #else
+    parameter = simd_set(m[3], m[2], m[1], m[0]);
+    vs = simd_set(s[3], s[2], s[1], s[0]);
+    init_seed = simd_and(vs, vmsk_lsb31);
+
+    prime_next = simd_set(tg);
+    prime_position = simd_set(gn);
+
     for (i = 0; i < SIMD_NUM_STREAMS; ++i)
         multiplier[i] = simd_load(CONFIG.MULT[m[i]]);
 
@@ -206,10 +214,17 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     vtmp = simd_and(vtmp, vmsk_lsb24);
     seed[0] = simd_or(seed[0], vtmp);
 
+    simd_print("seed[0]", seed[0]);
+
     seed[1] = simd_set(CONFIG.INIT_SEED[1]);
     vtmp = simd_sll_32(init_seed, 0x10); 
     vtmp = simd_and(vtmp, vmsk_msbset24);
     seed[1] = simd_or(seed[1], vtmp);
+
+    simd_print("seed[1]", seed[1]);
+
+    prime = simd_set(lprime);
+    // NOTE: prime check/set is incomplete
 #endif
 
     // Run generator for a while, same runs for each stream
