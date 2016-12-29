@@ -21,7 +21,7 @@ class LCG: public SPRNG
     double get_rn_dbl();
     int get_seed_rng() const;
     unsigned long int get_ngens() const;
-    // NOTE: for debug purposes
+#if defined(DEBUG)
     int get_prime();
 #if defined(LONG_SPRNG)
     unsigned long int get_seed();
@@ -29,6 +29,7 @@ class LCG: public SPRNG
 #else
     int get_seed();
     int get_multiplier();
+#endif
 #endif
 
   private:
@@ -42,16 +43,11 @@ class LCG: public SPRNG
 #if defined(LONG_SPRNG)
     unsigned long int seed;
     unsigned long int multiplier;
-    // NOTE: need to rename
-    unsigned long int mults_g[7];
-    unsigned long int multiplier_g;
 
     unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
 #else
     int seed[2];
     int *multiplier;
-    int mults_g[7][4];
-    int *multiplier_g;
 
     unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
 #endif

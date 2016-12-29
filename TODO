@@ -2,6 +2,7 @@ select stream config
 port to POWER9 SO arch
 output interface return primitive types instead of SIMD? 
 batch mode?
+put objects files in obj/
 
 change datatypes to int64_t standard conventions
 add const everywhere

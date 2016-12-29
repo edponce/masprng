@@ -8,7 +8,7 @@
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_errors(int rng_type)
+int check_errors(const int rng_type)
 {
     int i;
     int rval;
@@ -163,6 +163,6 @@ int check_errors(int rng_type)
     free(iseeds);
     free(m);
  
-    return 0;
+    return rval;
 }
 

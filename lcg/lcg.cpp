@@ -39,16 +39,10 @@ LCG::LCG()
 #if defined(LONG_SPRNG)
     seed = CONFIG.INIT_SEED;
     multiplier = 0;
-    for (int i = 0; i < CONFIG.NPARAMS; ++i)
-        mults_g[i] = CONFIG.MULT[i];
-    multiplier_g = 0;
 #else
     // NOTE: original version sets to 0 and 1 but they are overwritten.
     seed[0] = CONFIG.INIT_SEED[0];
     seed[1] = CONFIG.INIT_SEED[1];
-    for (int i = 0; i < CONFIG.NPARAMS; ++i)
-        for (int j = 0; j < 4; ++j)
-            mults_g[i][j] = CONFIG.MULT[i][j];
     multiplier = NULL;
 #endif
 
@@ -119,7 +113,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 
 #if defined(LONG_SPRNG)
     if (multiplier == 0)
-        multiplier = mults_g[m];
+        multiplier = CONFIG.MULT[m];
 
     seed ^= (unsigned long int)s << 16;
 
@@ -166,7 +160,7 @@ int LCG::get_seed_rng() const { return init_seed; }
 unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
 
 
-// NOTE: debug purposes
+#if defined(DEBUG)
 int LCG::get_prime() { return prime;}
 #if defined(LONG_SPRNG)
 unsigned long int LCG::get_seed() { return seed; }
@@ -174,6 +168,7 @@ unsigned long int LCG::get_multiplier() { return multiplier; }
 #else
 int LCG::get_seed() { return seed[0]; }
 int LCG::get_multiplier() { return *multiplier; }
+#endif
 #endif
 
 

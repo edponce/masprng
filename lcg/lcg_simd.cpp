@@ -39,15 +39,8 @@ VLCG::VLCG()
 
 #if defined(LONG_SPRNG) 
     seed = simd_set(CONFIG.INIT_SEED, CONFIG.INIT_SEED);
-    for (int i = 0; i < CONFIG.NPARAMS; ++i)
-        mults_g[i] = CONFIG.MULT[i];
-    multiplier_g = 0;
 #else
     seed = simd_set(CONFIG.INIT_SEED[1], CONFIG.INIT_SEED[0]);
-    for (int i = 0; i < CONFIG.NPARAMS; ++i)
-        for (int j = 0; j < 4; ++j)
-            mults_g[i][j] = CONFIG.MULT[i][j];
-    multiplier_g = NULL;
 #endif
 
     init_simd_masks();
@@ -149,7 +142,7 @@ int VLCG::init_rng(int gn, int tg, int *s, int *m)
     simd_store(lmultiplier, multiplier); 
     for (i = 0; i < SIMD_NUM_STREAMS; ++i) {
         if (lmultiplier[i] == 0)
-            lmultiplier[i] = mults_g[m[i]];
+            lmultiplier[i] = CONFIG.MULT[m[i]];
     }
     multiplier = simd_set(lmultiplier[1], lmultiplier[0]);
 
@@ -221,10 +214,11 @@ SIMD_INT VLCG::get_seed_rng() const { return init_seed; }
 unsigned long int VLCG::get_ngens() const { return LCG_NGENS; }
 
 
-// NOTE: debug purposes
+#if defined(DEBUG)
 SIMD_INT VLCG::get_seed() { return seed; }
 SIMD_INT VLCG::get_prime() { return prime; }
 SIMD_INT VLCG::get_multiplier() { return multiplier; }
+#endif
 
 
 #endif // SIMD_MODE

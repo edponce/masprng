@@ -49,8 +49,7 @@ class SPRNG
     virtual double get_rn_dbl() = 0;
     virtual int get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
-
-    // NOTE: for debug purposes
+#if defined(DEBUG)
     virtual int get_prime() = 0;
 #if defined(LONG_SPRNG)
     virtual unsigned long int get_seed() = 0;
@@ -58,6 +57,7 @@ class SPRNG
 #else
     virtual int get_seed() = 0;
     virtual int get_multiplier() = 0;
+#endif
 #endif
 };
 
@@ -78,11 +78,11 @@ class VSPRNG
     virtual SIMD_DBL get_rn_dbl() = 0;
     virtual SIMD_INT get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
-
-    // NOTE: for debug purposes
+#if defined(DEBUG)
     virtual SIMD_INT get_seed() = 0;
     virtual SIMD_INT get_prime() = 0;
     virtual SIMD_INT get_multiplier() = 0;
+#endif
 };
 #endif
 

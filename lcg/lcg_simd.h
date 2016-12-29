@@ -11,7 +11,7 @@
  */
 class VLCG: public VSPRNG
 {
-  // NOTE: not thread-safe?
+  // NOTE: thread-safe?
   static unsigned long int LCG_NGENS;
 
   public:
@@ -23,10 +23,11 @@ class VLCG: public VSPRNG
     SIMD_DBL get_rn_dbl();
     SIMD_INT get_seed_rng() const;
     unsigned long int get_ngens() const;
-    // NOTE: for debug purposes
+#if defined(DEBUG)
     SIMD_INT get_seed();
     SIMD_INT get_prime();
     SIMD_INT get_multiplier();
+#endif
 
   private:
     int rng_type;
@@ -38,22 +39,15 @@ class VLCG: public VSPRNG
     SIMD_INT seed;
     SIMD_INT multiplier;
     const char *gentype;
-#if defined(LONG_SPRNG)
-    // NOTE: need to rename
-    unsigned long int mults_g[7];
-    unsigned long int multiplier_g;
-#else
-    int mults_g[7][4];
-    int *multiplier_g;
-#endif
+    
     // SIMD masks
+    void init_simd_masks();
     SIMD_INT vmsk_lsb1[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_lh64[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_hi64;
     SIMD_INT vmsk_lsb48;
     SIMD_INT vmsk_seed;
 
-    void init_simd_masks();
     SIMD_INT multiply(SIMD_INT, SIMD_INT, SIMD_INT) const;
 };
 #endif  // SIMD_MODE

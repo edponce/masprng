@@ -8,7 +8,11 @@
 #include "check.h"
 
 
+#if defined(DEBUG)
+#define RNG_LIM 1
+#else
 #define RNG_LIM 100
+#endif
 
 
 // Control type of test
@@ -22,7 +26,7 @@
 #define VRNG_TYPE SIMD_INT 
 #define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
-#define RNG_ELEMS nstrms32
+#define RNG_ELEMS (2*nstrms)
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
@@ -32,7 +36,7 @@
 #define VRNG_TYPE SIMD_FLT 
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
-#define RNG_ELEMS nstrms32
+#define RNG_ELEMS (2*nstrms)
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
@@ -42,7 +46,7 @@
 #define VRNG_TYPE SIMD_DBL 
 #define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
-#define RNG_ELEMS nstrms64
+#define RNG_ELEMS nstrms
 #define RNG_SHIFT 1
 #define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif
@@ -83,8 +87,6 @@ int run(int rng_lim)
     double t1;
 
     const int nstrms = SIMD_NUM_STREAMS;
-    const int nstrms32 = 2 * nstrms;
-    const int nstrms64 = nstrms;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
@@ -103,14 +105,16 @@ int run(int rng_lim)
         m[i] = 0;
 
     // Scalar
+#if defined(DEBUG)
     unsigned long int *seeds = NULL;
-    rval = posix_memalign((void **)&seeds, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     unsigned long int *mults = NULL;
-    rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     int *primes = NULL;
-    rval = posix_memalign((void **)&primes, SIMD_ALIGN, nstrms32 * sizeof(int));
+    rval = posix_memalign((void **)&primes, SIMD_ALIGN, 2 * SIMD_NUM_STREAMS * sizeof(int));
+#endif
 
     // Integer/float/double
     RNG_TYPE *rngs = NULL;
@@ -129,11 +133,11 @@ int run(int rng_lim)
         for (j = 0; j < nstrms; ++j) {
             rngs[j] = rng[j]->get_rn();
 
-            // NOTE: debug
+#if defined(DEBUG)
             seeds[j] = rng[j]->get_seed();
             primes[j] = rng[j]->get_prime();
             mults[j] = rng[j]->get_multiplier();
-
+#endif
         }
     }
     t1 = stopTime(timers);
@@ -142,7 +146,11 @@ int run(int rng_lim)
     printf("gen nums %lu\n", rng[SIMD_NUM_STREAMS-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
+#if defined(DEBUG)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs[i], seeds[i], mults[i], primes[i]);
+#else
+        printf("scalar = " RNG_FMT "\n", rngs[i]);
+#endif
     printf("\n");
 
 
@@ -150,14 +158,16 @@ int run(int rng_lim)
     double t2;
 
     // SIMD
+#if defined(DEBUG)
     unsigned long int *seeds2 = NULL;
     rval = posix_memalign((void **)&seeds2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     unsigned long int *mults2 = NULL;
-    rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms64 * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, nstrms32 * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, 2 * SIMD_NUM_STREAMS * sizeof(unsigned int));
+#endif
 
     // Integer/float/double
     RNG_TYPE *rngs2 = NULL;
@@ -176,15 +186,21 @@ int run(int rng_lim)
     t2 = stopTime(timers);
 
     // Print results 
+#if defined(DEBUG)
     simd_store(seeds2, vrng->get_seed());
     simd_store(mults2, vrng->get_multiplier());
     simd_store(primes2, vrng->get_prime());
+#endif
     simd_store(rngs2, vrngs);
 
     printf("gen nums %lu\n", vrng->get_ngens());
     printf("Vector real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
+#if defined(DEBUG)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
+#else
+        printf("vector = " RNG_FMT "\n", rngs2[i*RNG_SHIFT]);
+#endif
     printf("\n");
 
     if (t2 > 0)
@@ -195,7 +211,11 @@ int run(int rng_lim)
     // Validate run
     int valid = 1;
     for (i = 0; i < nstrms; ++i) { 
+#if defined(DEBUG)
         if (RNG_NEQ(rngs[i], rngs2[i*RNG_SHIFT]) || RNG_NEQ(seeds[i], seeds2[i])) {
+#else
+        if (RNG_NEQ(rngs[i], rngs2[i*RNG_SHIFT])) {
+#endif
             valid = 0;
             break;
         }
@@ -207,22 +227,26 @@ int run(int rng_lim)
         printf("FAILED: " RNG_TYPE_STR " generator does not reproduce correct stream.\n");
     printf("\n");
 
+#if defined(DEBUG)
     free(seeds2);
     free(mults2);
     free(primes2);
+#endif
     free(rngs2);
     delete vrng;
 #endif
 
     free(iseeds);
     free(m);
+#if defined(DEBUG)
     free(seeds);
     free(mults);
     free(primes);
+#endif
     free(rngs);
     for (i = 0; i < nstrms; ++i)
         delete rng[i];
- 
-    return 0;
+
+    return rval;
 }
 

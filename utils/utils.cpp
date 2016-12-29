@@ -11,7 +11,7 @@
 #endif
 
 
-int setOmpEnv(int *num_threads)
+int setOmpEnv(int * const num_threads)
 {
     int nt;
 
