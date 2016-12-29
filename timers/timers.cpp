@@ -3,7 +3,7 @@
 #include "timers.h"
 
 
-void startTime(long long int *timers)
+void startTime(long int *timers)
 {
     struct timeval tv;
 
@@ -13,7 +13,7 @@ void startTime(long long int *timers)
 }
 
 
-double stopTime(long long int *timers)
+double stopTime(long int *timers)
 {
     double rtime;
     struct timeval tv;

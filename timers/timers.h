@@ -2,8 +2,8 @@
 #define __TIMERS_H
 
 
-void startTime(long long int *);
-double stopTime(long long int *);
+void startTime(long int *);
+double stopTime(long int *);
 
 
 #endif  // __TIMERS_H

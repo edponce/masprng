@@ -79,7 +79,7 @@ int run(int rng_lim)
     int i, j;
     int rval;
 
-    long long int timers[2];
+    long int timers[2];
     double t1;
 
     const int nstrms = SIMD_NUM_STREAMS;

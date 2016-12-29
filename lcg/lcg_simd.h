@@ -11,13 +11,13 @@
  */
 class VLCG: public VSPRNG
 {
-  // NOTE: not thread-safe
+  // NOTE: not thread-safe?
   static unsigned long int LCG_NGENS;
 
   public:
     VLCG();
     ~VLCG();
-    int init_rng(int, int, int *, int *); // NOTE: initialize using SIMD types?
+    int init_rng(int, int, int *, int *);
     SIMD_INT get_rn_int();
     SIMD_FLT get_rn_flt();
     SIMD_DBL get_rn_dbl();
