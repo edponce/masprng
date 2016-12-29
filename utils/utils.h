@@ -5,7 +5,7 @@
 /*!
  *  Configure OpenMP environment
  */
-int setOmpEnv(int *);
+int setOmpEnv(int * const);
 
 /*!
  *  Detect CPU SIMD features

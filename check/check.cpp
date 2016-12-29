@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "masprng.h"
 #include "utils.h"
-#include "lcg_check.h"
+#include "check.h"
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int lcg_check_errors()
+int check_errors(const int rng_type)
 {
     int i;
     int rval;
@@ -32,9 +32,9 @@ int lcg_check_errors()
     float frngs;
     double drngs;
 
-    // LCG RNG object
-    LCG rng;
-    rng.init_rng(0, 1, iseeds[0], m[0]);
+    // RNG object
+    SPRNG *rng = selectType(rng_type);
+    rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
     const int nstrms32 = 2 * nstrms;
@@ -52,9 +52,9 @@ int lcg_check_errors()
     SIMD_FLT fvrngs;
     SIMD_DBL dvrngs;
 
-    // LCG RNG object
-    VLCG vrng;
-    vrng.init_rng(0, 1, iseeds, m);
+    // RNG object
+    VSPRNG *vrng = selectTypeSIMD(rng_type);
+    vrng->init_rng(0, 1, iseeds, m);
 #endif
 
 
@@ -65,7 +65,7 @@ int lcg_check_errors()
     int valid = 1;
     for (i = 0; i < 200; ++i) {
         rval = scanf("%d\n", &rn);
-        irngs = rng.get_rn_int();
+        irngs = rng->get_rn_int();
 
         if (rn != irngs) {
             valid = 0;
@@ -73,7 +73,7 @@ int lcg_check_errors()
         }
 
 #if defined(SIMD_MODE)
-        ivrngs = vrng.get_rn_int();
+        ivrngs = vrng->get_rn_int();
         simd_store(irngs2, ivrngs);
 
         if (irngs != irngs2[0]) {
@@ -94,7 +94,7 @@ int lcg_check_errors()
     valid = 1;
     for (i = 0; i < 50; ++i) {
         rval = scanf("%d\n", &rn);
-        frngs = rng.get_rn_flt();
+        frngs = rng->get_rn_flt();
 
         int rn1 = rn >> 11;
         int rn2 = (int)(frngs * fltmult);
@@ -104,7 +104,7 @@ int lcg_check_errors()
         }
 
 #if defined(SIMD_MODE)
-        fvrngs = vrng.get_rn_flt();
+        fvrngs = vrng->get_rn_flt();
         simd_store(frngs2, fvrngs);
 
         int rn3 = (int)(frngs2[0] * fltmult);
@@ -126,7 +126,7 @@ int lcg_check_errors()
     valid = 1;
     for (i = 0; i < 50; ++i) {
         rval = scanf("%d\n", &rn);
-        drngs = rng.get_rn_dbl();
+        drngs = rng->get_rn_dbl();
 
         int rn1 = rn >> 1;
         int rn2 = (int)(drngs * dblmult);
@@ -136,7 +136,7 @@ int lcg_check_errors()
         }
 
 #if defined(SIMD_MODE)
-        dvrngs = vrng.get_rn_dbl();
+        dvrngs = vrng->get_rn_dbl();
         simd_store(drngs2, dvrngs);
 
         int rn3 = (int)(drngs2[0] * dblmult);
@@ -163,6 +163,6 @@ int lcg_check_errors()
     free(iseeds);
     free(m);
  
-    return 0;
+    return rval;
 }
 

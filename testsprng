@@ -1,5 +1,5 @@
 #! /bin/bash
 
-echo lcg: Checking C interface:
+echo LCG: Checking C interface:
 ./rng $1 < lcg/lcg.data 2> /dev/null
 

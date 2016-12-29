@@ -22,6 +22,7 @@ CC := g++
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
 CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options
@@ -34,7 +35,7 @@ CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=nat
 LFLAGS :=
 
 # Preprocessor definitions
-# -DUSE_AVX, -DUSE_SSE = select SPRNG vector mode
+# -DAVX_SPRNG, -DSSE_SPRNG = select SPRNG vector mode
 # -DDEBUG = enable debugging
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
@@ -44,8 +45,8 @@ LFLAGS :=
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG
-DEFINES := -DUSE_SSE -DLONG_SPRNG
-#DEFINES := -DUSE_AVX -DLONG_SPRNG
+DEFINES := -DSSE_SPRNG -DLONG_SPRNG
+#DEFINES := -DAVX_SPRNG -DLONG_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
@@ -63,13 +64,13 @@ LIBS := -lm
 
 # Source files to compile
 #SOURCES := masprng.cpp lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp
-SOURCES := masprng.cpp lcg/lcg.cpp lcg/lcg_simd.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse.cpp check/lcg_check.cpp
+SOURCES := masprng.cpp lcg/lcg.cpp lcg/lcg_simd.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse.cpp check/check.cpp
 
 # Object files to link
 OBJECTS := $(SOURCES:.cpp=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.cpp=.h) sprng.h primes/primelist_32.h lcg/lcg_config.h check/check.h
+HEADERS := $(SOURCES:.cpp=.h) sprng.h primes/primelist_32.h lcg/lcg_config.h
 
 # Driver file
 #LCG_DRIVER := drivers/main_lcg.cpp

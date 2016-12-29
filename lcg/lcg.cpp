@@ -20,6 +20,7 @@
 #include <limits.h>
 #include "primes_32.h"
 #include "lcg.h"
+#include "lcg_config.h"
 
 
 unsigned long int LCG::LCG_NGENS = 0;
@@ -38,13 +39,10 @@ LCG::LCG()
 #if defined(LONG_SPRNG)
     seed = CONFIG.INIT_SEED;
     multiplier = 0;
-    for (int i = 0; i < CONFIG.NPARAMS; ++i)
-        mults_g[i] = CONFIG.MULT[i];
-    multiplier_g = 0;
 #else
     // NOTE: original version sets to 0 and 1 but they are overwritten.
-    seed[0] = CONFIG.INIT_SEED1;
-    seed[1] = CONFIG.INIT_SEED2;
+    seed[0] = CONFIG.INIT_SEED[0];
+    seed[1] = CONFIG.INIT_SEED[1];
     multiplier = NULL;
 #endif
 
@@ -59,15 +57,22 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
-unsigned long int LCG::multiply_48_64(unsigned long int a, int b) const
+unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
-    unsigned long int c = seed;
-
-    c *= a;
-    c += b;
-    c &= CONFIG.LSB48;
-
-    return c;
+    unsigned long int res = a;
+    res *= b;
+    res += c;
+    res &= CONFIG.LSB48;
+    return res;
+}
+#else
+unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
+{
+    unsigned long int res = a;
+    res *= b;
+    res += c;
+    res &= CONFIG.LSB48;
+    return res;
 }
 #endif
 
@@ -108,7 +113,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 
 #if defined(LONG_SPRNG)
     if (multiplier == 0)
-        multiplier = mults_g[m];
+        multiplier = CONFIG.MULT[m];
 
     seed ^= (unsigned long int)s << 16;
 
@@ -132,7 +137,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
  */
 int LCG::get_rn_int()
 {
-    seed = multiply_48_64(multiplier, prime);
+    seed = multiply(seed, multiplier, prime);
     return (int)(seed >> 17);
 }
 
@@ -145,7 +150,7 @@ float LCG::get_rn_flt()
 
 double LCG::get_rn_dbl()
 {
-    seed = multiply_48_64(multiplier, prime);
+    seed = multiply(seed, multiplier, prime);
     return (double)seed * CONFIG.TWO_M48;
 }
 
@@ -155,14 +160,15 @@ int LCG::get_seed_rng() const { return init_seed; }
 unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
 
 
-// NOTE: debug purposes
-int LCG::get_prime() { return prime;}
+#if defined(DEBUG)
+int LCG::get_prime() const { return prime;}
 #if defined(LONG_SPRNG)
-unsigned long int LCG::get_seed() { return seed; }
-unsigned long int LCG::get_multiplier() { return multiplier; }
+unsigned long int LCG::get_seed() const { return seed; }
+unsigned long int LCG::get_multiplier() const { return multiplier; }
 #else
-int LCG::get_seed() { return seed[0]; }
-int LCG::get_multiplier() { return *multiplier; }
+int LCG::get_seed() const { return seed[0]; }
+int LCG::get_multiplier() const { return *multiplier; }
+#endif
 #endif
 
 

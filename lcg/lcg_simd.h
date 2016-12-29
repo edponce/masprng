@@ -2,33 +2,32 @@
 #define __LCG_SIMD_H
 
 
-#include "lcg_config.h"
 #include "sprng.h"
 
 
+#if defined(SIMD_MODE)
 /*! \class VLCG 
  *  \brief Class for SIMD linear congruential RNG.
  */
-#if defined(SIMD_MODE)
 class VLCG: public VSPRNG
 {
-  // NOTE: not thread-safe
+  // NOTE: thread-safe?
   static unsigned long int LCG_NGENS;
 
   public:
     VLCG();
     ~VLCG();
-    int init_rng(int, int, int *, int *); // NOTE: initialize using SIMD types?
+    int init_rng(int, int, int *, int *);
     SIMD_INT get_rn_int();
     SIMD_FLT get_rn_flt();
     SIMD_DBL get_rn_dbl();
     SIMD_INT get_seed_rng() const;
     unsigned long int get_ngens() const;
-
-    // NOTE: for debug purposes
-    SIMD_INT get_seed();
-    SIMD_INT get_prime();
-    SIMD_INT get_multiplier();
+#if defined(DEBUG)
+    SIMD_INT get_seed() const;
+    SIMD_INT get_prime() const;
+    SIMD_INT get_multiplier() const;
+#endif
 
   private:
     int rng_type;
@@ -40,28 +39,18 @@ class VLCG: public VSPRNG
     SIMD_INT seed;
     SIMD_INT multiplier;
     const char *gentype;
-
-#if defined(LONG_SPRNG)
-    // NOTE: need to rename
-    unsigned long int mults_g[7];
-    unsigned long int multiplier_g;
-#else
-    int mults_g[7][4];
-    int *multiplier_g;
-#endif
-
+    
     // SIMD masks
+    void init_simd_masks();
     SIMD_INT vmsk_lsb1[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_lh64[SIMD_NUM_STREAMS+1];
     SIMD_INT vmsk_hi64;
     SIMD_INT vmsk_lsb48;
     SIMD_INT vmsk_seed;
-    SIMD_INT vmult_shf;
-    void init_simd_masks();
 
-    SIMD_INT multiply_48_64(SIMD_INT, SIMD_INT) const;
+    SIMD_INT multiply(const SIMD_INT, const SIMD_INT, const SIMD_INT) const;
 };
-#endif
+#endif  // SIMD_MODE
 
 
 #endif  // __LCG_SIMD_H

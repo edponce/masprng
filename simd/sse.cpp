@@ -6,7 +6,7 @@
 #define SIMD_NUM_64BIT (SIMD_WIDTH_BYTES/8) /*!< number of 64-bit values per vector register */
 
 
-void simd_print(char const * const str, SIMD_INT const va)
+void simd_print(const char * const str, const SIMD_INT va)
 {
     unsigned int i;
 
@@ -33,7 +33,7 @@ void simd_print(char const * const str, SIMD_INT const va)
 }
 
 
-void simd_print(char const * const str, SIMD_FLT const va)
+void simd_print(const char * const str, const SIMD_FLT va)
 {
     unsigned int i;
 
@@ -46,7 +46,7 @@ void simd_print(char const * const str, SIMD_FLT const va)
 }
 
 
-void simd_print(char const * const str, SIMD_DBL const va)
+void simd_print(const char * const str, const SIMD_DBL va)
 {
     unsigned int i;
 

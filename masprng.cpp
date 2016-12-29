@@ -2,9 +2,17 @@
 #include "masprng.h"
 
 
-SPRNG * MASPRNG::selectType(int typenum)
+//#include "lfg.h"
+#include "lcg.h"
+//#include "lcg64.h"
+//#include "cmrg.h"
+//#include "mlfg.h"
+//#include "pmlcg.h"
+
+
+SPRNG * selectType(const int typenum)
 {
-    SPRNG * rng = NULL;
+    SPRNG *rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new LFG();
@@ -27,9 +35,18 @@ SPRNG * MASPRNG::selectType(int typenum)
 
 
 #if defined(SIMD_MODE)
-VSPRNG * MASPRNG::selectTypeSIMD(int typenum)
+//#include "lfg_simd.h"
+#include "lcg_simd.h"
+//#include "lcg64_simd.h"
+//#include "cmrg_simd.h"
+//#include "mlfg_simd.h"
+//#include "pmlcg_simd.h"
+
+
+
+VSPRNG * selectTypeSIMD(const int typenum)
 {
-    VSPRNG * rng = NULL;
+    VSPRNG *rng = NULL;
 
     switch (typenum) {
         //case SPRNG_LFG: rng = new VLFG();

@@ -5,7 +5,7 @@
 /*
  *  Check for SIMD mode
  */
-#if defined(USE_SSE)
+#if defined(SSE_SPRNG)
 #define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
 #include "sse.h"
 
@@ -49,15 +49,15 @@ class SPRNG
     virtual double get_rn_dbl() = 0;
     virtual int get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
-
-    // NOTE: for debug purposes
-    virtual int get_prime() = 0;
+#if defined(DEBUG)
+    virtual int get_prime() const = 0;
 #if defined(LONG_SPRNG)
-    virtual unsigned long int get_seed() = 0;
-    virtual unsigned long int get_multiplier() = 0;
+    virtual unsigned long int get_seed() const = 0;
+    virtual unsigned long int get_multiplier() const = 0;
 #else
-    virtual int get_seed() = 0;
-    virtual int get_multiplier() = 0;
+    virtual int get_seed() const = 0;
+    virtual int get_multiplier() const = 0;
+#endif
 #endif
 };
 
@@ -78,11 +78,11 @@ class VSPRNG
     virtual SIMD_DBL get_rn_dbl() = 0;
     virtual SIMD_INT get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
-
-    // NOTE: for debug purposes
-    virtual SIMD_INT get_seed() = 0;
-    virtual SIMD_INT get_prime() = 0;
-    virtual SIMD_INT get_multiplier() = 0;
+#if defined(DEBUG)
+    virtual SIMD_INT get_seed() const = 0;
+    virtual SIMD_INT get_prime() const = 0;
+    virtual SIMD_INT get_multiplier() const = 0;
+#endif
 };
 #endif
 
