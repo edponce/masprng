@@ -57,22 +57,22 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
-unsigned long int LCG::multiply(unsigned long int a, unsigned long int b, unsigned long int c) const
+unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
-    a *= b;
-    a += c;
-    a &= CONFIG.LSB48;
-
-    return a;
+    unsigned long int res = a;
+    res *= b;
+    res += c;
+    res &= CONFIG.LSB48;
+    return res;
 }
 #else
-unsigned long int LCG::multiply(unsigned long int a, unsigned long int b, unsigned long int c) const
+unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
-    a *= b;
-    a += c;
-    a &= CONFIG.LSB48;
-
-    return a;
+    unsigned long int res = a;
+    res *= b;
+    res += c;
+    res &= CONFIG.LSB48;
+    return res;
 }
 #endif
 
@@ -161,13 +161,13 @@ unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
 
 
 #if defined(DEBUG)
-int LCG::get_prime() { return prime;}
+int LCG::get_prime() const { return prime;}
 #if defined(LONG_SPRNG)
-unsigned long int LCG::get_seed() { return seed; }
-unsigned long int LCG::get_multiplier() { return multiplier; }
+unsigned long int LCG::get_seed() const { return seed; }
+unsigned long int LCG::get_multiplier() const { return multiplier; }
 #else
-int LCG::get_seed() { return seed[0]; }
-int LCG::get_multiplier() { return *multiplier; }
+int LCG::get_seed() const { return seed[0]; }
+int LCG::get_multiplier() const { return *multiplier; }
 #endif
 #endif
 

@@ -3,9 +3,18 @@ port to POWER9 SO arch
 output interface return primitive types instead of SIMD? 
 batch mode?
 put objects files in obj/
-
 change datatypes to int64_t standard conventions
-add const everywhere
 
 
-lcg/lcg.h:    // NOTE: need to rename
+sprng.h:#define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
+simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
+simd/sse.h: *  NOTE: these defines are mandatory to interface correctly with MASPRNG
+simd/sse.h: *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
+simd/sse.h: *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
+simd/sse.h:// NOTE: requires at least SSE 4.1 for _mm_test_all_zeros()
+utils/vutils.h:// NOTE: currently only support x86_64
+lcg/lcg_simd.cpp:    gentype = CONFIG.GENTYPE; // NOTE: refactor this, use std::string or char[] with strncpy
+lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/lcg.cpp:    // NOTE: original version sets to 0 and 1 but they are overwritten.
+lcg/lcg_simd.h:  // NOTE: thread-safe?

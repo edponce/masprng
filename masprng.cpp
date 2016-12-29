@@ -10,7 +10,7 @@
 //#include "pmlcg.h"
 
 
-SPRNG * selectType(int typenum)
+SPRNG * selectType(const int typenum)
 {
     SPRNG *rng = NULL;
 
@@ -44,7 +44,7 @@ SPRNG * selectType(int typenum)
 
 
 
-VSPRNG * selectTypeSIMD(int typenum)
+VSPRNG * selectTypeSIMD(const int typenum)
 {
     VSPRNG *rng = NULL;
 

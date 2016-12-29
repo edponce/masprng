@@ -24,9 +24,9 @@ class VLCG: public VSPRNG
     SIMD_INT get_seed_rng() const;
     unsigned long int get_ngens() const;
 #if defined(DEBUG)
-    SIMD_INT get_seed();
-    SIMD_INT get_prime();
-    SIMD_INT get_multiplier();
+    SIMD_INT get_seed() const;
+    SIMD_INT get_prime() const;
+    SIMD_INT get_multiplier() const;
 #endif
 
   private:
@@ -48,7 +48,7 @@ class VLCG: public VSPRNG
     SIMD_INT vmsk_lsb48;
     SIMD_INT vmsk_seed;
 
-    SIMD_INT multiply(SIMD_INT, SIMD_INT, SIMD_INT) const;
+    SIMD_INT multiply(const SIMD_INT, const SIMD_INT, const SIMD_INT) const;
 };
 #endif  // SIMD_MODE
 

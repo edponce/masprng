@@ -22,13 +22,13 @@ class LCG: public SPRNG
     int get_seed_rng() const;
     unsigned long int get_ngens() const;
 #if defined(DEBUG)
-    int get_prime();
+    int get_prime() const;
 #if defined(LONG_SPRNG)
-    unsigned long int get_seed();
-    unsigned long int get_multiplier();
+    unsigned long int get_seed() const;
+    unsigned long int get_multiplier() const;
 #else
-    int get_seed();
-    int get_multiplier();
+    int get_seed() const;
+    int get_multiplier() const;
 #endif
 #endif
 
@@ -43,13 +43,11 @@ class LCG: public SPRNG
 #if defined(LONG_SPRNG)
     unsigned long int seed;
     unsigned long int multiplier;
-
-    unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
+    unsigned long int multiply(const unsigned long int, const unsigned long int, const unsigned long int) const;
 #else
     int seed[2];
     int *multiplier;
-
-    unsigned long int multiply(unsigned long int, unsigned long int, unsigned long int) const;
+    unsigned long int multiply(const unsigned long int, const unsigned long int, const unsigned long int) const;
 #endif
 };
 

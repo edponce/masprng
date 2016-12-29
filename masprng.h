@@ -7,9 +7,9 @@
 /*!
  *  Interface used to create RNG instances.
  */
-SPRNG * selectType(int);
+SPRNG * selectType(const int);
 #if defined(SIMD_MODE)
-VSPRNG * selectTypeSIMD(int);
+VSPRNG * selectTypeSIMD(const int);
 #endif
 
 

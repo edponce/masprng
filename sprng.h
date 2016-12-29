@@ -50,13 +50,13 @@ class SPRNG
     virtual int get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
 #if defined(DEBUG)
-    virtual int get_prime() = 0;
+    virtual int get_prime() const = 0;
 #if defined(LONG_SPRNG)
-    virtual unsigned long int get_seed() = 0;
-    virtual unsigned long int get_multiplier() = 0;
+    virtual unsigned long int get_seed() const = 0;
+    virtual unsigned long int get_multiplier() const = 0;
 #else
-    virtual int get_seed() = 0;
-    virtual int get_multiplier() = 0;
+    virtual int get_seed() const = 0;
+    virtual int get_multiplier() const = 0;
 #endif
 #endif
 };
@@ -79,9 +79,9 @@ class VSPRNG
     virtual SIMD_INT get_seed_rng() const = 0;
     virtual unsigned long int get_ngens() const = 0;
 #if defined(DEBUG)
-    virtual SIMD_INT get_seed() = 0;
-    virtual SIMD_INT get_prime() = 0;
-    virtual SIMD_INT get_multiplier() = 0;
+    virtual SIMD_INT get_seed() const = 0;
+    virtual SIMD_INT get_prime() const = 0;
+    virtual SIMD_INT get_multiplier() const = 0;
 #endif
 };
 #endif

@@ -77,22 +77,22 @@ void VLCG::init_simd_masks()
 /*!
  *  LCG multiply 48-bits using 64-bits.
  */
-SIMD_INT VLCG::multiply(SIMD_INT a, SIMD_INT b, SIMD_INT c) const
+SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) const
 {
-    a = simd_mul_u64(a, b);
-    a = simd_add_64(a, c);
-    a = simd_and(a, vmsk_lsb48);
-
-    return a;
+    SIMD_INT res = a;
+    res = simd_mul_u64(res, b);
+    res = simd_add_64(res, c);
+    res = simd_and(res, vmsk_lsb48);
+    return res;
 }
 #else
-SIMD_INT VLCG::multiply(SIMD_INT a, SIMD_INT b, SIMD_INT c) const
+SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) const
 {
-    a = simd_mul_u64(a, b);
-    a = simd_add_64(a, c);
-    a = simd_and(a, vmsk_lsb48);
-
-    return a;
+    SIMD_INT res = a;
+    res = simd_mul_u64(res, b);
+    res = simd_add_64(res, c);
+    res = simd_and(res, vmsk_lsb48);
+    return res;
 }
 #endif
 
@@ -215,9 +215,9 @@ unsigned long int VLCG::get_ngens() const { return LCG_NGENS; }
 
 
 #if defined(DEBUG)
-SIMD_INT VLCG::get_seed() { return seed; }
-SIMD_INT VLCG::get_prime() { return prime; }
-SIMD_INT VLCG::get_multiplier() { return multiplier; }
+SIMD_INT VLCG::get_seed() const { return seed; }
+SIMD_INT VLCG::get_prime() const { return prime; }
+SIMD_INT VLCG::get_multiplier() const { return multiplier; }
 #endif
 
 
