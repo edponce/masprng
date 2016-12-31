@@ -1,6 +1,8 @@
 select stream config
 port to POWER9 SO arch
-memory manager, output interface return primitive types instead of SIMD? 
 put objects files in obj/
 change datatypes to int64_t standard conventions
 
+fix not long64
+instead of single NUM_STREAMS, use NUM_STREAMS_INT, NUM_STREAMS_FLT, NUM_STREAMS_DBL
+memory manager, output interface return primitive types instead of SIMD

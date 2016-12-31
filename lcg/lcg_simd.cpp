@@ -63,7 +63,7 @@ VLCG::~VLCG()
 /*!
  *  Initialize global SIMD masks
  */
-// NOTE: need to place masks as static constants in this file, I think (and improve names).
+// NOTE: need to place masks as static constants in this file, I think (and improve names). Also, automate for SIMD sizes.
 void VLCG::init_simd_masks()
 {
     // Set vector masks
@@ -252,14 +252,13 @@ SIMD_INT VLCG::get_rn_int()
 SIMD_DBL VLCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
-    SIMD_DBL vfac = simd_set(CONFIG.TWO_M48);
+    const SIMD_DBL vfac = simd_set(CONFIG.TWO_M48);
     SIMD_DBL vseedd;
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
 
-    seed = multiply(seed, multiplier, prime);
-
     // NOTE: casting done with CPU, bad!!
+    seed = multiply(seed, multiplier, prime);
     simd_store(lseed, seed);
     seedd[0] = lseed[0];
     seedd[1] = lseed[1];
@@ -267,27 +266,22 @@ SIMD_DBL VLCG::get_rn_dbl()
 
     return simd_mul_pd(vseedd, vfac);
 #else
-    SIMD_DBL vfac[2];
+    const SIMD_DBL vfac[2] = {simd_set(CONFIG.TWO_M24), simd_set(CONFIG.TWO_M48)};
     SIMD_DBL vseedd[2];
     int lseed[4] __attribute__ ((aligned(SIMD_ALIGN)));
     double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
 
-    multiply(seed, multiplier, prime);
-
     // NOTE: casting done with CPU, bad!!
+    multiply(seed, multiplier, prime);
     simd_store(lseed, seed[0]);
     seedd[0] = lseed[0];
     seedd[1] = lseed[2];
     vseedd[0] = simd_load(seedd);
 
-    // NOTE: casting done with CPU, bad!!
     simd_store(lseed, seed[1]);
     seedd[0] = lseed[0];
     seedd[1] = lseed[2];
     vseedd[1] = simd_load(seedd);
-
-    vfac[0] = simd_set(CONFIG.TWO_M24);
-    vfac[1] = simd_set(CONFIG.TWO_M48);
 
     SIMD_DBL vs1 = simd_mul_pd(vseedd[0], vfac[0]);
     SIMD_DBL vs2 = simd_mul_pd(vseedd[1], vfac[1]);
@@ -305,14 +299,17 @@ SIMD_FLT VLCG::get_rn_flt()
     SIMD_FLT vseedd;
     unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
     float seedd[4] __attribute__ ((aligned(SIMD_ALIGN)));
-    seed = multiply(seed, multiplier, prime);
 
     // NOTE: casting done with CPU, bad!!
+    seed = multiply(seed, multiplier, prime);
     simd_store(lseed, seed);
     seedd[0] = lseed[0];
-    seedd[1] = 0.0;
-    seedd[2] = lseed[1];
-    seedd[3] = 0.0;
+    //seedd[1] = lseed[1];
+
+    //seed = multiply(seed, multiplier, prime);
+    //simd_store(lseed, seed);
+    seedd[2] = lseed[0];
+    //seedd[3] = lseed[1];
     vseedd = simd_load(seedd);
 
     return simd_mul_ps(vseedd, vrng);
