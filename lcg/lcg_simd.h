@@ -45,18 +45,7 @@ class VLCG: public VSPRNG
     SIMD_INT multiplier[4];
     void multiply(SIMD_INT * const, SIMD_INT * const, const SIMD_INT) const;
 #endif
-    const char *gentype;
-    
-    // SIMD masks
-    void init_simd_masks();
-    SIMD_INT vmsk_lsb1[SIMD_NUM_STREAMS+1];
-    SIMD_INT vmsk_lh64[SIMD_NUM_STREAMS+1];
-    SIMD_INT vmsk_hi64;
-    SIMD_INT vmsk_lsb24;
-    SIMD_INT vmsk_lsb48;
-    SIMD_INT vmsk_lsb31;
-    SIMD_INT vmsk_msbset64;
-    SIMD_INT vmsk_msbset24;
+    const char *gentype;    
 };
 #endif  // SIMD_MODE
 

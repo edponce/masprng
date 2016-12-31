@@ -23,6 +23,39 @@
 #include "lcg_config.h"
 
 
+// Global SIMD_masks
+static SIMD_INT vmsk_lsb1[3];
+static SIMD_INT vmsk_lh64[3];
+static SIMD_INT vmsk_hi64;
+static SIMD_INT vmsk_lsb24;
+static SIMD_INT vmsk_lsb48;
+static SIMD_INT vmsk_lsb31;
+static SIMD_INT vmsk_msbset64;
+static SIMD_INT vmsk_msbset24;
+/*!
+ *  Initialize global SIMD masks
+ */
+static void init_simd_masks()
+{
+    // Set vector masks
+    vmsk_lsb1[0] = simd_set(0x1UL);                       // all 
+    vmsk_lsb1[1] = simd_set(0x0UL, 0x1UL);                // first
+    vmsk_lsb1[2] = simd_set(0x1UL, 0x0UL);                // second
+    vmsk_lh64[0] = simd_set(0xFFFFFFFFFFFFFFFFUL);        // all 
+    vmsk_lh64[1] = simd_set(0x0UL, 0xFFFFFFFFFFFFFFFFUL); // first
+    vmsk_lh64[2] = simd_set(0xFFFFFFFFFFFFFFFFUL, 0x0UL); // second
+    vmsk_hi64 = simd_set(0xFFFFFFFF00000000UL);           // all
+    vmsk_lsb24 = simd_set(0xffffff); 
+    vmsk_lsb48 = simd_set(0xffffffffffffL); 
+    vmsk_lsb31 = simd_set(0x7FFFFFFFUL);                   // only 31 LSB of seed considered
+    vmsk_msbset64 = simd_set(0x3ff0000000000000L);
+    vmsk_msbset24 = simd_set(0xff0000);
+}
+
+
+//static SIMD_INT load_idx() {}
+
+
 unsigned long int VLCG::LCG_NGENS = 0;
 
 
@@ -42,10 +75,8 @@ VLCG::VLCG()
 #else
     simd_set_zero(&seed[0]);
     seed[1] = simd_set(1);
-    simd_set_zero(&multiplier[0]);
-    simd_set_zero(&multiplier[1]);
-    simd_set_zero(&multiplier[2]);
-    simd_set_zero(&multiplier[3]);
+    for (int i = 0; i < 4; ++i)
+        simd_set_zero(&multiplier[i]);
 #endif
 
     init_simd_masks();
@@ -57,28 +88,6 @@ VLCG::VLCG()
 VLCG::~VLCG()
 {
     --LCG_NGENS;
-}
-
-
-/*!
- *  Initialize global SIMD masks
- */
-// NOTE: need to place masks as static constants in this file, I think (and improve names). Also, automate for SIMD sizes.
-void VLCG::init_simd_masks()
-{
-    // Set vector masks
-    vmsk_lsb1[0] = simd_set(0x1UL);                       // all 
-    vmsk_lsb1[1] = simd_set(0x0UL, 0x1UL);                // first
-    vmsk_lsb1[2] = simd_set(0x1UL, 0x0UL);                // second
-    vmsk_lh64[0] = simd_set(0xFFFFFFFFFFFFFFFFUL);        // all 
-    vmsk_lh64[1] = simd_set(0x0UL, 0xFFFFFFFFFFFFFFFFUL); // first
-    vmsk_lh64[2] = simd_set(0xFFFFFFFFFFFFFFFFUL, 0x0UL); // second
-    vmsk_hi64 = simd_set(0xFFFFFFFF00000000UL);           // all
-    vmsk_lsb24 = simd_set(0xffffff); 
-    vmsk_lsb48 = simd_set(0xffffffffffffL); 
-    vmsk_lsb31 = simd_set(0x7FFFFFFFUL);                   // only 31 LSB of seed considered
-    vmsk_msbset64 = simd_set(0x3ff0000000000000L);
-    vmsk_msbset24 = simd_set(0xff0000);
 }
 
 
