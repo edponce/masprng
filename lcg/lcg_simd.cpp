@@ -3,8 +3,8 @@
 /*             Parallel 48 bit Linear Congruential Generator             */
 /*                                                                       */ 
 /* Modified by: Eduardo Ponce                                            */
-/*             The University of Tennessee, Knoxville                    */
-/*             Email: eponcemo@utk.edu (Jan 2017)                        */
+/*              The University of Tennessee, Knoxville                   */
+/*              Email: eponcemo@utk.edu (Jan 2017)                       */
 /*                                                                       */
 /* Based on the implementation by:                                       */
 /*             J. Ren                                                    */
@@ -189,8 +189,10 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     }
 
 #if defined(LONG_SPRNG)
-    parameter = simd_set(m[1], m[0]);
-    vs = simd_set(s[1], s[0]);
+    //parameter = simd_set(m[1], m[0]);
+    parameter = simd_set(m, SIMD_NUM_STREAMS);
+    //vs = simd_set(s[1], s[0]);
+    vs = simd_set(s, SIMD_NUM_STREAMS);
     init_seed = simd_and(vs, vmsk_lsb31);
 
     prime_next = simd_set_64(tg);

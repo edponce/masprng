@@ -2,6 +2,10 @@
 #define __SSE_H
 
 
+#include <cstdlib>
+#include <cstring>
+
+
 /*
  *  Include supporting header files based on compiler and architecture
  *  NOTE: currently only support x86_64, GCC and Intel compilers
@@ -112,7 +116,7 @@ inline SIMD_INT simd_shuffle_32(const SIMD_INT va, const int ctrl)
  *  Set intrinsics 
  *******************/
 /*
- *  Set vector to zero and set 32-bit integer to either 32/64 slots.
+ *  Set vector to zero.
  */
 inline void simd_set_zero(SIMD_INT * const va)
 { *va = _mm_setzero_si128(); }
@@ -120,6 +124,9 @@ inline void simd_set_zero(SIMD_FLT * const va)
 { *va = _mm_setzero_ps(); }
 inline void simd_set_zero(SIMD_DBL * const va)
 { *va = _mm_setzero_pd(); }
+/*
+ *  Set 32-bit integer to either 32/64 slots.
+ */
 inline SIMD_INT simd_set(const int sa)
 { return _mm_set1_epi32(sa); }
 inline SIMD_INT simd_set_64(const int sa)
@@ -152,6 +159,41 @@ inline SIMD_FLT simd_set(const float sa3, const float sa2, const float sa1, cons
 { return _mm_set_ps(sa3, sa2, sa1, sa0); }
 inline SIMD_DBL simd_set(const double sa1, const double sa0)
 { return _mm_set_pd(sa1, sa0); }
+/*
+ *  Set vector given an array.
+ */
+/*
+inline SIMD_INT simd_set(const int * const sa, const int n)
+{
+    const int m = SIMD_WIDTH_BYTES/sizeof(int);
+    const int offs = m/n;
+    int * const arr = NULL;
+    int rval __attribute__ ((unused)) = posix_memalign((void **)&arr, SIMD_WIDTH_BYTES, SIMD_WIDTH_BYTES);
+    memset(arr, 0, SIMD_WIDTH_BYTES);
+    for (int i = 0, j = 0; i < m; i+=offs, ++j)
+        arr[i] = sa[j];
+    SIMD_INT va = _mm_load_si128((SIMD_INT *)arr);
+    free(arr);
+    return va;
+}
+*/
+// NOTE: can use unions to allow int and unsigned int
+inline SIMD_INT simd_set(const int * const sa, const int n)
+{
+    SIMD_INT va;
+
+    // Fill using 32-bit words
+    if (SIMD_WIDTH_BYTES/(n * sizeof(int)) == 1) {
+        if (n == 4)
+            va = simd_set(sa[3], sa[2], sa[1], sa[0]);
+    }
+    // Fill using 64-bit words
+    else {
+        if (n == 2)
+            va = simd_set(sa[1], sa[0]);
+    }
+    return va;
+}
 
 
 /***********************

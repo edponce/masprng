@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 int run(int rng_lim)
 {
     int i, j;
-    int rval;
+    int rval __attribute__ ((unused));
 
     long int timers[2];
     double t1;
@@ -247,6 +247,6 @@ int run(int rng_lim)
     for (i = 0; i < nstrms; ++i)
         delete rng[i];
 
-    return rval;
+    return 0;
 }
 

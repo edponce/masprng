@@ -12,9 +12,9 @@ struct LCG_CONFIG
     const int NPARAMS = 7;
 #if defined(LONG_SPRNG)
     const long int INIT_SEED = 0x2bc68cfe166dL;
-    const long int AN[7] = {0xdadf0ac00001L, 0xfefd7a400001L, 0x6417b5c00001L, 0xcf9f72c00001L, 0xbdf07b400001L, 0xf33747c00001L, 0xcbe632c00001L};
-    const long int PMULT[7] = {0xa42c22700000L, 0xfa858cb00000L, 0xd0c4ef00000L, 0xc3cc8e300000L, 0x11bdbe700000L, 0xb0f0e9f00000L, 0x6407de700000L};
-    const long int MULT[7] = {0x2875a2e7b175L, 0x5deece66dL, 0x3eac44605265L, 0x275b38eb4bbdL, 0x1ee1429cc9f5L, 0x739a9cb08605L, 0x3228d7cc25f5L};
+    const long int AN[7] __attribute__ ((aligned(SIMD_ALIGN))) = {0xdadf0ac00001L, 0xfefd7a400001L, 0x6417b5c00001L, 0xcf9f72c00001L, 0xbdf07b400001L, 0xf33747c00001L, 0xcbe632c00001L};
+    const long int PMULT[7] __attribute__ ((aligned(SIMD_ALIGN))) = {0xa42c22700000L, 0xfa858cb00000L, 0xd0c4ef00000L, 0xc3cc8e300000L, 0x11bdbe700000L, 0xb0f0e9f00000L, 0x6407de700000L};
+    const long int MULT[7] __attribute__ ((aligned(SIMD_ALIGN))) = {0x2875a2e7b175L, 0x5deece66dL, 0x3eac44605265L, 0x275b38eb4bbdL, 0x1ee1429cc9f5L, 0x739a9cb08605L, 0x3228d7cc25f5L};
 #else
     const int INIT_SEED[2] = {2868876, 16651885};
     // The following is done since the multiplier is stored in pieces of 12 bits each
