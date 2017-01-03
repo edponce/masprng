@@ -161,6 +161,7 @@ inline SIMD_DBL simd_set(const double sa1, const double sa0)
 { return _mm_set_pd(sa1, sa0); }
 /*
  *  Set vector given an array.
+ *  This is the general form but too involved compared to direct form.
  */
 /*
 inline SIMD_INT simd_set(const int * const sa, const int n)
@@ -177,22 +178,32 @@ inline SIMD_INT simd_set(const int * const sa, const int n)
     return va;
 }
 */
-// NOTE: can use unions to allow int and unsigned int
+/*
+ *  Set vector given an array.
+ *  Only required for 32-bit elements due to in-between padding,
+ *  64-bit elements can use load instructions.
+ */
 inline SIMD_INT simd_set(const int * const sa, const int n)
 {
-    SIMD_INT va;
-
-    // Fill using 32-bit words
-    if (SIMD_WIDTH_BYTES/(n * sizeof(int)) == 1) {
-        if (n == 4)
-            va = simd_set(sa[3], sa[2], sa[1], sa[0]);
-    }
-    // Fill using 64-bit words
-    else {
-        if (n == 2)
-            va = simd_set(sa[1], sa[0]);
-    }
-    return va;
+    if (n == 2)
+        return _mm_set_epi64x(sa[1], sa[0]);
+    else 
+        return _mm_load_si128((SIMD_INT *)sa);
+}
+inline SIMD_INT simd_set(const unsigned int * const sa, const int n)
+{
+    if (n == 2)
+        return _mm_set_epi64x(sa[1], sa[0]);
+    else 
+        return _mm_load_si128((SIMD_INT *)sa);
+}
+/*
+ *  Set vector given an index array and a value array.
+ */
+// NOTE: this functionality should be handled by a driver routine
+inline SIMD_INT simd_set_idx(const int * const ia, const long int * const sa, const int n)
+{
+    return _mm_set_epi64x(sa[ia[1]], sa[ia[0]]);
 }
 
 

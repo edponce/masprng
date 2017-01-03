@@ -53,8 +53,14 @@ static void init_simd_masks()
 }
 
 
-//static SIMD_INT load_idx() {}
-
+// NOTE: eventually only the single int version remains, since SPRNG interface uses int
+#if defined(LONG_SPRNG)
+const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT/2;
+const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT/2;
+#else
+const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT;
+const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT;
+#endif
 
 unsigned long int VLCG::LCG_NGENS = 0;
 
@@ -181,7 +187,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     }
     getprime_32(need, &lprime, gn);
 
-    for (i = 0; i < SIMD_NUM_STREAMS; ++i) {
+    for (i = 0; i < SIMD_STREAMS_MULT; ++i) {
         if (m[i] < 0 || m[i] >= CONFIG.NPARAMS) {
             printf("ERROR: multiplier out of range, %d\n", m[i]);
             m[i] = 0;
@@ -190,22 +196,23 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 
 #if defined(LONG_SPRNG)
     //parameter = simd_set(m[1], m[0]);
-    parameter = simd_set(m, SIMD_NUM_STREAMS);
     //vs = simd_set(s[1], s[0]);
-    vs = simd_set(s, SIMD_NUM_STREAMS);
+    parameter = simd_set(m, SIMD_STREAMS_MULT);
+    vs = simd_set(s, SIMD_STREAMS_SEED);
     init_seed = simd_and(vs, vmsk_lsb31);
 
     prime_next = simd_set_64(tg);
     prime_position = simd_set_64(gn);
 
-    multiplier = simd_set(CONFIG.MULT[m[1]], CONFIG.MULT[m[0]]);
+    //multiplier = simd_set(CONFIG.MULT[m[1]], CONFIG.MULT[m[0]]);
+    multiplier = simd_set_idx(m, CONFIG.MULT, SIMD_STREAMS_MULT);
 
     vs = simd_sll_64(init_seed, 0x10);
     seed = simd_set(CONFIG.INIT_SEED);
     seed = simd_xor(seed, vs);
 
     prime = simd_set_64(lprime);
-    for (i = 0; i < SIMD_NUM_STREAMS; ++i)
+    for (i = 0; i < SIMD_STREAMS_SEED; ++i)
         if (simd_test_zero(prime, vmsk_lh64[i]) == 1)
             seed = simd_or(seed, vmsk_lsb1[i]);
 #else
@@ -216,7 +223,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     prime_next = simd_set(tg);
     prime_position = simd_set(gn);
 
-    for (i = 0; i < SIMD_NUM_STREAMS; ++i)
+    for (i = 0; i < SIMD_STREAMS_MULT; ++i)
         multiplier[i] = simd_load(CONFIG.MULT[m[i]]);
 
     SIMD_INT vtmp;

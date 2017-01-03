@@ -11,8 +11,8 @@
  */
 class VLCG: public VSPRNG
 {
-  // NOTE: thread-safe?
-  static unsigned long int LCG_NGENS;
+    // NOTE: thread-safe?
+    static unsigned long int LCG_NGENS;
 
   public:
     VLCG();

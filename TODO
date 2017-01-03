@@ -8,5 +8,5 @@ instead of single NUM_STREAMS, use NUM_STREAMS_INT, NUM_STREAMS_FLT, NUM_STREAMS
 memory manager, output interface return primitive types instead of SIMD
 
 
-require SIMD set function for arrays (SIMD) 
 use typedef for aligned types, so aligned attribute is in one place
+use only LONG64 version

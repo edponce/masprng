@@ -10,7 +10,7 @@
  */
 class LCG: public SPRNG
 {
-  static unsigned long int LCG_NGENS;
+    static unsigned long int LCG_NGENS;
 
   public:
     LCG();

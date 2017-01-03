@@ -17,14 +17,6 @@ const int SIMD_STREAMS_INT = (SIMD_WIDTH_BYTES/sizeof(int));
 const int SIMD_STREAMS_FLT = (SIMD_WIDTH_BYTES/sizeof(float));
 const int SIMD_STREAMS_DBL = (SIMD_WIDTH_BYTES/sizeof(double));
 
-// NOTE: need to remove this variable
-#if defined(LONG_SPRNG)
-const int SIMD_NUM_STREAMS = (SIMD_WIDTH_BYTES/sizeof(unsigned long int));
-#else
-const int SIMD_NUM_STREAMS = (SIMD_WIDTH_BYTES/sizeof(int));
-#endif
-
-
 
 /*!
  *  RNG identifiers

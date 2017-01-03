@@ -4,6 +4,7 @@
 
 #include "sprng.h"
 
+
 /*!
  *  Interface used to create RNG instances.
  */
