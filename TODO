@@ -10,3 +10,17 @@ memory manager, output interface return primitive types instead of SIMD
 
 use typedef for aligned types, so aligned attribute is in one place
 use only LONG64 version
+
+simd/sse.h:// NOTE: this functionality should be handled by a driver routine
+utils/utils.cpp:// NOTE: change to not require pointer parameter
+lcg/lcg_config.h:// NOTE: required here for SIMD_ALIGN definition
+lcg/lcg_config.h:// NOTE: requires C++11 for non-static initialization in declaration of struct/class
+lcg/lcg_simd.cpp:// NOTE: eventually only the single int version remains, since SPRNG interface uses int
+lcg/lcg_simd.cpp:    gentype = CONFIG.GENTYPE; // NOTE: refactor this, use std::string or char[] with strncpy
+lcg/lcg_simd.cpp:    // NOTE: prime check/set is incomplete
+lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/lcg.cpp:// NOTE: could not use constant parameters because they may be modified.
+lcg/lcg.cpp:    // NOTE: verify these checks
+lcg/lcg_simd.h:    // NOTE: thread-safe?
