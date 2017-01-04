@@ -10,7 +10,7 @@
  */
 class LCG: public SPRNG
 {
-  static unsigned long int LCG_NGENS;
+    static unsigned long int LCG_NGENS;
 
   public:
     LCG();
@@ -46,8 +46,8 @@ class LCG: public SPRNG
     unsigned long int multiply(const unsigned long int, const unsigned long int, const unsigned long int) const;
 #else
     int seed[2];
-    int *multiplier;
-    unsigned long int multiply(const unsigned long int, const unsigned long int, const unsigned long int) const;
+    int multiplier[4];
+    void multiply(int * const, const int * const, const int) const;
 #endif
 };
 

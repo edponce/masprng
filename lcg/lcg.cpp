@@ -17,7 +17,8 @@
 
 
 #include <cstdio>
-#include <limits.h>
+#include <cstring>
+#include <climits>
 #include "primes_32.h"
 #include "lcg.h"
 #include "lcg_config.h"
@@ -37,13 +38,12 @@ LCG::LCG()
     gentype = CONFIG.GENTYPE;
 
 #if defined(LONG_SPRNG)
-    seed = CONFIG.INIT_SEED;
+    seed = 0;
     multiplier = 0;
 #else
-    // NOTE: original version sets to 0 and 1 but they are overwritten.
-    seed[0] = CONFIG.INIT_SEED[0];
-    seed[1] = CONFIG.INIT_SEED[1];
-    multiplier = NULL;
+    seed[0] = 0;
+    seed[1] = 1;
+    memset(multiplier, 0, sizeof(multiplier));
 #endif
 
     ++LCG_NGENS;
@@ -60,19 +60,33 @@ LCG::~LCG()
 unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
     unsigned long int res = a;
+
     res *= b;
     res += c;
-    res &= CONFIG.LSB48;
+    res &= 0xffffffffffffL;
+
     return res;
 }
 #else
-unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
+void LCG::multiply(int * const a, const int * const b, const int c) const
 {
-    unsigned long int res = a;
-    res *= b;
-    res += c;
-    res &= CONFIG.LSB48;
-    return res;
+    int s[4], res[4];
+
+    s[0] = a[1] & 4095;
+    s[1] = a[1] >> 12;
+    s[2] = a[0] & 4095;
+    s[3] = (unsigned int)a[0] >> 12;
+
+    res[0] = b[0] * s[0];
+    res[1] = b[1] * s[0] + b[0] * s[1];
+    res[2] = b[2] * s[0] + b[1] * s[1] + b[0] * s[2];
+    res[3] = b[3] * s[0] + b[2] * s[1] + b[1] * s[2] + b[0] * s[3];
+
+    a[0] = ((unsigned int)a[1] >> 24) + res[2] + ((unsigned int)res[1] >> 12) + (res[3] << 12);
+    a[1] = res[0] + ((res[1] & 4095) << 12) + c;
+
+    a[0] &= 16777215;
+    a[1] &= 16777215;
 }
 #endif
 
@@ -85,10 +99,7 @@ unsigned long int LCG::multiply(const unsigned long int a, const unsigned long i
 int LCG::init_rng(int gn, int tg, int s, int m)
 {
     int i;
-    int need = 1;
-
-    s &= 0x7fffffff; // only 31 LSB of seed considered
-    init_seed = s;
+    const int need = 1;
 
     if (tg <= 0) {
         printf("ERROR: total_gen out of range, %d\n", tg);
@@ -96,14 +107,13 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     prime_next = tg;
 
+    // NOTE: verify these checks
     if (gn < 0 || gn >= tg || gn >= CONFIG.LCG_MAX_STREAMS) {
         printf("ERROR: gennum out of range, %d\n", gn);
         return -1;
     }
     prime_position = gn;
-
-    getprime_32(need, &prime, gn);
-    getprime_32(need, &prime, gn);
+    getprime_32(need, &prime, prime_position);
 
     if (m < 0 || m >= CONFIG.NPARAMS) {
         printf("ERROR: multiplier out of range, %d\n", m);
@@ -111,17 +121,29 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     parameter = m;
 
-#if defined(LONG_SPRNG)
-    if (multiplier == 0)
-        multiplier = CONFIG.MULT[m];
+    init_seed = s & 0x7fffffff; // only 31 LSB of seed considered
 
-    seed ^= (unsigned long int)s << 16;
+#if defined(LONG_SPRNG)
+    multiplier = CONFIG.MULT[parameter];
+
+    seed = CONFIG.INIT_SEED ^ ((unsigned long int)init_seed << 16);
 
     if (prime == 0)
         seed |= 1;
+#else
+    memcpy(multiplier, CONFIG.MULT[parameter], sizeof(multiplier));
+
+    seed[0] = CONFIG.INIT_SEED[0] ^ (((unsigned long int)init_seed >> 8) & 0xffffff);
+    seed[1] = CONFIG.INIT_SEED[1] ^ (((unsigned long int)init_seed << 16) & 0xff0000);
+
+    printf("seed[0]\t%d\n", seed[0]);
+    printf("seed[1]\t%d\n", seed[1]);
+
+    if (prime == 0)
+        seed[1] |= 1;
 #endif
 
-    for (i = 0; i < (CONFIG.LCG_RUNUP * gn); ++i)
+    for (i = 0; i < (CONFIG.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
     return 0;
@@ -137,8 +159,13 @@ int LCG::init_rng(int gn, int tg, int s, int m)
  */
 int LCG::get_rn_int()
 {
+#if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
     return (int)(seed >> 17);
+#else
+    multiply(seed, multiplier, prime);
+    return (seed[0] << 7) | ((unsigned int)seed[1] >> 17);
+#endif
 }
 
 
@@ -150,8 +177,13 @@ float LCG::get_rn_flt()
 
 double LCG::get_rn_dbl()
 {
+#if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
     return (double)seed * CONFIG.TWO_M48;
+#else
+    multiply(seed, multiplier, prime);
+    return (double)seed[0] * CONFIG.TWO_M24 + (double)seed[1] * CONFIG.TWO_M48;
+#endif
 }
 
 
@@ -167,7 +199,7 @@ unsigned long int LCG::get_seed() const { return seed; }
 unsigned long int LCG::get_multiplier() const { return multiplier; }
 #else
 int LCG::get_seed() const { return seed[0]; }
-int LCG::get_multiplier() const { return *multiplier; }
+int LCG::get_multiplier() const { return multiplier[0]; }
 #endif
 #endif
 

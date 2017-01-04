@@ -6,32 +6,22 @@
  *  Check for SIMD mode
  */
 #if defined(SSE_SPRNG)
-#define SIMD_MODE 1 /*!< (NOTE: mandatory) MASPRNG vector flag */
+#define SIMD_MODE 1 /*!< NOTE: mandatory, MASPRNG vector flag */
 #include "sse.h"
-
-#else
-/*
- *  Scalar mode
- */
-#if defined(LONG_SPRNG)
-#define SIMD_WIDTH_BYTES 8
-#else
-#define SIMD_WIDTH_BYTES 4
-#endif
 #endif
 
-#define SIMD_ALIGN SIMD_WIDTH_BYTES
-#if defined(LONG_SPRNG)
-#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/8)
-#else
-#define SIMD_NUM_STREAMS (SIMD_WIDTH_BYTES/4)
-#endif
+
+// Global constants
+const int SIMD_ALIGN = SIMD_WIDTH_BYTES;
+const int SIMD_STREAMS_INT = (SIMD_WIDTH_BYTES/sizeof(int));
+const int SIMD_STREAMS_FLT = (SIMD_WIDTH_BYTES/sizeof(float));
+const int SIMD_STREAMS_DBL = (SIMD_WIDTH_BYTES/sizeof(double));
 
 
 /*!
  *  RNG identifiers
  */
-enum SPRNG_TYPES {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
+enum SPRNG_TYPE {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
 
 
 /*! \class SPRNG
@@ -72,7 +62,7 @@ class VSPRNG
 {
   public:
     virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_rng(int, int, int *, int *) = 0;
+    virtual int init_rng(int, int, int * const , int * const) = 0;
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;

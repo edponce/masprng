@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include "masprng.h"
 #include "utils.h"
 #include "check.h"
@@ -13,7 +13,7 @@ int check_errors(const int rng_type)
     int i;
     int rval;
 
-    const int nstrms = SIMD_NUM_STREAMS;
+    const int nstrms = SIMD_STREAMS_INT/2;
 
     // Initial seeds
     int *iseeds = NULL;

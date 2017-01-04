@@ -81,12 +81,12 @@ int main(int argc, char **argv)
 int run(int rng_lim)
 {
     int i, j;
-    int rval;
+    int rval __attribute__ ((unused));
 
     long int timers[2];
     double t1;
 
-    const int nstrms = SIMD_NUM_STREAMS;
+    const int nstrms = SIMD_STREAMS_INT/2;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
@@ -113,7 +113,7 @@ int run(int rng_lim)
     rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     int *primes = NULL;
-    rval = posix_memalign((void **)&primes, SIMD_ALIGN, 2 * SIMD_NUM_STREAMS * sizeof(int));
+    rval = posix_memalign((void **)&primes, SIMD_ALIGN, SIMD_STREAMS_INT * sizeof(int));
 #endif
 
     // Integer/float/double
@@ -121,7 +121,7 @@ int run(int rng_lim)
     rval = posix_memalign((void **)&rngs, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
 
     // RNG object
-    SPRNG *rng[SIMD_NUM_STREAMS];
+    SPRNG *rng[SIMD_STREAMS_INT/2];
     for (i = 0; i < nstrms; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
@@ -143,7 +143,7 @@ int run(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-    printf("gen nums %lu\n", rng[SIMD_NUM_STREAMS-1]->get_ngens());
+    printf("gen nums %lu\n", rng[SIMD_STREAMS_INT/2-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
 #if defined(DEBUG)
@@ -166,7 +166,7 @@ int run(int rng_lim)
     rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, 2 * SIMD_NUM_STREAMS * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, SIMD_STREAMS_INT * sizeof(unsigned int));
 #endif
 
     // Integer/float/double
@@ -247,6 +247,6 @@ int run(int rng_lim)
     for (i = 0; i < nstrms; ++i)
         delete rng[i];
 
-    return rval;
+    return 0;
 }
 

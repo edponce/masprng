@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib> // getenv
 #include <unistd.h> // sysconf
 #include "utils.h"
 
@@ -11,19 +12,25 @@
 #endif
 
 
-int setOmpEnv(int * const num_threads)
+/*
+ *  If parameter is less than 1, the environment variable OMP_NUM_THREADS is considered.
+ */
+int setOmpEnv(const int num_threads)
 {
     int nt;
 
 #if defined(_OPENMP)
-    nt = (num_threads) ? (*num_threads) : OMP_NUM_THREADS;
+    if (getenv("OMP_NUM_THREADS"))
+        nt = (num_threads > 0) ? (num_threads) : OMP_NUM_THREADS;
+    else
+        nt = (num_threads > 0) ? (num_threads) : 1;
     omp_set_num_threads(nt);
 
 #if defined(__INTEL_COMPILER)
     setenv("KMP_AFFINITY", "granularity=fine,scatter", 1);
 #endif
 #else
-    nt = (num_threads) ? (*num_threads) : 1;
+    nt = (num_threads > 0) ? (num_threads) : 1;
 #endif
 
     return nt;

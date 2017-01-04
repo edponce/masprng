@@ -13,3 +13,13 @@ Only a single SIMD technology is allowed per SPRNG object.
 All SIMD macro decisions are ordered from most recent technology backwards.
 This allows the use of best available technology without the user having to specify.
 Note that the user is allowed to decide on a specific technology using a macro definition.
+
+Each VSPRNG object generates random numbers from multipler streams. The number of streams
+depends on the width of the vector unit and the SPRNG mode (LONG or not). The LONG_SPRNG
+mode is faster, but allows less streams per vector register, so there is a tradeoff.
+
+Both traditional and vector SPRNG objects are supported via the same interface as SPRNG v5.0.
+
+As part of this project, a C interface for Intel SIMD intrinsics was developed. This interface
+allows having different vector technologies agnostic from the application.
+
