@@ -71,14 +71,14 @@ inline SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
  */
 inline SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
 {
-    SIMD_INT vshf, vh, vl;
+    SIMD_INT vshf, vh;
     vshf = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier 
     vh = _mm_mullo_epi32(va, vshf);     // xl * yh, xh * yl
     vshf = _mm_slli_epi64(vh, 0x20);    // shift << 32 
     vh = _mm_add_epi64(vh, vshf);       // h = h1 + h2 
     vshf = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
     vh = _mm_and_si128(vh, vshf);       // h & 0xFFFFFFFF00000000
-    vl = _mm_mul_epu32(va, vb);         // l = xl * yl
+    const SIMD_INT vl = _mm_mul_epu32(va, vb);         // l = xl * yl
     return _mm_add_epi64(vl, vh);       // l + h
 }
 
@@ -268,13 +268,11 @@ inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
 {
     unsigned long int sa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
     float fa[4] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
-
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (float)sa[0];
     fa[1] = 0.0;
     fa[2] = (float)sa[1];
     fa[3] = 0.0;
-    
     return _mm_load_ps(fa);
 }
 
@@ -286,11 +284,9 @@ inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 {
     unsigned long int sa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
     double fa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
-
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (double)sa[0];
     fa[1] = (double)sa[1];
-    
     return _mm_load_pd(fa);
 }
 

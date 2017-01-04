@@ -3,8 +3,8 @@
 /*             Parallel 48 bit Linear Congruential Generator             */
 /*                                                                       */ 
 /* Modified by: Eduardo Ponce                                            */
-/*             The University of Tennessee, Knoxville                    */
-/*             Email: eponcemo@utk.edu (Jan 2017)                        */
+/*              The University of Tennessee, Knoxville                   */
+/*              Email: eponcemo@utk.edu (Jan 2017)                       */
 /*                                                                       */
 /* Modified by: J. Ren                                                   */
 /*             Florida State University                                  */
@@ -59,12 +59,9 @@ LCG::~LCG()
 #if defined(LONG_SPRNG)
 unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
-    unsigned long int res = a;
-
-    res *= b;
+    unsigned long int res = a * b;
     res += c;
     res &= 0xffffffffffffL;
-
     return res;
 }
 #else
@@ -98,9 +95,6 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
  */
 int LCG::init_rng(int gn, int tg, int s, int m)
 {
-    int i;
-    const int need = 1;
-
     if (tg <= 0) {
         printf("ERROR: total_gen out of range, %d\n", tg);
         tg = 1;
@@ -113,6 +107,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
         return -1;
     }
     prime_position = gn;
+    const int need = 1;
     getprime_32(need, &prime, prime_position);
 
     if (m < 0 || m >= CONFIG.NPARAMS) {
@@ -143,7 +138,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
         seed[1] |= 1;
 #endif
 
-    for (i = 0; i < (CONFIG.LCG_RUNUP * prime_position); ++i)
+    for (int i = 0; i < (CONFIG.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
     return 0;

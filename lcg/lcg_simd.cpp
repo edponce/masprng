@@ -47,7 +47,7 @@ static void init_simd_masks()
     vmsk_hi64 = simd_set(0xFFFFFFFF00000000UL);           // all
     vmsk_lsb24 = simd_set(0xffffff); 
     vmsk_lsb48 = simd_set(0xffffffffffffL); 
-    vmsk_lsb31 = simd_set(0x7FFFFFFFUL);                   // only 31 LSB of seed considered
+    vmsk_lsb31 = simd_set(0x7FFFFFFFUL);                  // only 31 LSB of seed considered
     vmsk_msbset64 = simd_set(0x3ff0000000000000L);
     vmsk_msbset24 = simd_set(0xff0000);
 }
@@ -79,10 +79,9 @@ VLCG::VLCG()
     simd_set_zero(&seed);
     simd_set_zero(&multiplier);
 #else
-    int i;
     simd_set_zero(&seed[0]);
     seed[1] = simd_set(1);
-    for (i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; ++i)
         simd_set_zero(&multiplier[i]);
 #endif
 
@@ -105,9 +104,7 @@ VLCG::~VLCG()
 SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) const
 {
     SIMD_INT res = simd_mul_u64(a, b);
-
     res = simd_add_i64(res, c);
-
     return simd_and(res, vmsk_lsb48);
 }
 #else
@@ -170,12 +167,6 @@ void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) co
  */
 int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 {
-    int i;
-    const int need = 1;
-    int lprime;
-    long int lmultiplier[SIMD_STREAMS_MULT];
-    SIMD_INT vs;
-
     if (tg <= 0) {
         printf("ERROR: total_gen out of range, %d\n", tg);
         tg = 1;
@@ -185,15 +176,18 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
         printf("ERROR: gennum out of range, %d\n", gn);
         return -1;
     }
+    const int need = 1;
+    int lprime;
     getprime_32(need, &lprime, gn);
 
-    for (i = 0; i < SIMD_STREAMS_MULT; ++i) {
+    for (int i = 0; i < SIMD_STREAMS_MULT; ++i) {
         if (m[i] < 0 || m[i] >= CONFIG.NPARAMS) {
             printf("ERROR: multiplier out of range, %d\n", m[i]);
             m[i] = 0;
         }
     }
 
+    SIMD_INT vs;
 #if defined(LONG_SPRNG)
     parameter = simd_set(m, SIMD_STREAMS_MULT);
     vs = simd_set(s, SIMD_STREAMS_SEED);
@@ -202,7 +196,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     prime_next = simd_set_64(tg);
     prime_position = simd_set_64(gn);
 
-    for (i = 0; i < SIMD_STREAMS_MULT; ++i)
+    long int lmultiplier[SIMD_STREAMS_MULT];
+    for (int i = 0; i < SIMD_STREAMS_MULT; ++i)
         lmultiplier[i] = CONFIG.MULT[m[i]];
     multiplier = simd_set(lmultiplier, SIMD_STREAMS_MULT);
 
@@ -211,7 +206,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     seed = simd_xor(seed, vs);
 
     prime = simd_set_64(lprime);
-    for (i = 0; i < SIMD_STREAMS_SEED; ++i)
+    for (int i = 0; i < SIMD_STREAMS_SEED; ++i)
         if (simd_test_zero(prime, vmsk_lh64[i]) == 1)
             seed = simd_or(seed, vmsk_lsb1[i]);
 #else
@@ -222,7 +217,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     prime_next = simd_set(tg);
     prime_position = simd_set(gn);
 
-    for (i = 0; i < SIMD_STREAMS_MULT; ++i)
+    for (int i = 0; i < SIMD_STREAMS_MULT; ++i)
         multiplier[i] = simd_load(CONFIG.MULT[m[i]]);
 
     SIMD_INT vtmp;
@@ -245,7 +240,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 #endif
 
     // Run generator for a while, same runs for each stream
-    for (i = 0; i < (CONFIG.LCG_RUNUP * gn); ++i)
+    for (int i = 0; i < (CONFIG.LCG_RUNUP * gn); ++i)
         get_rn_dbl();
  
     return 0;
@@ -270,12 +265,9 @@ SIMD_INT VLCG::get_rn_int()
 SIMD_DBL VLCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
-    const SIMD_DBL vfac = simd_set(CONFIG.TWO_M48);
-    SIMD_DBL seed_dbl;
-
     seed = multiply(seed, multiplier, prime);
-    seed_dbl = simd_cvt_u64_f64(seed);
-
+    const SIMD_DBL seed_dbl = simd_cvt_u64_f64(seed);
+    const SIMD_DBL vfac = simd_set(CONFIG.TWO_M48);
     return simd_mul(seed_dbl, vfac);
 #else
     const SIMD_DBL vfac[2] = {simd_set(CONFIG.TWO_M24), simd_set(CONFIG.TWO_M48)};
@@ -306,12 +298,9 @@ SIMD_DBL VLCG::get_rn_dbl()
 SIMD_FLT VLCG::get_rn_flt()
 {
 #if defined(LONG_SPRNG)
-    const SIMD_FLT vfac = simd_set((float)CONFIG.TWO_M48);
-    SIMD_FLT seed_flt;
-
     seed = multiply(seed, multiplier, prime);
-    seed_flt = simd_cvt_u64_f32(seed);
-
+    const SIMD_FLT seed_flt = simd_cvt_u64_f32(seed);
+    const SIMD_FLT vfac = simd_set((float)CONFIG.TWO_M48);
     return simd_mul(seed_flt, vfac);
 #else
     SIMD_FLT vrng = simd_set((float)CONFIG.TWO_M48);
