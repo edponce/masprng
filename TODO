@@ -1,26 +1,20 @@
-select stream config
-port to POWER9 SO arch
 put objects files in obj/
 change datatypes to int64_t standard conventions
-
 fix not long64
-instead of single NUM_STREAMS, use NUM_STREAMS_INT, NUM_STREAMS_FLT, NUM_STREAMS_DBL
 memory manager, output interface return primitive types instead of SIMD
-
-
 use typedef for aligned types, so aligned attribute is in one place
-use only LONG64 version
+for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 
-simd/sse.h:// NOTE: this functionality should be handled by a driver routine
-utils/utils.cpp:// NOTE: change to not require pointer parameter
+
+simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
+simd/sse.h: *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
+simd/sse.h: *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
 lcg/lcg_config.h:// NOTE: required here for SIMD_ALIGN definition
 lcg/lcg_config.h:// NOTE: requires C++11 for non-static initialization in declaration of struct/class
-lcg/lcg_simd.cpp:// NOTE: eventually only the single int version remains, since SPRNG interface uses int
+lcg/lcg_simd.cpp:// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
 lcg/lcg_simd.cpp:    gentype = CONFIG.GENTYPE; // NOTE: refactor this, use std::string or char[] with strncpy
 lcg/lcg_simd.cpp:    // NOTE: prime check/set is incomplete
+lcg/lcg_simd.cpp:// NOTE: should return contiguous ints?
 lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
-lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
-lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
-lcg/lcg.cpp:// NOTE: could not use constant parameters because they may be modified.
 lcg/lcg.cpp:    // NOTE: verify these checks
 lcg/lcg_simd.h:    // NOTE: thread-safe?

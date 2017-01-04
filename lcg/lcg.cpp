@@ -18,7 +18,7 @@
 
 #include <cstdio>
 #include <cstring>
-#include <limits.h>
+#include <climits>
 #include "primes_32.h"
 #include "lcg.h"
 #include "lcg_config.h"
@@ -96,7 +96,6 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
  *  Should be called total_gen times, with different value
  *  of gennum in [0,total_gen) each call
  */
-// NOTE: could not use constant parameters because they may be modified.
 int LCG::init_rng(int gn, int tg, int s, int m)
 {
     int i;
@@ -127,7 +126,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 #if defined(LONG_SPRNG)
     multiplier = CONFIG.MULT[parameter];
 
-    seed = CONFIG.INIT_SEED ^ (unsigned long int)init_seed << 16;
+    seed = CONFIG.INIT_SEED ^ ((unsigned long int)init_seed << 16);
 
     if (prime == 0)
         seed |= 1;

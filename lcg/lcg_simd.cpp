@@ -17,8 +17,8 @@
 #if defined(SIMD_MODE)
 
 
-#include <stdio.h>
-#include <limits.h>
+#include <cstdio>
+#include <climits>
 #include "primes_32.h"
 #include "lcg_config.h"
 
@@ -53,13 +53,13 @@ static void init_simd_masks()
 }
 
 
-// NOTE: eventually only the single int version remains, since SPRNG interface uses int
+// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
 #if defined(LONG_SPRNG)
-const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT/2;
-const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT/2;
+static const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT/2;
+static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT/2;
 #else
-const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT;
-const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT;
+static const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT;
+static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT;
 #endif
 
 unsigned long int VLCG::LCG_NGENS = 0;
@@ -79,9 +79,10 @@ VLCG::VLCG()
     simd_set_zero(&seed);
     simd_set_zero(&multiplier);
 #else
+    int i;
     simd_set_zero(&seed[0]);
     seed[1] = simd_set(1);
-    for (int i = 0; i < 4; ++i)
+    for (i = 0; i < 4; ++i)
         simd_set_zero(&multiplier[i]);
 #endif
 
@@ -103,13 +104,11 @@ VLCG::~VLCG()
  */
 SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) const
 {
-    SIMD_INT res = a;
+    SIMD_INT res = simd_mul_u64(a, b);
 
-    res = simd_mul_u64(res, b);
-    res = simd_add_64(res, c);
-    res = simd_and(res, vmsk_lsb48);
+    res = simd_add_i64(res, c);
 
-    return res;
+    return simd_and(res, vmsk_lsb48);
 }
 #else
 /*!
@@ -127,35 +126,35 @@ void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) co
     s[2] = simd_and(a[0], s[2]);
     s[3] = simd_srl_32(a[0], 0xc);
 
-    res[0] = simd_mullo_32(b[0], s[0]);
-    res[1] = simd_mullo_32(b[1], s[0]);
-    vtmp = simd_mullo_32(b[0], s[1]);   
-    res[1] = simd_add_32(res[1], vtmp);
-    res[2] = simd_mullo_32(b[2], s[0]);
-    vtmp = simd_mullo_32(b[1], s[1]);   
-    res[2] = simd_add_32(res[2], vtmp);
-    vtmp = simd_mullo_32(b[0], s[2]);   
-    res[2] = simd_add_32(res[2], vtmp);
-    res[3] = simd_mullo_32(b[3], s[0]);
-    vtmp = simd_mullo_32(b[2], s[1]);   
-    res[3] = simd_add_32(res[3], vtmp);
-    vtmp = simd_mullo_32(b[1], s[2]);   
-    res[3] = simd_add_32(res[3], vtmp);
-    vtmp = simd_mullo_32(b[0], s[3]);   
-    res[3] = simd_add_32(res[3], vtmp);
+    res[0] = simd_mullo_i32(b[0], s[0]);
+    res[1] = simd_mullo_i32(b[1], s[0]);
+    vtmp = simd_mullo_i32(b[0], s[1]);   
+    res[1] = simd_add_i32(res[1], vtmp);
+    res[2] = simd_mullo_i32(b[2], s[0]);
+    vtmp = simd_mullo_i32(b[1], s[1]);   
+    res[2] = simd_add_i32(res[2], vtmp);
+    vtmp = simd_mullo_i32(b[0], s[2]);   
+    res[2] = simd_add_i32(res[2], vtmp);
+    res[3] = simd_mullo_i32(b[3], s[0]);
+    vtmp = simd_mullo_i32(b[2], s[1]);   
+    res[3] = simd_add_i32(res[3], vtmp);
+    vtmp = simd_mullo_i32(b[1], s[2]);   
+    res[3] = simd_add_i32(res[3], vtmp);
+    vtmp = simd_mullo_i32(b[0], s[3]);   
+    res[3] = simd_add_i32(res[3], vtmp);
  
     vtmp = simd_srl_32(a[1], 0x18); 
-    vtmp = simd_add_32(vtmp, res[2]);
+    vtmp = simd_add_i32(vtmp, res[2]);
     vtmp2 = simd_srl_32(res[1], 0xc);
-    vtmp = simd_add_32(vtmp, vtmp2);
+    vtmp = simd_add_i32(vtmp, vtmp2);
     vtmp2 = simd_sll_32(res[3], 0xc);
-    a[0] = simd_add_32(vtmp, vtmp2);
+    a[0] = simd_add_i32(vtmp, vtmp2);
 
     vtmp = simd_set(4095);
     vtmp = simd_and(res[1], vtmp);
     vtmp = simd_sll_32(vtmp, 0xc);
-    vtmp = simd_add_32(res[0], vtmp);
-    a[1] = simd_add_32(vtmp, c);
+    vtmp = simd_add_i32(res[0], vtmp);
+    a[1] = simd_add_i32(vtmp, c);
 
     vtmp = simd_set(16777215);
     a[0] = simd_and(a[0], vtmp);
@@ -174,6 +173,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     int i;
     const int need = 1;
     int lprime;
+    long int lmultiplier[SIMD_STREAMS_MULT];
     SIMD_INT vs;
 
     if (tg <= 0) {
@@ -195,8 +195,6 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     }
 
 #if defined(LONG_SPRNG)
-    //parameter = simd_set(m[1], m[0]);
-    //vs = simd_set(s[1], s[0]);
     parameter = simd_set(m, SIMD_STREAMS_MULT);
     vs = simd_set(s, SIMD_STREAMS_SEED);
     init_seed = simd_and(vs, vmsk_lsb31);
@@ -204,8 +202,9 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     prime_next = simd_set_64(tg);
     prime_position = simd_set_64(gn);
 
-    //multiplier = simd_set(CONFIG.MULT[m[1]], CONFIG.MULT[m[0]]);
-    multiplier = simd_set_idx(m, CONFIG.MULT, SIMD_STREAMS_MULT);
+    for (i = 0; i < SIMD_STREAMS_MULT; ++i)
+        lmultiplier[i] = CONFIG.MULT[m[i]];
+    multiplier = simd_set(lmultiplier, SIMD_STREAMS_MULT);
 
     vs = simd_sll_64(init_seed, 0x10);
     seed = simd_set(CONFIG.INIT_SEED);
@@ -253,6 +252,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 }
 
 
+// NOTE: should return contiguous ints?
 SIMD_INT VLCG::get_rn_int()
 {
 #if defined(LONG_SPRNG)
@@ -271,18 +271,12 @@ SIMD_DBL VLCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
     const SIMD_DBL vfac = simd_set(CONFIG.TWO_M48);
-    SIMD_DBL vseedd;
-    unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
-    double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
+    SIMD_DBL seed_dbl;
 
-    // NOTE: casting done with CPU, bad!!
     seed = multiply(seed, multiplier, prime);
-    simd_store(lseed, seed);
-    seedd[0] = lseed[0];
-    seedd[1] = lseed[1];
-    vseedd = simd_load(seedd);
+    seed_dbl = simd_cvt_u64_f64(seed);
 
-    return simd_mul_pd(vseedd, vfac);
+    return simd_mul(seed_dbl, vfac);
 #else
     const SIMD_DBL vfac[2] = {simd_set(CONFIG.TWO_M24), simd_set(CONFIG.TWO_M48)};
     SIMD_DBL vseedd[2];
@@ -301,40 +295,28 @@ SIMD_DBL VLCG::get_rn_dbl()
     seedd[1] = lseed[2];
     vseedd[1] = simd_load(seedd);
 
-    SIMD_DBL vs1 = simd_mul_pd(vseedd[0], vfac[0]);
-    SIMD_DBL vs2 = simd_mul_pd(vseedd[1], vfac[1]);
+    SIMD_DBL vs1 = simd_mul(vseedd[0], vfac[0]);
+    SIMD_DBL vs2 = simd_mul(vseedd[1], vfac[1]);
  
-    return simd_add_pd(vs1, vs2);
+    return simd_add(vs1, vs2);
 #endif
 }
 
 
 SIMD_FLT VLCG::get_rn_flt()
 {
-    SIMD_FLT vrng = simd_set((float)CONFIG.TWO_M48);
-
 #if defined(LONG_SPRNG)
-    SIMD_FLT vseedd;
-    unsigned long int lseed[2] __attribute__ ((aligned(SIMD_ALIGN)));
-    float seedd[4] __attribute__ ((aligned(SIMD_ALIGN)));
+    const SIMD_FLT vfac = simd_set((float)CONFIG.TWO_M48);
+    SIMD_FLT seed_flt;
 
-    // NOTE: casting done with CPU, bad!!
     seed = multiply(seed, multiplier, prime);
-    simd_store(lseed, seed);
-    seedd[0] = lseed[0];
-    //seedd[1] = lseed[1];
+    seed_flt = simd_cvt_u64_f32(seed);
 
-    //seed = multiply(seed, multiplier, prime);
-    //simd_store(lseed, seed);
-    seedd[2] = lseed[0];
-    //seedd[3] = lseed[1];
-    vseedd = simd_load(seedd);
-
-    return simd_mul_ps(vseedd, vrng);
-    //return simd_cvt_pd2ps(get_rn_dbl());
+    return simd_mul(seed_flt, vfac);
 #else
+    SIMD_FLT vrng = simd_set((float)CONFIG.TWO_M48);
     multiply(seed, multiplier, prime);
-    return simd_mul_ps(vrng, vrng);
+    return simd_mul(vrng, vrng);
 #endif
 }
 

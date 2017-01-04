@@ -1,8 +1,9 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/time.h>
 #include "timers.h"
 
 
+// NOTE: use <ctime> functions instead of <sys/time.h>
 void startTime(long int * const timers)
 {
     struct timeval tv;
