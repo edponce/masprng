@@ -1,0 +1,12 @@
+#ifndef __SPRNG_CONFIG_H
+#define __SPRNG_CONFIG_H
+
+
+/*!
+ *  RNG identifiers
+ */
+enum SPRNG_TYPE {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
+
+
+#endif  // __SPRNG_CONFIG_H
+

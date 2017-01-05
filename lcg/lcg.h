@@ -2,9 +2,6 @@
 #define __LCG_H
 
 
-#include "sprng.h"
-
-
 /*! \class LCG 
  *  \brief Class for linear congruential RNG. 
  */
@@ -23,13 +20,13 @@ class LCG: public SPRNG
     unsigned long int get_ngens() const;
 #if defined(DEBUG)
     int get_prime() const;
-  #if defined(LONG_SPRNG)
+# if defined(LONG_SPRNG)
     unsigned long int get_seed() const;
     unsigned long int get_multiplier() const;
-  #else
+# else
     int get_seed() const;
     int get_multiplier() const;
-  #endif
+# endif
 #endif
 
   private:

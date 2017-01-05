@@ -19,9 +19,10 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
-#include "primes_32.h"
-#include "lcg.h"
+#include "sprng.h"
 #include "lcg_config.h"
+#include "lcg.h"
+#include "primes_32.h"
 
 
 unsigned long int LCG::LCG_NGENS = 0;
@@ -189,13 +190,13 @@ unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
 
 #if defined(DEBUG)
 int LCG::get_prime() const { return prime;}
-  #if defined(LONG_SPRNG)
+# if defined(LONG_SPRNG)
 unsigned long int LCG::get_seed() const { return seed; }
 unsigned long int LCG::get_multiplier() const { return multiplier; }
-  #else
+# else
 int LCG::get_seed() const { return seed[0]; }
 int LCG::get_multiplier() const { return multiplier[0]; }
-  #endif
+# endif
 #endif
 
 

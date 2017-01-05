@@ -8,7 +8,7 @@
 
 
 #if defined(_OPENMP)
-  #include <omp.h>
+#include <omp.h>
 #endif
 
 
@@ -26,9 +26,9 @@ int setOmpEnv(const int num_threads)
         nt = (num_threads > 0) ? (num_threads) : 1;
     omp_set_num_threads(nt);
 
-  #if defined(__INTEL_COMPILER)
+# if defined(__INTEL_COMPILER)
     setenv("KMP_AFFINITY", "granularity=fine,scatter", 1);
-  #endif
+# endif
 #else
     nt = (num_threads > 0) ? (num_threads) : 1;
 #endif
