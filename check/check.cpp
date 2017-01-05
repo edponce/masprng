@@ -1,8 +1,14 @@
 #include <cstdio>
 #include <cstdlib>
-#include "masprng.h"
+#include "sprng.h"
 #include "utils.h"
 #include "check.h"
+
+
+#if !defined(SIMD_MODE)
+#define SIMD_ALIGN 8
+#define SIMD_STREAMS_INT 1
+#endif
 
 
 /*!

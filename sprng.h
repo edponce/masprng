@@ -1,11 +1,11 @@
-#ifndef __MASPRNG_H
-#define __MASPRNG_H
+#ifndef __SPRNG_H
+#define __SPRNG_H
 
 
 #include <cstdio>
 
 
-#include "sprng.h"
+#include "ssprng.h"
 //#include "lfg.h"
 #include "lcg.h"
 //#include "lcg64.h"
@@ -79,5 +79,5 @@ inline VSPRNG * selectTypeSIMD(const int typenum)
 #endif
 
 
-#endif  // __MASPRNG_H
+#endif  // __SPRNG_H
 
