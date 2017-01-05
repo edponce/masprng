@@ -1,7 +1,0 @@
-<map id="check_gen" name="check_gen">
-<area shape="rect" id="node2" href="$dc/d18/classSPRNG.html#afa5c04d8c7cf709bc469ad7eae81be7d" title="SPRNG::get_rn_dbl" alt="" coords="139,5,277,32"/>
-<area shape="rect" id="node3" href="$dc/d18/classSPRNG.html#a4a6dc1907421b37d02defbd6ec0fa446" title="SPRNG::get_rn_flt" alt="" coords="142,56,274,83"/>
-<area shape="rect" id="node4" href="$dc/d18/classSPRNG.html#a228fb52d1350f90b33f248b471803bdf" title="SPRNG::get_rn_int" alt="" coords="141,107,275,133"/>
-<area shape="rect" id="node5" href="$dc/d18/classSPRNG.html#ad9862ab2a1362b455c3fd329041e3dd4" title="SPRNG::init_rng" alt="" coords="148,157,268,184"/>
-<area shape="rect" id="node6" href="$d6/dec/masprng_8cpp.html#a438a09dea20c289086f0b8cbca09a112" title="selectType" alt="" coords="165,208,251,235"/>
-</map>

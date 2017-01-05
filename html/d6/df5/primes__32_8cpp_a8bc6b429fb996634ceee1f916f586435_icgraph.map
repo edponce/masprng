@@ -1,5 +1,0 @@
-<map id="init_prime_32" name="init_prime_32">
-<area shape="rect" id="node2" href="$df/d0f/primes__32_8h.html#a4a0045941fbaa2678463dc6deb8d886f" title="getprime_32" alt="" coords="152,31,245,57"/>
-<area shape="rect" id="node3" href="$d2/d05/classLCG.html#a85170da4c35402fdf74ea62f1b2b7a91" title="LCG::init_rng" alt="" coords="298,5,397,32"/>
-<area shape="rect" id="node4" href="$d3/dc0/classVLCG.html#a6c9569bd644644ca109dadd7531f66dd" title="VLCG::init_rng" alt="" coords="293,56,401,83"/>
-</map>
