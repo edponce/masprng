@@ -1,3 +1,4 @@
 <map id="SPRNG::get_seed_rng" name="SPRNG::get_seed_rng">
-<area shape="rect" id="node2" href="$dc/d18/classSPRNG.html#a9fc05f3faa7656af1318581779e6f7f3" title="SPRNG::~SPRNG" alt="" coords="209,5,344,32"/>
+<area shape="rect" id="node2" href="$dc/d18/classSPRNG.html#a9fc05f3faa7656af1318581779e6f7f3" title="SPRNG::~SPRNG" alt="" coords="218,5,353,32"/>
+<area shape="rect" id="node3" href="$de/dc5/classVSPRNG.html#a28fff448bf1d191b71097e3cee7f0e07" title="VSPRNG::~VSPRNG" alt="" coords="209,56,361,83"/>
 </map>

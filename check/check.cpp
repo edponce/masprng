@@ -8,7 +8,7 @@
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_errors(const int rng_type)
+int check_gen(const int rng_type)
 {
     int i;
     int rval;

@@ -7,3 +7,5 @@ rng
 # Temporary files
 utils/vutils*
 
+# Documentation
+html/

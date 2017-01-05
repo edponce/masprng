@@ -1,13 +1,12 @@
 var indexSectionsWithContent =
 {
-  0: "_cdgilmnprstuvy~",
-  1: "ls",
+  0: "_cdgilmnprstuv~",
+  1: "lsv",
   2: "cdlmpstuv",
-  3: "_cgilmprs~",
-  4: "cgilmnprst",
+  3: "_cgilmpsv~",
+  4: "cgilmnprstv",
   5: "s",
-  6: "s",
-  7: "gmnprstvy"
+  6: "s"
 };
 
 var indexSectionNames =
@@ -18,19 +17,17 @@ var indexSectionNames =
   3: "functions",
   4: "variables",
   5: "enums",
-  6: "enumvalues",
-  7: "defines"
+  6: "enumvalues"
 };
 
 var indexSectionLabels =
 {
   0: "All",
-  1: "Classes",
+  1: "Data Structures",
   2: "Files",
   3: "Functions",
   4: "Variables",
   5: "Enumerations",
-  6: "Enumerator",
-  7: "Macros"
+  6: "Enumerator"
 };
 

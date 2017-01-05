@@ -316,13 +316,13 @@ unsigned long int VLCG::get_ngens() const { return LCG_NGENS; }
 
 #if defined(DEBUG)
 SIMD_INT VLCG::get_prime() const { return prime; }
-#if defined(LONG_SPRNG)
+  #if defined(LONG_SPRNG)
 SIMD_INT VLCG::get_seed() const { return seed; }
 SIMD_INT VLCG::get_multiplier() const { return multiplier; }
-#else
+  #else
 SIMD_INT VLCG::get_seed() const { return seed[0]; }
 SIMD_INT VLCG::get_multiplier() const { return multiplier[0]; }
-#endif
+  #endif
 #endif
 
 

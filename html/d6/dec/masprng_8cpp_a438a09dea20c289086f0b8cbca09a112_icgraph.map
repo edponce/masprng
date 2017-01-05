@@ -1,7 +1,5 @@
 <map id="selectType" name="selectType">
-<area shape="rect" id="node2" href="$d6/d38/check_8h.html#a009f3e65f5161dc4c222590b4346b424" title="check_errors" alt="" coords="140,5,237,32"/>
-<area shape="rect" id="node4" href="$d1/d88/main__lcg_8cpp.html#a488408158c6ba38333934d4c82060126" title="check_gen" alt="" coords="146,107,231,133"/>
-<area shape="rect" id="node6" href="$d5/d15/driver_8cpp.html#a08d1a0102b61a65474e906c5f1c894ee" title="run" alt="" coords="169,56,209,83"/>
-<area shape="rect" id="node3" href="$d5/d15/driver_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="285,31,336,57"/>
-<area shape="rect" id="node5" href="$d1/d88/main__lcg_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title="main" alt="" coords="285,107,336,133"/>
+<area shape="rect" id="node2" href="$d6/d38/check_8h.html#a05200c6d005c78abac4a8bd3ef1c0014" title="check_gen" alt="" coords="140,5,225,32"/>
+<area shape="rect" id="node4" href="$d5/d15/driver_8cpp.html#a46735800fdc6a3f22d029918ca026199" title="main_gen" alt="" coords="143,56,222,83"/>
+<area shape="rect" id="node3" href="$d5/d15/driver_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="273,31,324,57"/>
 </map>

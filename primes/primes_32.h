@@ -6,6 +6,7 @@
 #define MINPRIME 3444     /*!< sqrt(MAXPRIME) */
 #define MAXPRIMEOFFSET 779156
 
+
 int getprime_32(int, int *, int);
 
 

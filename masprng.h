@@ -6,10 +6,14 @@
 
 
 /*!
- *  Interface used to create RNG instances.
+ *  Function used to create RNG instances.
  */
 SPRNG * selectType(const int);
+
 #if defined(SIMD_MODE)
+/*!
+ *  Function used to create SIMD RNG instances.
+ */
 VSPRNG * selectTypeSIMD(const int);
 #endif
 

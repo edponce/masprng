@@ -35,12 +35,12 @@ SPRNG * selectType(const int typenum)
 
 
 #if defined(SIMD_MODE)
-//#include "lfg_simd.h"
-#include "lcg_simd.h"
-//#include "lcg64_simd.h"
-//#include "cmrg_simd.h"
-//#include "mlfg_simd.h"
-//#include "pmlcg_simd.h"
+  //#include "lfg_simd.h"
+  #include "lcg_simd.h"
+  //#include "lcg64_simd.h"
+  //#include "cmrg_simd.h"
+  //#include "mlfg_simd.h"
+  //#include "pmlcg_simd.h"
 
 
 

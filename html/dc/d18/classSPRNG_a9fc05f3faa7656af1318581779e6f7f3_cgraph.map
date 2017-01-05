@@ -1,8 +1,11 @@
 <map id="SPRNG::~SPRNG" name="SPRNG::~SPRNG">
-<area shape="rect" id="node2" href="$dc/d18/classSPRNG.html#ac7fd3514af4e2b4ae01042d2903048ba" title="SPRNG::get_ngens" alt="" coords="197,5,335,32"/>
-<area shape="rect" id="node3" href="$dc/d18/classSPRNG.html#afa5c04d8c7cf709bc469ad7eae81be7d" title="SPRNG::get_rn_dbl" alt="" coords="197,56,335,83"/>
-<area shape="rect" id="node4" href="$dc/d18/classSPRNG.html#a4a6dc1907421b37d02defbd6ec0fa446" title="SPRNG::get_rn_flt" alt="" coords="200,107,332,133"/>
-<area shape="rect" id="node5" href="$dc/d18/classSPRNG.html#a228fb52d1350f90b33f248b471803bdf" title="SPRNG::get_rn_int" alt="" coords="199,157,333,184"/>
-<area shape="rect" id="node6" href="$dc/d18/classSPRNG.html#a40f87d016a40a59cc8e926d11e24734e" title="SPRNG::get_seed_rng" alt="" coords="188,208,344,235"/>
-<area shape="rect" id="node7" href="$dc/d18/classSPRNG.html#ad9862ab2a1362b455c3fd329041e3dd4" title="SPRNG::init_rng" alt="" coords="206,259,326,285"/>
+<area shape="rect" id="node2" href="$dc/d18/classSPRNG.html#adc9b4cf546b80df8d8a2efc12d7b2400" title="SPRNG::get_multiplier" alt="" coords="189,5,343,32"/>
+<area shape="rect" id="node3" href="$dc/d18/classSPRNG.html#ac7fd3514af4e2b4ae01042d2903048ba" title="SPRNG::get_ngens" alt="" coords="197,56,335,83"/>
+<area shape="rect" id="node4" href="$dc/d18/classSPRNG.html#a1364fcd0ebb0004ad23342c6b7577162" title="SPRNG::get_prime" alt="" coords="199,107,333,133"/>
+<area shape="rect" id="node5" href="$dc/d18/classSPRNG.html#afa5c04d8c7cf709bc469ad7eae81be7d" title="SPRNG::get_rn_dbl" alt="" coords="197,157,335,184"/>
+<area shape="rect" id="node6" href="$dc/d18/classSPRNG.html#a4a6dc1907421b37d02defbd6ec0fa446" title="SPRNG::get_rn_flt" alt="" coords="200,208,332,235"/>
+<area shape="rect" id="node7" href="$dc/d18/classSPRNG.html#a228fb52d1350f90b33f248b471803bdf" title="SPRNG::get_rn_int" alt="" coords="199,259,333,285"/>
+<area shape="rect" id="node8" href="$dc/d18/classSPRNG.html#a0dc1d040cd2af220653af1311cb693bd" title="SPRNG::get_seed" alt="" coords="201,309,331,336"/>
+<area shape="rect" id="node9" href="$dc/d18/classSPRNG.html#a40f87d016a40a59cc8e926d11e24734e" title="SPRNG::get_seed_rng" alt="" coords="188,360,344,387"/>
+<area shape="rect" id="node10" href="$dc/d18/classSPRNG.html#ad9862ab2a1362b455c3fd329041e3dd4" title="SPRNG::init_rng" alt="" coords="206,411,326,437"/>
 </map>
