@@ -1,10 +1,11 @@
 put objects files in obj/
 change datatypes to int64_t standard conventions
 fix not long64
-memory manager, output interface return primitive types instead of SIMD
 use typedef for aligned types, so aligned attribute is in one place
 for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 
+memory manager, output interface return primitive types instead of SIMD
+provide 2 modes for layout of random numbers: (1) interleaved streams, (2) independent streams with additional function to change between streams
 
 simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
 simd/sse.h: *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.

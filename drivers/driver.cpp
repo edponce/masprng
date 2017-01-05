@@ -26,7 +26,7 @@
 #define VRNG_TYPE SIMD_INT 
 #define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
-#define RNG_ELEMS (2*nstrms)
+#define RNG_ELEMS SIMD_STREAMS_INT 
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
@@ -36,7 +36,7 @@
 #define VRNG_TYPE SIMD_FLT 
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
-#define RNG_ELEMS (2*nstrms)
+#define RNG_ELEMS SIMD_STREAMS_FLT
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
@@ -46,7 +46,7 @@
 #define VRNG_TYPE SIMD_DBL 
 #define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
-#define RNG_ELEMS nstrms
+#define RNG_ELEMS SIMD_STREAMS_DBL 
 #define RNG_SHIFT 1
 #define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif

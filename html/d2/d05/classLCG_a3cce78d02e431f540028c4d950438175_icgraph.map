@@ -1,0 +1,7 @@
+<map id="LCG::multiply" name="LCG::multiply">
+<area shape="rect" id="node2" href="$d2/d05/classLCG.html#a0e3298e61ce1634b919c3b67f28ea097" title="LCG::get_rn_dbl" alt="" coords="156,31,273,57"/>
+<area shape="rect" id="node5" href="$d2/d05/classLCG.html#aad77a4d985a3f522e100395c01b48bf2" title="LCG::get_rn_int" alt="" coords="157,81,272,108"/>
+<area shape="rect" id="node6" href="$d2/d05/classLCG.html#a8706ec6e2e341ceb52c148397efd2424" title="LCG::~LCG" alt="" coords="169,132,261,159"/>
+<area shape="rect" id="node3" href="$d2/d05/classLCG.html#a9297d68e6dca571badca3505d35c63cb" title="LCG::get_rn_flt" alt="" coords="321,5,432,32"/>
+<area shape="rect" id="node4" href="$d2/d05/classLCG.html#a85170da4c35402fdf74ea62f1b2b7a91" title="LCG::init_rng" alt="" coords="327,56,426,83"/>
+</map>

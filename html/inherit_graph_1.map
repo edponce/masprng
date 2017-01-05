@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$dc/d18/classSPRNG.html" title="Interface (pure abstract class) used as base class for RNG types. " alt="" coords="5,5,76,32"/>
+<area shape="rect" id="node2" href="$d2/d05/classLCG.html" title="Class for linear congruential RNG. " alt="" coords="124,5,173,32"/>
+</map>
