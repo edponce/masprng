@@ -1,5 +1,5 @@
-#ifndef __LCG_SIMD_H
-#define __LCG_SIMD_H
+#ifndef __VLCG_H
+#define __VLCG_H
 
 
 /*! \class VLCG 
@@ -45,5 +45,5 @@ class VLCG: public VSPRNG
 };
 
 
-#endif  // __LCG_SIMD_H
+#endif  // __VLCG_H
 

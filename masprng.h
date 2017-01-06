@@ -1,11 +1,8 @@
-#ifndef __SPRNG_H
-#define __SPRNG_H
+#ifndef __MASPRNG_H
+#define __MASPRNG_H
 
 
-#include <cstdio>
-
-
-#include "ssprng.h"
+#include "sprng.h"
 //#include "lfg.h"
 #include "lcg.h"
 //#include "lcg64.h"
@@ -17,7 +14,7 @@
 /*!
  *  Function used to create RNG instances.
  */
-inline SPRNG * selectType(const int typenum)
+static SPRNG * selectType(const int typenum)
 {
     SPRNG *rng = NULL;
 
@@ -34,7 +31,6 @@ inline SPRNG * selectType(const int typenum)
         //    break;
         //case SPRNG_PMLCG: rng = new PMLCG();
         //    break;
-        default: printf("ERROR: invalid RNG generator type.\n");
     }
 
     return rng;
@@ -43,18 +39,18 @@ inline SPRNG * selectType(const int typenum)
 
 #include "vsprng.h"
 #if defined(SIMD_MODE)
-//#include "lfg_simd.h"
-#include "lcg_simd.h"
-//#include "lcg64_simd.h"
-//#include "cmrg_simd.h"
-//#include "mlfg_simd.h"
-//#include "pmlcg_simd.h"
+//#include "vlfg.h"
+#include "vlcg.h"
+//#include "vlcg64.h"
+//#include "vcmrg.h"
+//#include "vmlfg.h"
+//#include "vpmlcg.h"
 
 
 /*!
  *  Function used to create SIMD RNG instances.
  */
-inline VSPRNG * selectTypeSIMD(const int typenum)
+static VSPRNG * selectTypeSIMD(const int typenum)
 {
     VSPRNG *rng = NULL;
 
@@ -71,7 +67,6 @@ inline VSPRNG * selectTypeSIMD(const int typenum)
         //    break;
         //case SPRNG_PMLCG: rng = new VPMLCG();
         //    break;
-        default: printf("ERROR: invalid RNG generator type.\n");
     }
 
     return rng;
@@ -79,5 +74,5 @@ inline VSPRNG * selectTypeSIMD(const int typenum)
 #endif
 
 
-#endif  // __SPRNG_H
+#endif  // __MASPRNG_H
 

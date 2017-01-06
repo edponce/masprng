@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cfloat>
-#include "sprng.h"
+#include "masprng.h"
 #include "timers.h"
 #include "utils.h"
 #include "check.h"

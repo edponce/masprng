@@ -20,7 +20,7 @@
 #include <cstdio>
 #include <climits>
 #include "lcg_config.h"
-#include "lcg_simd.h"
+#include "vlcg.h"
 #include "primes_32.h"
 
 

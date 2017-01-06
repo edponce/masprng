@@ -1,5 +1,5 @@
-#ifndef __SSPRNG_H
-#define __SSPRNG_H
+#ifndef __SPRNG_H
+#define __SPRNG_H
 
 
 #include "sprng_config.h"
@@ -33,5 +33,5 @@ class SPRNG
 };
 
 
-#endif  // __SSPRNG_H
+#endif  // __SPRNG_H
 
