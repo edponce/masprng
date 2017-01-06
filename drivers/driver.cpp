@@ -8,14 +8,6 @@
 #include "check.h"
 
 
-#if !defined(SIMD_MODE)
-#define SIMD_ALIGN 8
-#define SIMD_STREAMS_INT 1
-#define SIMD_STREAMS_FLT 1
-#define SIMD_STREAMS_DBL 1
-#endif
-
-
 #if defined(DEBUG)
 #define RNG_LIM 1
 #else

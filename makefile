@@ -16,12 +16,12 @@ CC := g++
 # -O1, -O2, -O3 = optimization levels
 # -march= = target architecture (implies -mtune=cpu-type)
 # -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4 = SIMD extensions
-# -mavx, -mavx2, -mavx512, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd = SIMD extensions
+# -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd = SIMD extensions
 # -funroll-loops = enable loop unrolling
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+CFLAGS := -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
@@ -35,7 +35,7 @@ CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=nat
 LFLAGS :=
 
 # Preprocessor definitions
-# -DAVX_SPRNG, -DSSE_SPRNG = select SPRNG vector mode
+# -DAVX512BW_SPRNG, -DAVX2_SPRNG, -DSSE4_1_SPRNG = select SPRNG vector mode
 # -DDEBUG = enable debugging
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
@@ -45,9 +45,10 @@ LFLAGS :=
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG
-DEFINES := -DSSE_SPRNG -DLONG_SPRNG
-#DEFINES := -DSSE_SPRNG
-#DEFINES := -DAVX_SPRNG -DLONG_SPRNG
+DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG
+#DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DAVX2_SPRNG -DLONG_SPRNG
+#DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
@@ -65,13 +66,13 @@ LIBS := -lm
 
 # Source files to compile
 #SOURCES := masprng.cpp lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp
-SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse.cpp check/check.cpp
+SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse4_1.cpp check/check.cpp
 
 # Object files to link
 OBJECTS := $(SOURCES:.cpp=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.cpp=.h) masprng_config.h masprng.h interfaces/sprng.h interfaces/vsprng.h primes/primelist_32.h lcg/lcg_config.h
+HEADERS := $(SOURCES:.cpp=.h) masprng_config.h simd/simd_config.h masprng.h interfaces/sprng.h interfaces/vsprng.h primes/primelist_32.h lcg/lcg_config.h
 
 # Driver file
 #LCG_DRIVER := drivers/main_lcg.cpp

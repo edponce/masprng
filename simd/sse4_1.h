@@ -1,5 +1,5 @@
-#ifndef __SSE_H
-#define __SSE_H
+#ifndef __SSE4_1_H
+#define __SSE4_1_H
 
 
 #include <cstdlib>
@@ -343,5 +343,5 @@ void simd_print(const char * const, const SIMD_FLT);
 void simd_print(const char * const, const SIMD_DBL);
 
 
-#endif  // __SSE_H
+#endif  // __SSE4_1_H
 

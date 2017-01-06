@@ -24,6 +24,7 @@
 #include "primes_32.h"
 
 
+///////////////////////////////////////////
 // Global SIMD_masks
 static SIMD_INT vmsk_lsb1[3];
 static SIMD_INT vmsk_lh64[3];
@@ -62,6 +63,9 @@ static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT/2;
 static const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT;
 static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT;
 #endif
+///////////////////////////////////////////
+
+
 
 unsigned long int VLCG::LCG_NGENS = 0;
 

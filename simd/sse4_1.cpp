@@ -1,5 +1,5 @@
 #include <cstdio>
-#include "sse.h"
+#include "sse4_1.h"
 
 
 #define SIMD_NUM_32BIT (SIMD_WIDTH_BYTES/4) /*!< number of 32-bit values per vector register */

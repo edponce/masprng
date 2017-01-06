@@ -3,25 +3,10 @@
 
 
 #include "masprng_config.h"
+#include "simd_config.h"
 
 
-/*
- *  Check for SIMD mode
- */
-#if defined(SSE_SPRNG)
-#define SIMD_MODE 1 /*!< NOTE: mandatory, MASPRNG vector flag */
-#include "sse.h"
-#endif
-
-
-#if defined(SIMD_MODE)
-// Global constants
-const int SIMD_ALIGN = SIMD_WIDTH_BYTES;
-const int SIMD_STREAMS_INT = (SIMD_WIDTH_BYTES/sizeof(int));
-const int SIMD_STREAMS_FLT = (SIMD_WIDTH_BYTES/sizeof(float));
-const int SIMD_STREAMS_DBL = (SIMD_WIDTH_BYTES/sizeof(double));
-
-
+# if defined(SIMD_MODE)
 /*! \class VSPRNG
  *  \brief Interface (abstract base class) for SIMD RNG types. 
  *

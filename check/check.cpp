@@ -5,12 +5,6 @@
 #include "check.h"
 
 
-#if !defined(SIMD_MODE)
-#define SIMD_ALIGN 8
-#define SIMD_STREAMS_INT 1
-#endif
-
-
 /*!
  *  Check errors with SPRNG data output found in file
  */
