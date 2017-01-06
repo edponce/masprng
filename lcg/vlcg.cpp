@@ -26,37 +26,28 @@
 #include "primes_32.h"
 
 
-///////////////////////////////////////////
-// Global SIMD_masks
-static SIMD_INT vmsk_lsb1[3];
-static SIMD_INT vmsk_lh64[3];
-static SIMD_INT vmsk_hi64;
-static SIMD_INT vmsk_lsb24;
-static SIMD_INT vmsk_lsb48;
-static SIMD_INT vmsk_lsb31;
-static SIMD_INT vmsk_msbset64;
-static SIMD_INT vmsk_msbset24;
-/*!
- *  Initialize global SIMD masks
+/*
+ *  SIMD masks
+ *  NOTE: some masks can be placed directly into the code where used.
  */
-static void init_simd_masks()
-{
-    // Set vector masks
-    vmsk_lsb1[0] = simd_set(0x1UL);                       // all 
-    vmsk_lsb1[1] = simd_set(0x0UL, 0x1UL);                // first
-    vmsk_lsb1[2] = simd_set(0x1UL, 0x0UL);                // second
-    vmsk_lh64[0] = simd_set(0xFFFFFFFFFFFFFFFFUL);        // all 
-    vmsk_lh64[1] = simd_set(0x0UL, 0xFFFFFFFFFFFFFFFFUL); // first
-    vmsk_lh64[2] = simd_set(0xFFFFFFFFFFFFFFFFUL, 0x0UL); // second
-    vmsk_hi64 = simd_set(0xFFFFFFFF00000000UL);           // all
-    vmsk_lsb24 = simd_set(0xffffff); 
-    vmsk_lsb48 = simd_set(0xffffffffffffL); 
-    vmsk_lsb31 = simd_set(0x7FFFFFFFUL);                  // only 31 LSB of seed considered
-    vmsk_msbset64 = simd_set(0x3ff0000000000000L);
-    vmsk_msbset24 = simd_set(0xff0000);
-}
+static const SIMD_INT vmsk_lsb31 = simd_set(0x7FFFFFFFUL); // only 31 LSB of seed considered
+#if defined(LONG_SPRNG)
+static const SIMD_INT vmsk_lsb1[3] = { simd_set(0x1UL),   // all elements
+                                simd_set(0x0UL, 0x1UL),   // first element 
+                                simd_set(0x1UL, 0x0UL) }; // second element 
+static const SIMD_INT vmsk_lsb64[3] = { simd_set(0xFFFFFFFFFFFFFFFFUL),   // all elements
+                                 simd_set(0x0UL, 0xFFFFFFFFFFFFFFFFUL),   // first element
+                                 simd_set(0xFFFFFFFFFFFFFFFFUL, 0x0UL) }; // second element
+static const SIMD_INT vmsk_lsb48 = simd_set(0xFFFFFFFFFFFFUL); 
+#else
+static const SIMD_INT vmsk_lsb24 = simd_set(0xFFFFFF); 
+static const SIMD_INT vmsk_msb8_24 = simd_set(0xFF0000);
+#endif
 
 
+/*
+ *  Specify number of independent streams for seed and multiplier
+ */
 #if defined(LONG_SPRNG)
 static const int SIMD_STREAMS_SEED = SIMD_STREAMS_64;
 static const int SIMD_STREAMS_MULT = SIMD_STREAMS_64;
@@ -64,8 +55,6 @@ static const int SIMD_STREAMS_MULT = SIMD_STREAMS_64;
 static const int SIMD_STREAMS_SEED = SIMD_STREAMS_32;
 static const int SIMD_STREAMS_MULT = SIMD_STREAMS_32;
 #endif
-///////////////////////////////////////////
-
 
 
 unsigned long int VLCG::LCG_NGENS = 0;
@@ -90,8 +79,6 @@ VLCG::VLCG()
     for (int i = 0; i < 4; ++i)
         simd_set_zero(&multiplier[i]);
 #endif
-
-    init_simd_masks();
 
     ++LCG_NGENS;
 }
@@ -213,7 +200,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 
     prime = simd_set_64(lprime);
     for (int i = 0; i < SIMD_STREAMS_SEED; ++i)
-        if (simd_test_zero(prime, vmsk_lh64[i]) == 1)
+        if (simd_test_zero(prime, vmsk_lsb64[i]) == 1)
             seed = simd_or(seed, vmsk_lsb1[i]);
 #else
     parameter = simd_set(m[3], m[2], m[1], m[0]);
@@ -236,7 +223,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 
     seed[1] = simd_set(CONFIG.INIT_SEED[1]);
     vtmp = simd_sll_32(init_seed, 0x10); 
-    vtmp = simd_and(vtmp, vmsk_msbset24);
+    vtmp = simd_and(vtmp, vmsk_msb8_24);
     seed[1] = simd_or(seed[1], vtmp);
 
     simd_print("seed[1]", seed[1]);
