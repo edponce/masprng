@@ -2,9 +2,6 @@
 #define __MASPRNG_H
 
 
-#include "sprng_config.h"
-
-
 #include "sprng.h"
 //#include "lfg.h"
 #include "lcg.h"
@@ -61,17 +58,17 @@ static VSPRNG * selectTypeSIMD(const int typenum)
     VSPRNG *rng = NULL;
 
     switch (typenum) {
-        //case SPRNG_LFG: rng = new VLFG();
+        //case VSPRNG_LFG: rng = new VLFG();
         //    break;
-        case SPRNG_LCG: rng = new VLCG();
+        case VSPRNG_LCG: rng = new VLCG();
             break;
-        //case SPRNG_LCG64: rng = new VLCG64();
+        //case VSPRNG_LCG64: rng = new VLCG64();
         //    break;
-        //case SPRNG_CMRG: rng = new VCMRG();
+        //case VSPRNG_CMRG: rng = new VCMRG();
         //    break;
-        //case SPRNG_MLFG: rng = new VMLFG();
+        //case VSPRNG_MLFG: rng = new VMLFG();
         //    break;
-        //case SPRNG_PMLCG: rng = new VPMLCG();
+        //case VSPRNG_PMLCG: rng = new VPMLCG();
         //    break;
     }
 

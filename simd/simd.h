@@ -2,9 +2,7 @@
 #define __SIMD_H
 
 
-/*
- *  Compiler and architecture specific settings 
- */
+// Compiler and architecture specific settings 
 #include "arch.h"
 
 
@@ -28,21 +26,27 @@
 
 
 /*
- *  Include corresponding SIMD interfaces.
  *  If SIMD_MODE is disabled, check for the SIMD mode requested.
+ *  SIMD_MODE has to be defined to access available SIMD features.
+ *  Include corresponding SIMD interfaces.
  */
 #if defined(AVX512_SPRNG)
-    #define SIMD_MODE /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE
     #include "avx512.h"
 #elif defined(AVX2_SPRNG)
-    #define SIMD_MODE /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE
     #include "avx2.h"
 #elif defined(SSE4_1_SPRNG)
-    #define SIMD_MODE /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE
     #include "sse4_1.h"
 #endif
 
 
+/*
+ *  Define additional SIMD global constants, alignment macro,
+ *  and helper print functions.
+ *  SIMD_ALIGNED macro has to be always defined.
+ */
 #if defined(SIMD_MODE)
     #define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
     const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);

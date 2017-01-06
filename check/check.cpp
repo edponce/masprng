@@ -15,7 +15,7 @@
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_gen(const int rng_type)
+int check_gen(const int rng_type, const int vrng_type)
 {
     int i;
     int rval;
@@ -57,7 +57,7 @@ int check_gen(const int rng_type)
     SIMD_DBL dvrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(rng_type);
+    VSPRNG *vrng = selectTypeSIMD(vrng_type);
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 

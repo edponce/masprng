@@ -1,16 +1,14 @@
-#ifndef __LCG_CONFIG_H
-#define __LCG_CONFIG_H
+#ifndef __LCG_GLOBALS_H
+#define __LCG_GLOBALS_H
 
 
-/*
- *  Provides access to alignment attributes required for SIMD mode.
- *  Misalignment will cause segmentation faults.
- */
+// Provides access to alignment attributes required for SIMD mode.
+// Misalignment will cause segmentation faults.
 #include "simd.h"
 
 
 // NOTE: requires C++11 for non-static initialization in declaration of struct/class
-struct LCG_CONFIG
+struct LCG_GLOBALS
 {
     const char * const GENTYPE = "48 bit Linear Congruential Generator with Prime Addend";
     const int NPARAMS = 7;
@@ -36,8 +34,8 @@ struct LCG_CONFIG
 /*!
  *  Global instance of configuration structure.
  */
-const LCG_CONFIG CONFIG;
+const LCG_GLOBALS GLOBALS;
 
 
-#endif  // __LCG_CONFIG_H
+#endif  // __LCG_GLOBALS_H
 

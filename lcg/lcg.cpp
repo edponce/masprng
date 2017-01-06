@@ -19,10 +19,9 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
-#include "sprng_config.h"
 #include "sprng.h"
 #include "lcg.h"
-#include "lcg_config.h"
+#include "lcg_globals.h"
 #include "primes_32.h"
 
 
@@ -37,7 +36,7 @@ LCG::LCG()
     prime_position = 0;
     prime_next = 0;
     parameter = 0;
-    gentype = CONFIG.GENTYPE;
+    gentype = GLOBALS.GENTYPE;
 
 #if defined(LONG_SPRNG)
     seed = 0;
@@ -104,7 +103,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     prime_next = tg;
 
     // NOTE: verify these checks
-    if (gn < 0 || gn >= tg || gn >= CONFIG.LCG_MAX_STREAMS) {
+    if (gn < 0 || gn >= tg || gn >= GLOBALS.LCG_MAX_STREAMS) {
         printf("ERROR: gennum out of range, %d\n", gn);
         return -1;
     }
@@ -112,7 +111,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     const int need = 1;
     getprime_32(need, &prime, prime_position);
 
-    if (m < 0 || m >= CONFIG.NPARAMS) {
+    if (m < 0 || m >= GLOBALS.NPARAMS) {
         printf("ERROR: multiplier out of range, %d\n", m);
         m = 0;
     }
@@ -121,17 +120,17 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     init_seed = s & 0x7fffffff; // only 31 LSB of seed considered
 
 #if defined(LONG_SPRNG)
-    multiplier = CONFIG.MULT[parameter];
+    multiplier = GLOBALS.MULT[parameter];
 
-    seed = CONFIG.INIT_SEED ^ ((unsigned long int)init_seed << 16);
+    seed = GLOBALS.INIT_SEED ^ ((unsigned long int)init_seed << 16);
 
     if (prime == 0)
         seed |= 1;
 #else
-    memcpy(multiplier, CONFIG.MULT[parameter], sizeof(multiplier));
+    memcpy(multiplier, GLOBALS.MULT[parameter], sizeof(multiplier));
 
-    seed[0] = CONFIG.INIT_SEED[0] ^ (((unsigned long int)init_seed >> 8) & 0xffffff);
-    seed[1] = CONFIG.INIT_SEED[1] ^ (((unsigned long int)init_seed << 16) & 0xff0000);
+    seed[0] = GLOBALS.INIT_SEED[0] ^ (((unsigned long int)init_seed >> 8) & 0xffffff);
+    seed[1] = GLOBALS.INIT_SEED[1] ^ (((unsigned long int)init_seed << 16) & 0xff0000);
 
     printf("seed[0]\t%d\n", seed[0]);
     printf("seed[1]\t%d\n", seed[1]);
@@ -140,7 +139,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
         seed[1] |= 1;
 #endif
 
-    for (int i = 0; i < (CONFIG.LCG_RUNUP * prime_position); ++i)
+    for (int i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
     return 0;
@@ -176,10 +175,10 @@ double LCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
-    return (double)seed * CONFIG.TWO_M48;
+    return (double)seed * GLOBALS.TWO_M48;
 #else
     multiply(seed, multiplier, prime);
-    return (double)seed[0] * CONFIG.TWO_M24 + (double)seed[1] * CONFIG.TWO_M48;
+    return (double)seed[0] * GLOBALS.TWO_M24 + (double)seed[1] * GLOBALS.TWO_M48;
 #endif
 }
 

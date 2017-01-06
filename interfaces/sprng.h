@@ -2,6 +2,12 @@
 #define __SPRNG_H
 
 
+/*!
+ *  RNG identifiers
+ */
+enum SPRNG_TYPE {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
+
+
 /*! \class SPRNG
  *  \brief Interface (pure abstract class) used as base class for RNG types. 
  *

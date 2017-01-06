@@ -24,6 +24,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
+#define VRNG_TYPE_NUM VSPRNG_LCG
 #define TEST 0
 
 #if TEST == 0
@@ -64,12 +65,10 @@ int main_gen(int);
 
 int main(int argc, char **argv)
 {
-/*
     printf("\n");
     printSysconf();
     printSIMDconf();
     printf("\n");
-*/
 
     int rng_lim = RNG_LIM;
 
@@ -79,7 +78,7 @@ int main(int argc, char **argv)
     if (rng_lim > 0)
         main_gen(rng_lim);
     else
-       check_gen(RNG_TYPE_NUM);
+        check_gen(RNG_TYPE_NUM, VRNG_TYPE_NUM);
 
     return 0;
 }
@@ -182,7 +181,7 @@ int main_gen(int rng_lim)
     VRNG_TYPE vrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
+    VSPRNG *vrng = selectTypeSIMD(VRNG_TYPE_NUM);
     vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel

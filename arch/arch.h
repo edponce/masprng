@@ -3,7 +3,7 @@
 
 
 /*
- *  Compiler specific macro to set array alignment
+ *  Compiler specific macro to set array alignment.
  */
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
     #define SET_ALIGNED(a) __attribute__((aligned(a)))
