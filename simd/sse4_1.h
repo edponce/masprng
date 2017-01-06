@@ -30,6 +30,9 @@ const int SIMD_WIDTH_BYTES = 16;
  */
 
 
+/*
+ *  Compiler and architecture specific settings 
+ */
 #include "arch.h"
 
 

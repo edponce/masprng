@@ -13,14 +13,16 @@
 /*************************************************************************/
 
 
-#include "vsprng.h"
+#include "simd.h"
 #if defined(SIMD_MODE)
 
 
 #include <cstdio>
 #include <climits>
-#include "lcg_config.h"
+#include "sprng_config.h"
+#include "vsprng.h"
 #include "vlcg.h"
+#include "lcg_config.h"
 #include "primes_32.h"
 
 

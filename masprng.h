@@ -2,6 +2,9 @@
 #define __MASPRNG_H
 
 
+#include "sprng_config.h"
+
+
 #include "sprng.h"
 //#include "lfg.h"
 #include "lcg.h"
@@ -37,8 +40,11 @@ static SPRNG * selectType(const int typenum)
 }
 
 
-#include "vsprng.h"
+#include "simd.h"
 #if defined(SIMD_MODE)
+
+
+#include "vsprng.h"
 //#include "vlfg.h"
 #include "vlcg.h"
 //#include "vlcg64.h"

@@ -3,10 +3,17 @@
 
 
 /*
+ *  Compiler and architecture specific settings 
+ */
+#include "arch.h"
+
+
+/*
  *  If SIMD_MODE is enabled, use compiler flags to
  *  check automatically for best SIMD mode supported.
  */
 #if defined(SIMD_MODE)
+    #undef SIMD_MODE
     #undef AVX512_SPRNG
     #undef AVX2_SPRNG
     #undef SSE4_1_SPRNG
@@ -16,8 +23,6 @@
     #define AVX2_SPRNG
 # elif defined(__SSE4_1__)
     #define SSE4_1_SPRNG
-# else
-    #undef SIMD_MODE
 # endif
 #endif
 
@@ -38,22 +43,15 @@
 #endif
 
 
-/*
- *  Compiler and architecture specific settings 
- */
-#include "arch.h"
-
-
 #if defined(SIMD_MODE)
-const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
-const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
-void simd_print(const char * const, const SIMD_INT);
-void simd_print(const char * const, const SIMD_FLT);
-void simd_print(const char * const, const SIMD_DBL);
-#define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
+    #define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
+    const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
+    const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
+    void simd_print(const char * const, const SIMD_INT);
+    void simd_print(const char * const, const SIMD_FLT);
+    void simd_print(const char * const, const SIMD_DBL);
 #else
-const int SIMD_STREAMS_32 = 1;
-const int SIMD_STREAMS_64 = 1;
+    #define SIMD_ALIGNED
 #endif
 
 

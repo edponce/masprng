@@ -21,7 +21,7 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-CFLAGS := -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
@@ -35,7 +35,7 @@ CFLAGS := -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=
 LFLAGS :=
 
 # Preprocessor definitions
-# -DAVX512BW_SPRNG, -DAVX2_SPRNG, -DSSE4_1_SPRNG = select SPRNG vector mode
+# -DSIMD_MODE, -DAVX512BW_SPRNG, -DAVX2_SPRNG, -DSSE4_1_SPRNG = select SPRNG vector mode
 # -DDEBUG = enable debugging
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
@@ -45,15 +45,15 @@ LFLAGS :=
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG
-DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG
-#DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DSIMD_MODE -DLONG_SPRNG
+#DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG
+DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG
 #DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
-#INCDIR := -I. -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Icheck
 INCDIR := -I. -Iarch -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
 
 # Define library paths in addition to /usr/lib
@@ -65,7 +65,7 @@ LIBDIR :=
 LIBS := -lm
 
 # Source files to compile
-#SOURCES := masprng.cpp lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp
+#SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
 SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/simd.cpp check/check.cpp
 
 # Object files to link

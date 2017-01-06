@@ -5,6 +5,13 @@
 #include "check.h"
 
 
+#if !defined(SIMD_MODE)
+#define SIMD_WIDTH_BYTES 8
+#define SIMD_STREAMS_32 1
+#define SIMD_STREAMS_64 1
+#endif
+
+
 /*!
  *  Check errors with SPRNG data output found in file
  */
@@ -37,16 +44,13 @@ int check_gen(const int rng_type)
     rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
-    const int nstrms32 = 2 * nstrms;
-    const int nstrms64 = nstrms;
-
     // SIMD
     int *irngs2 = NULL;
-    rval = posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, nstrms32 * sizeof(int));
+    rval = posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
     float *frngs2 = NULL;
-    rval = posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, nstrms32 * sizeof(float));
+    rval = posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(float));
     double *drngs2 = NULL;
-    rval = posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, nstrms64 * sizeof(double));
+    rval = posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_64 * sizeof(double));
 
     SIMD_INT ivrngs;
     SIMD_FLT fvrngs;

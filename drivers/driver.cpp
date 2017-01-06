@@ -8,6 +8,13 @@
 #include "check.h"
 
 
+#if !defined(SIMD_MODE)
+#define SIMD_WIDTH_BYTES 8
+#define SIMD_STREAMS_32 1
+#define SIMD_STREAMS_64 1
+#endif
+
+
 #if defined(DEBUG)
 #define RNG_LIM 1
 #else
@@ -17,7 +24,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 2
+#define TEST 0
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -85,12 +92,7 @@ int main_gen(int rng_lim)
 
     long int timers[2];
     double t1;
-
-#if defined(SIMD_MODE)
     const int nstrms = SIMD_STREAMS_64;
-#else
-    const int nstrms = 1;
-#endif
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
@@ -125,11 +127,7 @@ int main_gen(int rng_lim)
     rval = posix_memalign((void **)&rngs, SIMD_WIDTH_BYTES, RNG_ELEMS * sizeof(RNG_TYPE));
 
     // RNG object
-#if defined(SIMD_MODE)
-    SPRNG *rng[SIMD_STREAMS_64];
-#else
-    SPRNG *rng[SIMD_STREAMS_32];
-#endif
+    SPRNG *rng[nstrms];
     for (i = 0; i < nstrms; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
@@ -151,11 +149,7 @@ int main_gen(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-#if defined(SIMD_MODE)
-    printf("gen nums %lu\n", rng[SIMD_STREAMS_64-1]->get_ngens());
-#else
-    printf("gen nums %lu\n", rng[SIMD_STREAMS_32-1]->get_ngens());
-#endif
+    printf("gen nums %lu\n", rng[nstrms-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
 #if defined(DEBUG)

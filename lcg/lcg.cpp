@@ -19,9 +19,10 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
+#include "sprng_config.h"
 #include "sprng.h"
-#include "lcg_config.h"
 #include "lcg.h"
+#include "lcg_config.h"
 #include "primes_32.h"
 
 

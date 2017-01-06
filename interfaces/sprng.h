@@ -2,9 +2,6 @@
 #define __SPRNG_H
 
 
-#include "sprng_config.h"
-
-
 /*! \class SPRNG
  *  \brief Interface (pure abstract class) used as base class for RNG types. 
  *

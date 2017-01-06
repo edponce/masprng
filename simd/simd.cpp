@@ -1,5 +1,8 @@
-#include <cstdio>
 #include "simd.h"
+#if defined(SIMD_MODE)
+
+
+#include <cstdio>
 
 
 void simd_print(const char * const str, const SIMD_INT va)
@@ -47,4 +50,7 @@ void simd_print(const char * const str, const SIMD_DBL va)
       printf("%f\t", tmp[i]);
     printf("\n");
 }
+
+
+#endif // SIMD_MODE
 

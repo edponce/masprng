@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "primes_32.h"
 #include "primelist_32.h"
+#include "primes_32.h"
 
 
 enum { NO = 0, YES };

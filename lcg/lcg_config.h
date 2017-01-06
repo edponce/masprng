@@ -2,7 +2,10 @@
 #define __LCG_CONFIG_H
 
 
-// Provides access to alignment attributes, misalignment will cause segmentation faults.
+/*
+ *  Provides access to alignment attributes required for SIMD mode.
+ *  Misalignment will cause segmentation faults.
+ */
 #include "simd.h"
 
 

@@ -2,11 +2,8 @@
 #define __VSPRNG_H
 
 
-#include "sprng_config.h"
 #include "simd.h"
-
-
-# if defined(SIMD_MODE)
+#if defined(SIMD_MODE)
 /*! \class VSPRNG
  *  \brief Interface (abstract base class) for SIMD RNG types. 
  *
@@ -28,7 +25,7 @@ class VSPRNG
     virtual SIMD_INT get_multiplier() const = 0;
 # endif
 };
-#endif
+#endif // SIMD_MODE
 
 
 #endif  // __VSPRNG_H
