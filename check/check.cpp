@@ -13,7 +13,7 @@ int check_gen(const int rng_type)
     int i;
     int rval;
 
-    const int nstrms = SIMD_STREAMS_INT/2;
+    const int nstrms = SIMD_STREAMS_64;
 
     // Initial seeds
     int *iseeds = NULL;

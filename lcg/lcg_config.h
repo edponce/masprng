@@ -3,7 +3,7 @@
 
 
 // Provides access to alignment attributes, misalignment will cause segmentation faults.
-#include "simd_config.h"
+#include "simd.h"
 
 
 // NOTE: requires C++11 for non-static initialization in declaration of struct/class

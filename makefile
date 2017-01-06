@@ -54,7 +54,7 @@ DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
 #INCDIR := -I. -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Icheck
-INCDIR := -I. -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
+INCDIR := -I. -Iarch -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
 
 # Define library paths in addition to /usr/lib
 #LIBDIR := -L/dir1 -L/dir2
@@ -66,13 +66,13 @@ LIBS := -lm
 
 # Source files to compile
 #SOURCES := masprng.cpp lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp
-SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/sse4_1.cpp check/check.cpp
+SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/simd.cpp check/check.cpp
 
 # Object files to link
 OBJECTS := $(SOURCES:.cpp=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.cpp=.h) masprng_config.h simd/simd_config.h masprng.h interfaces/sprng.h interfaces/vsprng.h primes/primelist_32.h lcg/lcg_config.h
+HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h *.h simd/*.h primes/*.h lcg/*.h
 
 # Driver file
 #LCG_DRIVER := drivers/main_lcg.cpp

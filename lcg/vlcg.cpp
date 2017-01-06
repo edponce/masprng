@@ -55,13 +55,12 @@ static void init_simd_masks()
 }
 
 
-// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
 #if defined(LONG_SPRNG)
-static const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT/2;
-static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT/2;
+static const int SIMD_STREAMS_SEED = SIMD_STREAMS_64;
+static const int SIMD_STREAMS_MULT = SIMD_STREAMS_64;
 #else
-static const int SIMD_STREAMS_SEED = SIMD_STREAMS_INT;
-static const int SIMD_STREAMS_MULT = SIMD_STREAMS_INT;
+static const int SIMD_STREAMS_SEED = SIMD_STREAMS_32;
+static const int SIMD_STREAMS_MULT = SIMD_STREAMS_32;
 #endif
 ///////////////////////////////////////////
 

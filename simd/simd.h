@@ -1,5 +1,5 @@
-#ifndef __SIMD_CONFIG_H
-#define __SIMD_CONFIG_H
+#ifndef __SIMD_H
+#define __SIMD_H
 
 
 /*
@@ -27,32 +27,35 @@
  *  If SIMD_MODE is disabled, check for the SIMD mode requested.
  */
 #if defined(AVX512_SPRNG)
-    #define SIMD_MODE 1 /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE /*!< Mandatory global SIMD flag */
     #include "avx512.h"
 #elif defined(AVX2_SPRNG)
-    #define SIMD_MODE 1 /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE /*!< Mandatory global SIMD flag */
     #include "avx2.h"
 #elif defined(SSE4_1_SPRNG)
-    #define SIMD_MODE 1 /*!< Mandatory global SIMD flag */
+    #define SIMD_MODE /*!< Mandatory global SIMD flag */
     #include "sse4_1.h"
 #endif
 
 
 /*
- *  Global SIMD constants for alignment and streams counts
+ *  Compiler and architecture specific settings 
  */
+#include "arch.h"
+
+
 #if defined(SIMD_MODE)
-const bool SIMD_SPRNG = true; 
-const int SIMD_STREAMS_INT = (SIMD_WIDTH_BYTES/sizeof(int));
-const int SIMD_STREAMS_FLT = (SIMD_WIDTH_BYTES/sizeof(float));
-const int SIMD_STREAMS_DBL = (SIMD_WIDTH_BYTES/sizeof(double));
+const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
+const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
+void simd_print(const char * const, const SIMD_INT);
+void simd_print(const char * const, const SIMD_FLT);
+void simd_print(const char * const, const SIMD_DBL);
+#define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
 #else
-const bool SIMD_SPRNG = false;
-const int SIMD_STREAMS_INT = 1;
-const int SIMD_STREAMS_FLT = 1;
-const int SIMD_STREAMS_DBL = 1;
+const int SIMD_STREAMS_32 = 1;
+const int SIMD_STREAMS_64 = 1;
 #endif
 
 
-#endif  // __SIMD_CONFIG_H
+#endif  // __SIMD_H
 

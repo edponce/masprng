@@ -30,14 +30,7 @@ const int SIMD_WIDTH_BYTES = 16;
  */
 
 
-/*
- *  Alignment macro
- */
-#if defined(__GNUC__) || defined(__INTEL_COMPILER)
-    #define SIMD_ALIGNED __attribute__((aligned(SIMD_WIDTH_BYTES)))
-#else
-    #define SIMD_ALIGNED
-#endif
+#include "arch.h"
 
 
 /**************************
@@ -252,8 +245,8 @@ static inline SIMD_FLT simd_cvt_f64_f32(const SIMD_DBL va)
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
 {
-    unsigned long int sa[2] SIMD_ALIGNED;
-    float fa[4] SIMD_ALIGNED;
+    unsigned long int sa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    float fa[4] SET_ALIGNED(SIMD_WIDTH_BYTES);
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (float)sa[0];
     fa[1] = 0.0;
@@ -268,8 +261,8 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 {
-    unsigned long int sa[2] SIMD_ALIGNED;
-    double fa[2] SIMD_ALIGNED;
+    unsigned long int sa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    double fa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (double)sa[0];
     fa[1] = (double)sa[1];
@@ -319,15 +312,6 @@ static inline void simd_store(float * const sa, const SIMD_FLT va)
 
 static inline void simd_store(double * const sa, const SIMD_DBL va)
 { _mm_store_pd(sa, va); }
-
-
-/**********************************
- *  SIMD general helper functions
- **********************************/
-// NOTE: need to move these functions out of here
-void simd_print(const char * const, const SIMD_INT);
-void simd_print(const char * const, const SIMD_FLT);
-void simd_print(const char * const, const SIMD_DBL);
 
 
 #endif  // __SSE4_1_H

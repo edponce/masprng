@@ -26,7 +26,7 @@
 #define VRNG_TYPE SIMD_INT 
 #define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
-#define RNG_ELEMS SIMD_STREAMS_INT 
+#define RNG_ELEMS SIMD_STREAMS_32 
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
@@ -36,7 +36,7 @@
 #define VRNG_TYPE SIMD_FLT 
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
-#define RNG_ELEMS SIMD_STREAMS_FLT
+#define RNG_ELEMS SIMD_STREAMS_32
 #define RNG_SHIFT 2
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
@@ -46,7 +46,7 @@
 #define VRNG_TYPE SIMD_DBL 
 #define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
-#define RNG_ELEMS SIMD_STREAMS_DBL 
+#define RNG_ELEMS SIMD_STREAMS_64 
 #define RNG_SHIFT 1
 #define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif
@@ -87,7 +87,7 @@ int main_gen(int rng_lim)
     double t1;
 
 #if defined(SIMD_MODE)
-    const int nstrms = SIMD_STREAMS_INT/2;
+    const int nstrms = SIMD_STREAMS_64;
 #else
     const int nstrms = 1;
 #endif
@@ -117,7 +117,7 @@ int main_gen(int rng_lim)
     rval = posix_memalign((void **)&mults, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     int *primes = NULL;
-    rval = posix_memalign((void **)&primes, SIMD_WIDTH_BYTES, SIMD_STREAMS_INT * sizeof(int));
+    rval = posix_memalign((void **)&primes, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
 #endif
 
     // Integer/float/double
@@ -126,9 +126,9 @@ int main_gen(int rng_lim)
 
     // RNG object
 #if defined(SIMD_MODE)
-    SPRNG *rng[SIMD_STREAMS_INT/2];
+    SPRNG *rng[SIMD_STREAMS_64];
 #else
-    SPRNG *rng[SIMD_STREAMS_INT];
+    SPRNG *rng[SIMD_STREAMS_32];
 #endif
     for (i = 0; i < nstrms; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
@@ -152,9 +152,9 @@ int main_gen(int rng_lim)
 
     // Print results 
 #if defined(SIMD_MODE)
-    printf("gen nums %lu\n", rng[SIMD_STREAMS_INT/2-1]->get_ngens());
+    printf("gen nums %lu\n", rng[SIMD_STREAMS_64-1]->get_ngens());
 #else
-    printf("gen nums %lu\n", rng[SIMD_STREAMS_INT-1]->get_ngens());
+    printf("gen nums %lu\n", rng[SIMD_STREAMS_32-1]->get_ngens());
 #endif
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
@@ -178,7 +178,7 @@ int main_gen(int rng_lim)
     rval = posix_memalign((void **)&mults2, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, SIMD_WIDTH_BYTES, SIMD_STREAMS_INT * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(unsigned int));
 # endif
 
     // Integer/float/double
