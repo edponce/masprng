@@ -277,8 +277,8 @@ SIMD_DBL VLCG::get_rn_dbl()
 #else
     const SIMD_DBL vfac[2] = {simd_set(CONFIG.TWO_M24), simd_set(CONFIG.TWO_M48)};
     SIMD_DBL vseedd[2];
-    int lseed[4] __attribute__ ((aligned(SIMD_ALIGN)));
-    double seedd[2] __attribute__ ((aligned(SIMD_ALIGN)));
+    int lseed[4] SIMD_ALIGNED;
+    double seedd[2] SIMD_ALIGNED;
 
     // NOTE: casting done with CPU, bad!!
     multiply(seed, multiplier, prime);

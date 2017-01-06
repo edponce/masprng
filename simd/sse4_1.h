@@ -2,10 +2,6 @@
 #define __SSE4_1_H
 
 
-#include <cstdlib>
-#include <cstring>
-
-
 /*
  *  Include supporting header files based on compiler and architecture
  *  NOTE: currently only support x86_64, GCC and Intel compilers
@@ -14,13 +10,13 @@
 
 
 /*
- *  SSE2 128-bit wide vector units 
- *  Define some constants required for SIMD module to function properly.
+ *  SSE4.1 128-bit wide vector units 
+ *  Define constants required for MASPRNG and SIMD module to function properly.
  */
-#define SIMD_WIDTH_BYTES 16 
 #define SIMD_INT __m128i
 #define SIMD_FLT __m128
 #define SIMD_DBL __m128d
+const int SIMD_WIDTH_BYTES = 16; 
 
 
 /* Interface Legend
@@ -32,6 +28,16 @@
  * simd_*_XX  = (set functions) specifies width to consider for integer types
  * simd_*     = datatype obtained from function overloading and parameters
  */
+
+
+/*
+ *  Alignment macro
+ */
+#if defined(__GNUC__) || defined(__INTEL_COMPILER)
+    #define SIMD_ALIGNED __attribute__((aligned(SIMD_WIDTH_BYTES)))
+#else
+    #define SIMD_ALIGNED
+#endif
 
 
 /**************************
@@ -193,26 +199,6 @@ static inline SIMD_DBL simd_set(const double sa1, const double sa0)
 
 /*!
  *  Set vector given an array.
- *  This is the general form but too involved compared to direct form.
- */
-/*
-static inline SIMD_INT simd_set(const int * const sa, const int n)
-{
-    const int m = SIMD_WIDTH_BYTES/sizeof(int);
-    const int offs = m/n;
-    int * const arr = NULL;
-    int rval __attribute__ ((unused)) = posix_memalign((void **)&arr, SIMD_WIDTH_BYTES, SIMD_WIDTH_BYTES);
-    memset(arr, 0, SIMD_WIDTH_BYTES);
-    for (int i = 0, j = 0; i < m; i+=offs, ++j)
-        arr[i] = sa[j];
-    SIMD_INT va = _mm_load_si128((SIMD_INT *)arr);
-    free(arr);
-    return va;
-}
-*/
-
-/*!
- *  Set vector given an array.
  *  Only required for non-contiguous 32-bit elements due to in-between padding,
  *  64-bit elements can use load instructions.
  */
@@ -266,8 +252,8 @@ static inline SIMD_FLT simd_cvt_f64_f32(const SIMD_DBL va)
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
 {
-    unsigned long int sa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
-    float fa[4] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
+    unsigned long int sa[2] SIMD_ALIGNED;
+    float fa[4] SIMD_ALIGNED;
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (float)sa[0];
     fa[1] = 0.0;
@@ -282,8 +268,8 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 {
-    unsigned long int sa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
-    double fa[2] __attribute__ ((aligned(SIMD_WIDTH_BYTES)));
+    unsigned long int sa[2] SIMD_ALIGNED;
+    double fa[2] SIMD_ALIGNED;
     _mm_store_si128((SIMD_INT *)sa, va);
     fa[0] = (double)sa[0];
     fa[1] = (double)sa[1];
@@ -338,6 +324,7 @@ static inline void simd_store(double * const sa, const SIMD_DBL va)
 /**********************************
  *  SIMD general helper functions
  **********************************/
+// NOTE: need to move these functions out of here
 void simd_print(const char * const, const SIMD_INT);
 void simd_print(const char * const, const SIMD_FLT);
 void simd_print(const char * const, const SIMD_DBL);

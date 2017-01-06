@@ -42,12 +42,12 @@
  *  Global SIMD constants for alignment and streams counts
  */
 #if defined(SIMD_MODE)
-const int SIMD_ALIGN = SIMD_WIDTH_BYTES;
+const bool SIMD_SPRNG = true; 
 const int SIMD_STREAMS_INT = (SIMD_WIDTH_BYTES/sizeof(int));
 const int SIMD_STREAMS_FLT = (SIMD_WIDTH_BYTES/sizeof(float));
 const int SIMD_STREAMS_DBL = (SIMD_WIDTH_BYTES/sizeof(double));
 #else
-const int SIMD_ALIGN = 8;  // NOTE: default alignment is 64-bit architecture
+const bool SIMD_SPRNG = false;
 const int SIMD_STREAMS_INT = 1;
 const int SIMD_STREAMS_FLT = 1;
 const int SIMD_STREAMS_DBL = 1;

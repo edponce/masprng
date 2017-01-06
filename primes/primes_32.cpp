@@ -5,13 +5,11 @@
 #include "primelist_32.h"
 
 
-#define YES 1
-#define NO  0
-#define NPRIMES 1000
+enum { NO = 0, YES };
+const int NPRIMES = 1000;
+
 
 #define primes primes32
-
-
 static int primes[NPRIMES];
 
 

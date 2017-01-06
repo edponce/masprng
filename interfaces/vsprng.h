@@ -2,8 +2,8 @@
 #define __VSPRNG_H
 
 
-#include "masprng_config.h"
 #include "simd_config.h"
+#include "masprng_config.h"
 
 
 # if defined(SIMD_MODE)

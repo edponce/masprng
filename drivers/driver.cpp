@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 int main_gen(int rng_lim)
 {
     int i, j;
-    int rval __attribute__ ((unused));
+    int rval __attribute__((unused));
 
     long int timers[2];
     double t1;
@@ -98,31 +98,31 @@ int main_gen(int rng_lim)
 
     // Initial seeds
     int *iseeds = NULL;
-    rval = posix_memalign((void **)&iseeds, SIMD_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
             iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
     int *m = NULL;
-    rval = posix_memalign((void **)&m, SIMD_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
     // Scalar
 #if defined(DEBUG)
     unsigned long int *seeds = NULL;
-    rval = posix_memalign((void **)&seeds, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     unsigned long int *mults = NULL;
-    rval = posix_memalign((void **)&mults, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     int *primes = NULL;
-    rval = posix_memalign((void **)&primes, SIMD_ALIGN, SIMD_STREAMS_INT * sizeof(int));
+    rval = posix_memalign((void **)&primes, SIMD_WIDTH_BYTES, SIMD_STREAMS_INT * sizeof(int));
 #endif
 
     // Integer/float/double
     RNG_TYPE *rngs = NULL;
-    rval = posix_memalign((void **)&rngs, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    rval = posix_memalign((void **)&rngs, SIMD_WIDTH_BYTES, RNG_ELEMS * sizeof(RNG_TYPE));
 
     // RNG object
 #if defined(SIMD_MODE)
@@ -172,18 +172,18 @@ int main_gen(int rng_lim)
 
 # if defined(DEBUG)
     unsigned long int *seeds2 = NULL;
-    rval = posix_memalign((void **)&seeds2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&seeds2, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     unsigned long int *mults2 = NULL;
-    rval = posix_memalign((void **)&mults2, SIMD_ALIGN, nstrms * sizeof(unsigned long int));
+    rval = posix_memalign((void **)&mults2, SIMD_WIDTH_BYTES, nstrms * sizeof(unsigned long int));
 
     unsigned int *primes2 = NULL;
-    rval = posix_memalign((void **)&primes2, SIMD_ALIGN, SIMD_STREAMS_INT * sizeof(unsigned int));
+    rval = posix_memalign((void **)&primes2, SIMD_WIDTH_BYTES, SIMD_STREAMS_INT * sizeof(unsigned int));
 # endif
 
     // Integer/float/double
     RNG_TYPE *rngs2 = NULL;
-    rval = posix_memalign((void **)&rngs2, SIMD_ALIGN, RNG_ELEMS * sizeof(RNG_TYPE));
+    rval = posix_memalign((void **)&rngs2, SIMD_WIDTH_BYTES, RNG_ELEMS * sizeof(RNG_TYPE));
 
     VRNG_TYPE vrngs;
 

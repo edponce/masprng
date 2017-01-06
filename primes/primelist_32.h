@@ -1,6 +1,6 @@
-#define PRIMELISTSIZE1 1000
-#define PRIMELISTSIZE2 1778
-#define STEP 1000
+const int PRIMELISTSIZE1 = 1000;
+const int PRIMELISTSIZE2 = 1778;
+const int STEP = 1000;
 
 
 int prime_list_32[PRIMELISTSIZE2] = 
