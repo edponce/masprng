@@ -2,7 +2,7 @@
 #define __VSPRNG_H
 
 
-#include "sprng_config.h"
+#include "masprng_config.h"
 
 
 /*

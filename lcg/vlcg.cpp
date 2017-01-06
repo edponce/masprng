@@ -74,7 +74,7 @@ VLCG::VLCG()
     simd_set_zero(&prime_position);
     simd_set_zero(&prime_next);
     simd_set_zero(&parameter);
-    gentype = CONFIG.GENTYPE; // NOTE: refactor this, use std::string or char[] with strncpy
+    gentype = CONFIG.GENTYPE;
 
 #if defined(LONG_SPRNG) 
     simd_set_zero(&seed);

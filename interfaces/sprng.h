@@ -2,7 +2,7 @@
 #define __SPRNG_H
 
 
-#include "sprng_config.h"
+#include "masprng_config.h"
 
 
 /*! \class SPRNG
