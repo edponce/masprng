@@ -4,4 +4,8 @@ rng
 # Object files
 *.o
 
+# Temporary files
 utils/vutils*
+
+# Documentation
+html/

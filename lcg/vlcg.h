@@ -1,11 +1,14 @@
-#ifndef __LCG_SIMD_H
-#define __LCG_SIMD_H
+#ifndef __VLCG_H
+#define __VLCG_H
 
 
-#include "sprng.h"
+#include "simd.h"
+#if defined SIMD_MODE
 
 
-#if defined(SIMD_MODE)
+#include "vsprng.h"
+
+
 /*! \class VLCG 
  *  \brief Class for SIMD linear congruential RNG.
  */
@@ -47,8 +50,10 @@ class VLCG: public VSPRNG
 #endif
     const char *gentype;    
 };
-#endif  // SIMD_MODE
 
 
-#endif  // __LCG_SIMD_H
+#endif // SIMD_MODE
+
+
+#endif  // __VLCG_H
 

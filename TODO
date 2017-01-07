@@ -1,20 +1,16 @@
 put objects files in obj/
 change datatypes to int64_t standard conventions
 fix not long64
-memory manager, output interface return primitive types instead of SIMD
 use typedef for aligned types, so aligned attribute is in one place
 for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 
+memory manager, output interface return primitive types instead of SIMD
+provide 2 modes for layout of random numbers: (1) interleaved streams, (2) independent streams with additional function to change between streams
 
-simd/sse.h: *  NOTE: currently only support x86_64, GCC and Intel compilers
-simd/sse.h: *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
-simd/sse.h: *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
-lcg/lcg_config.h:// NOTE: required here for SIMD_ALIGN definition
-lcg/lcg_config.h:// NOTE: requires C++11 for non-static initialization in declaration of struct/class
-lcg/lcg_simd.cpp:// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
-lcg/lcg_simd.cpp:    gentype = CONFIG.GENTYPE; // NOTE: refactor this, use std::string or char[] with strncpy
-lcg/lcg_simd.cpp:    // NOTE: prime check/set is incomplete
-lcg/lcg_simd.cpp:// NOTE: should return contiguous ints?
-lcg/lcg_simd.cpp:    // NOTE: casting done with CPU, bad!!
+
+lcg/vlcg.h:    // NOTE: thread-safe?
 lcg/lcg.cpp:    // NOTE: verify these checks
-lcg/lcg_simd.h:    // NOTE: thread-safe?
+lcg/vlcg.cpp:// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
+lcg/vlcg.cpp:    // NOTE: prime check/set is incomplete
+lcg/vlcg.cpp:// NOTE: should return contiguous ints?
+lcg/vlcg.cpp:    // NOTE: casting done with CPU, bad!!

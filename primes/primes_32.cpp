@@ -1,18 +1,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "primes_32.h"
 #include "primelist_32.h"
+#include "primes_32.h"
 
 
-#define YES 1
-#define NO  0
-#define NPRIMES 1000
+enum { NO = 0, YES };
+static const int NPRIMES = 1000;
 
-#define primes primes32
-
-
-static int primes[NPRIMES];
+#define PRIMES primes32
+static int PRIMES[NPRIMES];
 
 
 static int init_prime_32()
@@ -23,16 +20,16 @@ static int init_prime_32()
         isprime = YES;
       
         for (j = 0; j < obtained; ++j) {
-            if (i % primes[j] == 0) {
+            if (i % PRIMES[j] == 0) {
                 isprime = NO;
                 break;
             }
-            else if (primes[j]*primes[j] > i)
+            else if (PRIMES[j]*PRIMES[j] > i)
                 break;
         }
 
         if (isprime == YES) {
-            primes[obtained] = i;
+            PRIMES[obtained] = i;
             obtained++;
         }
     }
@@ -88,7 +85,7 @@ int getprime_32(int need, int *prime_array, int offset)
         isprime = YES;
         largest -= 2;
         for (i = 0; i < num_prime; ++i)
-            if (largest%primes[i] == 0) {
+            if (largest%PRIMES[i] == 0) {
                 isprime = NO;
                 break;
             }

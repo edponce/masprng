@@ -5,25 +5,32 @@
 #include "check.h"
 
 
+#if !defined(SIMD_MODE)
+#define SIMD_WIDTH_BYTES 8
+#define SIMD_STREAMS_32 1
+#define SIMD_STREAMS_64 1
+#endif
+
+
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_errors(const int rng_type)
+int check_gen(const int rng_type, const int vrng_type)
 {
     int i;
     int rval;
 
-    const int nstrms = SIMD_STREAMS_INT/2;
+    const int nstrms = SIMD_STREAMS_64;
 
     // Initial seeds
     int *iseeds = NULL;
-    rval = posix_memalign((void **)&iseeds, SIMD_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
     int *m = NULL;
-    rval = posix_memalign((void **)&m, SIMD_ALIGN, nstrms * sizeof(int));
+    rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
@@ -37,23 +44,20 @@ int check_errors(const int rng_type)
     rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
-    const int nstrms32 = 2 * nstrms;
-    const int nstrms64 = nstrms;
-
     // SIMD
     int *irngs2 = NULL;
-    rval = posix_memalign((void **)&irngs2, SIMD_ALIGN, nstrms32 * sizeof(int));
+    rval = posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
     float *frngs2 = NULL;
-    rval = posix_memalign((void **)&frngs2, SIMD_ALIGN, nstrms32 * sizeof(float));
+    rval = posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(float));
     double *drngs2 = NULL;
-    rval = posix_memalign((void **)&drngs2, SIMD_ALIGN, nstrms64 * sizeof(double));
+    rval = posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_64 * sizeof(double));
 
     SIMD_INT ivrngs;
     SIMD_FLT fvrngs;
     SIMD_DBL dvrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(rng_type);
+    VSPRNG *vrng = selectTypeSIMD(vrng_type);
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 
