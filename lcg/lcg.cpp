@@ -19,7 +19,6 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
-#include "sprng.h"
 #include "lcg.h"
 #include "lcg_globals.h"
 #include "primes_32.h"

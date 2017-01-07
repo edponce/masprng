@@ -2,10 +2,22 @@
 #define __VSPRNG_H
 
 
+#include "simd.h"
+#if defined(SIMD_MODE)
+
+
 /*!
  *  RNG identifiers
  */
-enum VSPRNG_TYPE {VSPRNG_LFG = 0, VSPRNG_LCG, VSPRNG_LCG64, VSPRNG_CMRG, VSPRNG_MLFG, VSPRNG_PMLCG};
+enum VSPRNG_TYPE
+{
+    VSPRNG_LFG = 0,
+    VSPRNG_LCG,
+    VSPRNG_LCG64,
+    VSPRNG_CMRG,
+    VSPRNG_MLFG,
+    VSPRNG_PMLCG
+};
 
 
 /*! \class VSPRNG
@@ -17,7 +29,7 @@ class VSPRNG
 {
   public:
     virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
-    virtual int init_rng(int, int, int * const , int * const) = 0;
+    virtual int init_rng(int, int, int * const, int * const) = 0;
     virtual SIMD_INT get_rn_int() = 0;
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;
@@ -29,6 +41,9 @@ class VSPRNG
     virtual SIMD_INT get_multiplier() const = 0;
 #endif
 };
+
+
+#endif // SIMD_MODE
 
 
 #endif  // __VSPRNG_H

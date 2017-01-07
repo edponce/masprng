@@ -2,7 +2,9 @@
 #define __SIMD_H
 
 
-// Compiler and architecture specific settings 
+/*
+ *  Compiler and architecture specific settings 
+ */
 #include "arch.h"
 
 
@@ -56,6 +58,14 @@
     void simd_print(const char * const, const SIMD_DBL);
 #else
     #define SIMD_ALIGNED
+
+    // NOTE: The following are not required but may be convenient.
+    #define SIMD_WIDTH_BYTES 8
+    #define SIMD_INT int
+    #define SIMD_FLT float 
+    #define SIMD_DBL double 
+    const int SIMD_STREAMS_32 = 1;
+    const int SIMD_STREAMS_64 = 1;
 #endif
 
 

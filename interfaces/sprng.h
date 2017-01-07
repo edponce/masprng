@@ -5,7 +5,15 @@
 /*!
  *  RNG identifiers
  */
-enum SPRNG_TYPE {SPRNG_LFG = 0, SPRNG_LCG, SPRNG_LCG64, SPRNG_CMRG, SPRNG_MLFG, SPRNG_PMLCG};
+enum SPRNG_TYPE
+{
+    SPRNG_LFG = 0,
+    SPRNG_LCG,
+    SPRNG_LCG64,
+    SPRNG_CMRG,
+    SPRNG_MLFG,
+    SPRNG_PMLCG
+};
 
 
 /*! \class SPRNG

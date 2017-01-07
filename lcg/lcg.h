@@ -2,6 +2,9 @@
 #define __LCG_H
 
 
+#include "sprng.h"
+
+
 /*! \class LCG 
  *  \brief Class for linear congruential RNG. 
  */

@@ -24,7 +24,8 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define VRNG_TYPE_NUM VSPRNG_LCG
+#define VRNG_TYPE_NUM SPRNG_LCG
+//#define VRNG_TYPE_NUM VSPRNG_LCG
 #define TEST 0
 
 #if TEST == 0

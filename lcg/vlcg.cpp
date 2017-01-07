@@ -19,7 +19,6 @@
 
 #include <cstdio>
 #include <climits>
-#include "vsprng.h"
 #include "vlcg.h"
 #include "lcg_globals.h"
 #include "primes_32.h"

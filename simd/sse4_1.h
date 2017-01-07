@@ -3,6 +3,12 @@
 
 
 /*
+ *  Compiler and architecture specific settings 
+ */
+#include "arch.h"
+
+
+/*
  *  Include supporting header files based on compiler and architecture
  *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
@@ -11,7 +17,7 @@
 
 /*
  *  SSE4.1 128-bit wide vector units 
- *  Define constants required for MASPRNG and SIMD module to function properly.
+ *  Define constants required for SIMD module to function properly.
  */
 #define SIMD_INT __m128i
 #define SIMD_FLT __m128
@@ -28,12 +34,6 @@ const int SIMD_WIDTH_BYTES = 16;
  * simd_*_XX  = (set functions) specifies width to consider for integer types
  * simd_*     = datatype obtained from function overloading and parameters
  */
-
-
-/*
- *  Compiler and architecture specific settings 
- */
-#include "arch.h"
 
 
 /**************************
