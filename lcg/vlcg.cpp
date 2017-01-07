@@ -100,49 +100,36 @@ SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) co
  */
 void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) const
 {
-    SIMD_INT s[4], res[4];
-    SIMD_INT vtmp, vtmp2;
+    SIMD_INT s[4], res[4], vtmp[3];
+    const SIMD_INT vmsk_4095 = simd_set(4095U);
+    const SIMD_INT vmsk_167_ = simd_set(16777215U);
 
-    s[0] = simd_set(4095);
-    s[0] = simd_and(a[1], s[0]);
+    s[0] = simd_and(a[1], vmsk_4095);
     s[1] = simd_srl_32(a[1], 0xc);
-    s[2] = simd_set(4095);
-    s[2] = simd_and(a[0], s[2]);
+    s[2] = simd_and(a[0], vmsk_4095);
     s[3] = simd_srl_32(a[0], 0xc);
 
-    res[0] = simd_mullo_i32(b[0], s[0]);
-    res[1] = simd_mullo_i32(b[1], s[0]);
-    vtmp = simd_mullo_i32(b[0], s[1]);   
-    res[1] = simd_add_i32(res[1], vtmp);
-    res[2] = simd_mullo_i32(b[2], s[0]);
-    vtmp = simd_mullo_i32(b[1], s[1]);   
-    res[2] = simd_add_i32(res[2], vtmp);
-    vtmp = simd_mullo_i32(b[0], s[2]);   
-    res[2] = simd_add_i32(res[2], vtmp);
-    res[3] = simd_mullo_i32(b[3], s[0]);
-    vtmp = simd_mullo_i32(b[2], s[1]);   
-    res[3] = simd_add_i32(res[3], vtmp);
-    vtmp = simd_mullo_i32(b[1], s[2]);   
-    res[3] = simd_add_i32(res[3], vtmp);
-    vtmp = simd_mullo_i32(b[0], s[3]);   
-    res[3] = simd_add_i32(res[3], vtmp);
- 
-    vtmp = simd_srl_32(a[1], 0x18); 
-    vtmp = simd_add_i32(vtmp, res[2]);
-    vtmp2 = simd_srl_32(res[1], 0xc);
-    vtmp = simd_add_i32(vtmp, vtmp2);
-    vtmp2 = simd_sll_32(res[3], 0xc);
-    a[0] = simd_add_i32(vtmp, vtmp2);
+    for (int i = 0; i < 4; ++i) {
+        res[i] = simd_mullo_i32(b[0], s[i]);
+        for (int j = 0; j < i; ++j) {
+            const SIMD_INT vmul = simd_mullo_i32(b[i-j], s[j]);
+            res[i] = simd_add_i32(res[i], vmul);
+        }
+    }
 
-    vtmp = simd_set(4095);
-    vtmp = simd_and(res[1], vtmp);
-    vtmp = simd_sll_32(vtmp, 0xc);
-    vtmp = simd_add_i32(res[0], vtmp);
-    a[1] = simd_add_i32(vtmp, c);
+    vtmp[0] = simd_srl_32(a[1], 0x18); 
+    vtmp[1] = simd_srl_32(res[1], 0xc);
+    vtmp[2] = simd_sll_32(res[3], 0xc);
+    vtmp[0] = simd_add_i32(vtmp[0], res[2]);
+    vtmp[1] = simd_add_i32(vtmp[1], vtmp[2]);
+    a[0] = simd_add_i32(vtmp[0], vtmp[1]);
+    a[0] = simd_and(a[0], vmsk_167_);
 
-    vtmp = simd_set(16777215);
-    a[0] = simd_and(a[0], vtmp);
-    a[1] = simd_and(a[1], vtmp);
+    vtmp[0] = simd_and(res[1], vmsk_4095);
+    vtmp[0] = simd_sll_32(vtmp[0], 0xc);
+    vtmp[1] = simd_add_i32(res[0], c);
+    a[1] = simd_add_i32(vtmp[0], vtmp[1]);
+    a[1] = simd_and(a[1], vmsk_167_);
 }
 #endif
 
@@ -256,26 +243,11 @@ SIMD_DBL VLCG::get_rn_dbl()
     const SIMD_DBL vfac = simd_set(GLOBALS.TWO_M48);
     return simd_mul(seed_dbl, vfac);
 #else
-    const SIMD_DBL vfac[2] = {simd_set(GLOBALS.TWO_M24), simd_set(GLOBALS.TWO_M48)};
-    SIMD_DBL vseedd[2];
-    int lseed[4] SIMD_ALIGNED;
-    double seedd[2] SIMD_ALIGNED;
-
-    // NOTE: casting done with CPU, bad!!
     multiply(seed, multiplier, prime);
-    simd_store(lseed, seed[0]);
-    seedd[0] = lseed[0];
-    seedd[1] = lseed[2];
-    vseedd[0] = simd_load(seedd);
-
-    simd_store(lseed, seed[1]);
-    seedd[0] = lseed[0];
-    seedd[1] = lseed[2];
-    vseedd[1] = simd_load(seedd);
-
-    SIMD_DBL vs1 = simd_mul(vseedd[0], vfac[0]);
-    SIMD_DBL vs2 = simd_mul(vseedd[1], vfac[1]);
- 
+    const SIMD_DBL seed_dbl[2] = { simd_cvt_i32_f64(seed[0]), simd_cvt_i32_f64(seed[1]) };
+    const SIMD_DBL vfac[2] = { simd_set(GLOBALS.TWO_M24), simd_set(GLOBALS.TWO_M48) };
+    const SIMD_DBL vs1 = simd_mul(seed_dbl[0], vfac[0]);
+    const SIMD_DBL vs2 = simd_mul(seed_dbl[1], vfac[1]);
     return simd_add(vs1, vs2);
 #endif
 }
@@ -289,9 +261,12 @@ SIMD_FLT VLCG::get_rn_flt()
     const SIMD_FLT vfac = simd_set((float)GLOBALS.TWO_M48);
     return simd_mul(seed_flt, vfac);
 #else
-    SIMD_FLT vrng = simd_set((float)GLOBALS.TWO_M48);
     multiply(seed, multiplier, prime);
-    return simd_mul(vrng, vrng);
+    const SIMD_FLT seed_flt[2] = { simd_cvt_i32_f32(seed[0]), simd_cvt_i32_f32(seed[1]) };
+    const SIMD_FLT vfac[2] = { simd_set((float)GLOBALS.TWO_M24), simd_set((float)GLOBALS.TWO_M48) };
+    const SIMD_FLT vs1 = simd_mul(seed_flt[0], vfac[0]);
+    const SIMD_FLT vs2 = simd_mul(seed_flt[1], vfac[1]);
+    return simd_add(vs1, vs2);
 #endif
 }
 

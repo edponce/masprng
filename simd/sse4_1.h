@@ -236,6 +236,20 @@ static inline SIMD_INT simd_set(const unsigned long int * const sa, const int n)
  *  Convert intrinsics 
  ***********************/
 /*!
+ *  Convert packed 32-bit integer elements
+ *  to packed single-precision floating-point elements.
+ */
+static inline SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
+{ return _mm_cvtepi32_ps(va); }
+
+/*!
+ *  Convert packed 32-bit integer elements
+ *  to packed double-precision floating-point elements.
+ */
+static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
+{ return _mm_cvtepi32_pd(va); }
+
+/*!
  *  Convert packed double-precision floating-point elements
  *  to packed single-precision floating-point elements.
  */

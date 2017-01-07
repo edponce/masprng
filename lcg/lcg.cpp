@@ -70,7 +70,7 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
     int s[4], res[4];
 
     s[0] = a[1] & 4095;
-    s[1] = a[1] >> 12;
+    s[1] = (unsigned int)a[1] >> 12;
     s[2] = a[0] & 4095;
     s[3] = (unsigned int)a[0] >> 12;
 
@@ -79,8 +79,8 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
     res[2] = b[2] * s[0] + b[1] * s[1] + b[0] * s[2];
     res[3] = b[3] * s[0] + b[2] * s[1] + b[1] * s[2] + b[0] * s[3];
 
-    a[0] = ((unsigned int)a[1] >> 24) + res[2] + ((unsigned int)res[1] >> 12) + (res[3] << 12);
-    a[1] = res[0] + ((res[1] & 4095) << 12) + c;
+    a[0] = ((unsigned int)a[1] >> 24) + res[2] + ((unsigned int)res[1] >> 12) + ((unsigned int)res[3] << 12);
+    a[1] = res[0] + ((unsigned int)(res[1] & 4095) << 12) + c;
 
     a[0] &= 16777215;
     a[1] &= 16777215;
@@ -130,8 +130,8 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 #else
     memcpy(multiplier, GLOBALS.MULT[parameter], sizeof(multiplier));
 
-    seed[0] = GLOBALS.INIT_SEED[0] ^ ((init_seed >> 8) & 0xffffff);
-    seed[1] = GLOBALS.INIT_SEED[1] ^ ((init_seed << 16) & 0xff0000);
+    seed[0] = GLOBALS.INIT_SEED[0] ^ (((unsigned int)init_seed >> 8) & 0xffffff);
+    seed[1] = GLOBALS.INIT_SEED[1] ^ (((unsigned int)init_seed << 16) & 0xff0000);
 
     if (prime == 0)
         seed[1] |= 1;

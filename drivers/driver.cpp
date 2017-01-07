@@ -16,10 +16,8 @@
 
 
 #if defined(LONG_SPRNG)
-#define SIMD_STREAMS SIMD_STREAMS_64
 #define SIMD_SHIFT_32 2
 #else
-#define SIMD_STREAMS SIMD_STREAMS_32
 #define SIMD_SHIFT_32 1
 #endif
 
@@ -35,7 +33,7 @@
 #define RNG_TYPE_NUM SPRNG_LCG
 #define VRNG_TYPE_NUM SPRNG_LCG
 //#define VRNG_TYPE_NUM VSPRNG_LCG
-#define TEST 0
+#define TEST 2
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -101,7 +99,7 @@ int main_gen(int rng_lim)
 
     long int timers[2];
     double t1;
-    const int nstrms = SIMD_STREAMS;
+    const int nstrms = RNG_ELEMS;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
