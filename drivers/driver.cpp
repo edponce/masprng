@@ -33,7 +33,7 @@
 #define RNG_TYPE_NUM SPRNG_LCG
 #define VRNG_TYPE_NUM SPRNG_LCG
 //#define VRNG_TYPE_NUM VSPRNG_LCG
-#define TEST 1
+#define TEST 0
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"

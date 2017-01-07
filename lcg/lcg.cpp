@@ -36,7 +36,6 @@ LCG::LCG()
     prime_next = 0;
     parameter = 0;
     gentype = GLOBALS.GENTYPE;
-
 #if defined(LONG_SPRNG)
     seed = 0;
     multiplier = 0;
@@ -60,8 +59,10 @@ LCG::~LCG()
 unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
     unsigned long int res = a * b;
+
     res += c;
     res &= 0xffffffffffffL;
+
     return res;
 }
 #else
@@ -74,15 +75,18 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
     s[2] = a[0] & 4095;
     s[3] = (unsigned int)a[0] >> 12;
 
-    res[0] = b[0] * s[0];
-    res[1] = b[1] * s[0] + b[0] * s[1];
-    res[2] = b[2] * s[0] + b[1] * s[1] + b[0] * s[2];
-    res[3] = b[3] * s[0] + b[2] * s[1] + b[1] * s[2] + b[0] * s[3];
+    for (int i = 0; i < 4; ++i) {
+        res[i] = b[0] * s[i];
+        for (int j = 0; j < i; ++j) {
+            const int vmul = b[i-j] * s[j];
+            res[i] += vmul;
+        }
+    }
 
     a[0] = ((unsigned int)a[1] >> 24) + res[2] + ((unsigned int)res[1] >> 12) + ((unsigned int)res[3] << 12);
-    a[1] = res[0] + ((unsigned int)(res[1] & 4095) << 12) + c;
-
     a[0] &= 16777215;
+
+    a[1] = res[0] + ((unsigned int)(res[1] & 4095) << 12) + c;
     a[1] &= 16777215;
 }
 #endif
@@ -109,8 +113,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
         return -1;
     }
     prime_position = gn;
-    const int need = 1;
-    getprime_32(need, &prime, prime_position);
+    getprime_32(1, &prime, prime_position);
 
     if (m < 0 || m >= GLOBALS.NPARAMS) {
         printf("ERROR: multiplier out of range, %d\n", m);
@@ -155,9 +158,11 @@ int LCG::get_rn_int()
 {
 #if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
+
     return (int)(seed >> 17);
 #else
     multiply(seed, multiplier, prime);
+
     return (seed[0] << 7) | (seed[1] >> 17);
 #endif
 }
@@ -173,9 +178,11 @@ double LCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
+
     return (double)seed * GLOBALS.TWO_M48;
 #else
     multiply(seed, multiplier, prime);
+
     return (double)seed[0] * GLOBALS.TWO_M24 + (double)seed[1] * GLOBALS.TWO_M48;
 #endif
 }

@@ -36,8 +36,8 @@ class VLCG: public VSPRNG
     int rng_type;
     SIMD_INT init_seed;
     SIMD_INT prime;
-    SIMD_INT prime_position;
-    SIMD_INT prime_next;
+    int prime_position;
+    int prime_next;
     SIMD_INT parameter;
 #if defined(LONG_SPRNG)
     SIMD_INT seed;

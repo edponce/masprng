@@ -32,17 +32,16 @@ VLCG::VLCG()
     rng_type = VSPRNG_LCG;
     simd_set_zero(&init_seed);
     simd_set_zero(&prime);
-    simd_set_zero(&prime_position);
-    simd_set_zero(&prime_next);
+    prime_position = 0;
+    prime_next = 0;
     simd_set_zero(&parameter);
     gentype = GLOBALS.GENTYPE;
-
 #if defined(LONG_SPRNG) 
     simd_set_zero(&seed);
     simd_set_zero(&multiplier);
 #else
     simd_set_zero(&seed[0]);
-    seed[1] = simd_set((int)0x1);
+    seed[1] = simd_set(0x1U);
     for (int i = 0; i < 4; ++i)
         simd_set_zero(&multiplier[i]);
 #endif
@@ -65,7 +64,9 @@ SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) co
 {
     const SIMD_INT vmsk_lsb48 = simd_set(0xFFFFFFFFFFFFUL); 
     SIMD_INT res = simd_mul_u64(a, b);
+
     res = simd_add_i64(res, c);
+
     return simd_and(res, vmsk_lsb48);
 }
 #else
@@ -74,13 +75,14 @@ SIMD_INT VLCG::multiply(const SIMD_INT a, const SIMD_INT b, const SIMD_INT c) co
  */
 void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) const
 {
-    SIMD_INT res[4], vtmp[3];
     const SIMD_INT vmsk_4095 = simd_set(4095U);
     const SIMD_INT vmsk_167_ = simd_set(16777215U);
-    const SIMD_INT s[4] = { simd_and(a[1], vmsk_4095),
-                               simd_srl_32(a[1], 0xc),
-                            simd_and(a[0], vmsk_4095),
-                               simd_srl_32(a[0], 0xc) };
+    SIMD_INT s[4], res[4], vtmp[3];
+
+    s[0] = simd_and(a[1], vmsk_4095);
+    s[1] = simd_srl_32(a[1], 0xc);
+    s[2] = simd_and(a[0], vmsk_4095);
+    s[3] = simd_srl_32(a[0], 0xc);
 
     for (int i = 0; i < 4; ++i) {
         res[i] = simd_mullo_i32(b[0], s[i]);
@@ -118,6 +120,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
         printf("ERROR: total_gen out of range, %d\n", tg);
         tg = 1;
     }
+    prime_next = tg;
 
     if (gn >= GLOBALS.LCG_MAX_STREAMS)
         printf("WARNING: generator number (%d) is greater than maximum number of independent streams (%d), independence of streams cannot be guaranteed.\n", gn, GLOBALS.LCG_MAX_STREAMS);
@@ -126,9 +129,10 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
         printf("ERROR: generator number is out of range, %d\n", gn);
         return -1;
     }
-    const int need = 1;
+
     int lprime;
-    getprime_32(need, &lprime, gn);
+    prime_position = gn;
+    getprime_32(1, &lprime, prime_position);
 
 #if defined(LONG_SPRNG)
     for (int i = 0; i < SIMD_STREAMS_64; ++i) {
@@ -143,9 +147,6 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     SIMD_INT vs = simd_set(s, SIMD_STREAMS_64);
     init_seed = simd_and(vs, vmsk_lsb31);
 
-    prime_next = simd_set_64(tg);
-    prime_position = simd_set_64(gn);
-
     long int lmultiplier[SIMD_STREAMS_64];
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
         lmultiplier[i] = GLOBALS.MULT[m[i]];
@@ -155,7 +156,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     seed = simd_set(GLOBALS.INIT_SEED);
     seed = simd_xor(seed, vs);
 
-    const SIMD_INT vmsk_lsb1 = simd_set(0x1UL, 0x1UL);
+    const SIMD_INT vmsk_lsb1 = simd_set(0x1UL);
     prime = simd_set_64(lprime);
     if (lprime == 0)
         seed = simd_or(seed, vmsk_lsb1);
@@ -171,9 +172,6 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     const SIMD_INT vmsk_lsb31 = simd_set(0x7FFFFFFFU);
     SIMD_INT vs = simd_set(s, SIMD_STREAMS_32);
     init_seed = simd_and(vs, vmsk_lsb31);
-
-    prime_next = simd_set(tg);
-    prime_position = simd_set(gn);
 
     int lmultiplier[SIMD_STREAMS_32];
     for (int j = 0; j < 4; ++j) {
@@ -201,8 +199,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
         seed[1] = simd_or(seed[1], vmsk_lsb1);
 #endif
 
-    // Run generator for a while, same runs for each stream
-    for (int i = 0; i < (GLOBALS.LCG_RUNUP * gn); ++i)
+    // Run generator several times
+    for (int i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
     return 0;
@@ -214,11 +212,14 @@ SIMD_INT VLCG::get_rn_int()
 {
 #if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
+
     return simd_srl_64(seed, 0x11);
 #else
     multiply(seed, multiplier, prime);
+
     const SIMD_INT vs[2] = { simd_sll_32(seed[0], 0x7),
                             simd_srl_32(seed[1], 0x11) };
+
     return simd_or(vs[0], vs[1]);
 #endif
 }
@@ -228,17 +229,21 @@ SIMD_DBL VLCG::get_rn_dbl()
 {
 #if defined(LONG_SPRNG)
     const SIMD_DBL vfac = simd_set(GLOBALS.TWO_M48);
+
     seed = multiply(seed, multiplier, prime);
     const SIMD_DBL seed_dbl = simd_cvt_u64_f64(seed);
+
     return simd_mul(seed_dbl, vfac);
 #else
     const SIMD_DBL vfac[2] = { simd_set(GLOBALS.TWO_M24),
                                simd_set(GLOBALS.TWO_M48) };
+
     multiply(seed, multiplier, prime);
     const SIMD_DBL seed_dbl[2] = { simd_cvt_i32_f64(seed[0]),
                                    simd_cvt_i32_f64(seed[1]) };
     const SIMD_DBL vs[2] = { simd_mul(seed_dbl[0], vfac[0]),
                              simd_mul(seed_dbl[1], vfac[1]) };
+
     return simd_add(vs[0], vs[1]);
 #endif
 }
@@ -248,17 +253,21 @@ SIMD_FLT VLCG::get_rn_flt()
 {
 #if defined(LONG_SPRNG)
     const SIMD_FLT vfac = simd_set((float)GLOBALS.TWO_M48);
+
     seed = multiply(seed, multiplier, prime);
     const SIMD_FLT seed_flt = simd_cvt_u64_f32(seed);
+
     return simd_mul(seed_flt, vfac);
 #else
     const SIMD_FLT vfac[2] = { simd_set((float)GLOBALS.TWO_M24),
                                simd_set((float)GLOBALS.TWO_M48) };
+
     multiply(seed, multiplier, prime);
     const SIMD_FLT seed_flt[2] = { simd_cvt_i32_f32(seed[0]),
                                    simd_cvt_i32_f32(seed[1]) };
     const SIMD_FLT vs[2] = { simd_mul(seed_flt[0], vfac[0]),
                              simd_mul(seed_flt[1], vfac[1]) };
+
     return simd_add(vs[0], vs[1]);
 #endif
 }
