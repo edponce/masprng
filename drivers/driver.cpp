@@ -33,7 +33,7 @@
 #define RNG_TYPE_NUM SPRNG_LCG
 #define VRNG_TYPE_NUM SPRNG_LCG
 //#define VRNG_TYPE_NUM VSPRNG_LCG
-#define TEST 2
+#define TEST 1
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
@@ -115,7 +115,7 @@ int main_gen(int rng_lim)
     int *m = NULL;
     rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
-        m[i] = 0;
+        m[i] = i;
 
     // Scalar
 #if defined(DEBUG)
