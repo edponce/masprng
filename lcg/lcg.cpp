@@ -101,9 +101,11 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     prime_next = tg;
 
-    // NOTE: verify these checks
-    if (gn < 0 || gn >= tg || gn >= GLOBALS.LCG_MAX_STREAMS) {
-        printf("ERROR: gennum out of range, %d\n", gn);
+    if (gn >= GLOBALS.LCG_MAX_STREAMS)
+        printf("WARNING: generator number (%d) is greater than maximum number of independent streams (%d), independence of streams cannot be guaranteed.\n", gn, GLOBALS.LCG_MAX_STREAMS);
+
+    if (gn < 0 || gn >= tg) {
+        printf("ERROR: generator number is out of range, %d\n", gn);
         return -1;
     }
     prime_position = gn;
@@ -128,11 +130,8 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 #else
     memcpy(multiplier, GLOBALS.MULT[parameter], sizeof(multiplier));
 
-    seed[0] = GLOBALS.INIT_SEED[0] ^ (((unsigned long int)init_seed >> 8) & 0xffffff);
-    seed[1] = GLOBALS.INIT_SEED[1] ^ (((unsigned long int)init_seed << 16) & 0xff0000);
-
-    printf("seed[0]\t%d\n", seed[0]);
-    printf("seed[1]\t%d\n", seed[1]);
+    seed[0] = GLOBALS.INIT_SEED[0] ^ ((init_seed >> 8) & 0xffffff);
+    seed[1] = GLOBALS.INIT_SEED[1] ^ ((init_seed << 16) & 0xff0000);
 
     if (prime == 0)
         seed[1] |= 1;
@@ -159,7 +158,7 @@ int LCG::get_rn_int()
     return (int)(seed >> 17);
 #else
     multiply(seed, multiplier, prime);
-    return (seed[0] << 7) | ((unsigned int)seed[1] >> 17);
+    return (seed[0] << 7) | (seed[1] >> 17);
 #endif
 }
 

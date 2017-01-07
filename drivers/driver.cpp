@@ -15,6 +15,15 @@
 #endif
 
 
+#if defined(LONG_SPRNG)
+#define SIMD_STREAMS SIMD_STREAMS_64
+#define SIMD_SHIFT_32 2
+#else
+#define SIMD_STREAMS SIMD_STREAMS_32
+#define SIMD_SHIFT_32 1
+#endif
+
+
 #if defined(DEBUG)
 #define RNG_LIM 1
 #else
@@ -36,7 +45,7 @@
 #define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
 #define RNG_ELEMS SIMD_STREAMS_32 
-#define RNG_SHIFT 2
+#define RNG_SHIFT SIMD_SHIFT_32
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
 #define RNG_TYPE_STR "Float"
@@ -46,7 +55,7 @@
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS SIMD_STREAMS_32
-#define RNG_SHIFT 2
+#define RNG_SHIFT SIMD_SHIFT_32 
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
 #define RNG_TYPE_STR "Double"
@@ -92,7 +101,7 @@ int main_gen(int rng_lim)
 
     long int timers[2];
     double t1;
-    const int nstrms = SIMD_STREAMS_64;
+    const int nstrms = SIMD_STREAMS;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
