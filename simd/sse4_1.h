@@ -277,11 +277,13 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
 {
     unsigned long int sa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
     float fa[4] SET_ALIGNED(SIMD_WIDTH_BYTES);
+
     _mm_store_si128((SIMD_INT *)sa, va);
-    fa[0] = (float)sa[0];
-    fa[1] = 0.0;
-    fa[2] = (float)sa[1];
-    fa[3] = 0.0;
+    for (int i = 0; i < 2; ++i) {
+        fa[i*2] = (float)sa[i];
+        fa[i*2+1] = 0.0;
+    }
+
     return _mm_load_ps(fa);
 }
 
@@ -293,9 +295,11 @@ static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __SIMD_NEED__
 {
     unsigned long int sa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
     double fa[2] SET_ALIGNED(SIMD_WIDTH_BYTES);
+
     _mm_store_si128((SIMD_INT *)sa, va);
-    fa[0] = (double)sa[0];
-    fa[1] = (double)sa[1];
+    for (int i = 0; i < 2; ++i)
+        fa[i] = (double)sa[i];
+
     return _mm_load_pd(fa);
 }
 

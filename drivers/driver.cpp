@@ -102,7 +102,7 @@ int main_gen(int rng_lim)
     int *m = NULL;
     rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
-        m[i] = i;
+        m[i] = i % 7;
 
     // Scalar
 #if defined(DEBUG)
