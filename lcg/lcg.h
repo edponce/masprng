@@ -33,13 +33,13 @@ class LCG: public SPRNG
 #endif
 
   private:
+    const char *gentype;
     int rng_type;
     int init_seed;
     int prime;
     int prime_position;
     int prime_next;
     int parameter;
-    const char *gentype;
 #if defined(LONG_SPRNG)
     unsigned long int seed;
     unsigned long int multiplier;

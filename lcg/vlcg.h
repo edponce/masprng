@@ -33,6 +33,7 @@ class VLCG: public VSPRNG
 #endif
 
   private:
+    const char *gentype;    
     int rng_type;
     int prime_position;
     int prime_next;
@@ -51,7 +52,6 @@ class VLCG: public VSPRNG
     SIMD_INT multiplier[4];
     void multiply(SIMD_INT * const, SIMD_INT * const, const SIMD_INT) const;
 #endif
-    const char *gentype;    
 };
 
 

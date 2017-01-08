@@ -7,7 +7,12 @@
 #include "simd.h"
 
 
-// NOTE: requires C++11 for non-static initialization in declaration of struct/class
+/*!
+ *  Global parameters for LCG
+ *
+ *  NOTE: all arrays should be aligned for SIMD mode, a macro is provided.
+ *  NOTE: requires C++11 for non-static initialization in declaration of struct/class
+ */
 struct LCG_GLOBALS
 {
     const char * const GENTYPE = "48 bit Linear Congruential Generator with Prime Addend";

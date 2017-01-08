@@ -27,15 +27,18 @@
 unsigned long int LCG::LCG_NGENS = 0;
 
 
+/*!
+ *  \brief Constructor (no parameters)
+ */
 LCG::LCG()
 {
+    gentype = GLOBALS.GENTYPE;
     rng_type = SPRNG_LCG;
     init_seed = 0;
     prime = 0;
     prime_position = 0;
     prime_next = 0;
     parameter = 0;
-    gentype = GLOBALS.GENTYPE;
 #if defined(LONG_SPRNG)
     seed = 0;
     multiplier = 0;
@@ -49,6 +52,9 @@ LCG::LCG()
 }
 
 
+/*!
+ *  \brief Destructor
+ */
 LCG::~LCG()
 {
     --LCG_NGENS;
@@ -56,6 +62,9 @@ LCG::~LCG()
 
 
 #if defined(LONG_SPRNG)
+/*!
+ *  \brief LCG multiply 48-bits using 64-bits.
+ */
 unsigned long int LCG::multiply(const unsigned long int a, const unsigned long int b, const unsigned long int c) const
 {
     unsigned long int res = a * b;
@@ -66,6 +75,9 @@ unsigned long int LCG::multiply(const unsigned long int a, const unsigned long i
     return res;
 }
 #else
+/*!
+ *  \brief LCG multiply 48-bits using 32-bits.
+ */
 void LCG::multiply(int * const a, const int * const b, const int c) const
 {
     int s[4], res[4];
@@ -93,9 +105,11 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
 
 
 /*!
+ *  \brief Initialize RNG
+ *
  *  Gives back one generator (node gennum) with updated spawning info.
  *  Should be called total_gen times, with different value
- *  of gennum in [0,total_gen) each call
+ *  of gennum in [0,total_gen) each call.
  */
 int LCG::init_rng(int gn, int tg, int s, int m)
 {
@@ -121,7 +135,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     parameter = m;
 
-    init_seed = s & 0x7fffffff; // only 31 LSB of seed considered
+    init_seed = s & 0x7fffffff;
 
 #if defined(LONG_SPRNG)
     multiplier = GLOBALS.MULT[parameter];
