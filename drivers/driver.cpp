@@ -5,6 +5,7 @@
 #include "masprng.h"
 #include "timers.h"
 #include "utils.h"
+#include "vutils.h"
 #include "check.h"
 
 

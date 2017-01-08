@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include "masprng.h"
-#include "utils.h"
 #include "check.h"
 
 

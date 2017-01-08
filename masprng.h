@@ -37,10 +37,6 @@ static SPRNG * selectType(const int typenum)
 }
 
 
-#include "simd.h"
-#if defined(SIMD_MODE)
-
-
 #include "vsprng.h"
 //#include "vlfg.h"
 #include "vlcg.h"
@@ -48,6 +44,9 @@ static SPRNG * selectType(const int typenum)
 //#include "vcmrg.h"
 //#include "vmlfg.h"
 //#include "vpmlcg.h"
+
+
+#if defined(SIMD_MODE)
 
 
 /*!
@@ -74,7 +73,9 @@ static VSPRNG * selectTypeSIMD(const int typenum)
 
     return rng;
 }
-#endif
+
+
+#endif // SIMD_MODE
 
 
 #endif  // __MASPRNG_H
