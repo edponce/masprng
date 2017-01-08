@@ -1,5 +1,5 @@
-#ifndef __SSE4_1_H
-#define __SSE4_1_H
+#ifndef __AVX2_H
+#define __AVX2_H
 
 
 /*
@@ -16,13 +16,13 @@
 
 
 /*
- *  SSE4.1 128-bit wide vector units 
+ *  AVX2 256-bit wide vector units 
  *  Define constants required for SIMD module to function properly.
  */
-#define SIMD_INT __m128i
-#define SIMD_FLT __m128
-#define SIMD_DBL __m128d
-const int SIMD_WIDTH_BYTES = 16; 
+#define SIMD_INT __m256i
+#define SIMD_FLT __m256
+#define SIMD_DBL __m256d
+const int SIMD_WIDTH_BYTES = 32; 
 
 
 /* Interface Legend
@@ -66,7 +66,6 @@ static inline SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb) __SIMD
 /*!
  *  Multiply low signed 32-bit integers from each packed 64-bit elements
  *  and store the signed 64-bit results 
- *  NOTE: requires at least SSE 4.1 for _mm_mul_epi32()
  */
 static inline SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb) __SIMD_RECOMMEND__
 { return _mm_mul_epi32(va, vb); }
@@ -344,5 +343,5 @@ static inline void simd_store(double * const sa, const SIMD_DBL va) __SIMD_NEED_
 { _mm_store_pd(sa, va); }
 
 
-#endif  // __SSE4_1_H
+#endif  // __AVX2_H
 

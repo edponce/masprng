@@ -6,7 +6,7 @@ General requirements:
     C++11 - non-static initialization in struct/class
 
 SIMD requirements:
-    SSE - at least SSE4.1 for _mm_mullo_epi32()
+    SSE - at least SSE4.1 for _mm_mullo_epi32() and _mm_mul_epi32()
     AVX - at AVX2
 
 Only a single SIMD technology is allowed per SPRNG object.
