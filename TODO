@@ -1,6 +1,5 @@
 put objects files in obj/
 change datatypes to int64_t standard conventions
-fix not long64
 use typedef for aligned types, so aligned attribute is in one place
 for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 

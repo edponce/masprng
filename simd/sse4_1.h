@@ -137,8 +137,26 @@ static inline SIMD_INT simd_srl_64(const SIMD_INT va, const int shft)
 /*!
  *  Shuffle 32-bit integers using control value 
  */
-static inline SIMD_INT simd_shuffle_32(const SIMD_INT va, const int ctrl)
+static inline SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl)
 { return _mm_shuffle_epi32(va, ctrl); }
+
+static inline SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const unsigned int ctrl)
+{ return _mm_shuffle_ps(va, vb, ctrl); }
+
+/*
+ *  Unpack lower 32/64-bit elements
+ */
+static inline SIMD_INT simd_unpacklo(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_unpacklo_epi32(va, vb); }
+
+static inline SIMD_INT simd_unpacklo_64(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_unpacklo_epi64(va, vb); }
+
+static inline SIMD_FLT simd_unpacklo(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_unpacklo_ps(va, vb); }
+
+static inline SIMD_DBL simd_unpacklo(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_unpacklo_pd(va, vb); }
 
 
 /*******************
@@ -235,6 +253,20 @@ static inline SIMD_INT simd_set(const unsigned long int * const sa, const int n)
 /***********************
  *  Convert intrinsics 
  ***********************/
+/*!
+ *  Convert packed 32-bit integer elements
+ *  to packed single-precision floating-point elements.
+ */
+static inline SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
+{ return _mm_cvtepi32_ps(va); }
+
+/*!
+ *  Convert packed 32-bit integer elements
+ *  to packed double-precision floating-point elements.
+ */
+static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
+{ return _mm_cvtepi32_pd(va); }
+
 /*!
  *  Convert packed double-precision floating-point elements
  *  to packed single-precision floating-point elements.

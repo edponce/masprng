@@ -34,16 +34,19 @@ class VLCG: public VSPRNG
 
   private:
     int rng_type;
-    SIMD_INT init_seed;
-    SIMD_INT prime;
-    SIMD_INT prime_position;
-    SIMD_INT prime_next;
-    SIMD_INT parameter;
+    int prime_position;
+    int prime_next;
 #if defined(LONG_SPRNG)
-    SIMD_INT seed;
-    SIMD_INT multiplier;
+    SIMD_INT init_seed[2];
+    SIMD_INT parameter[2];
+    SIMD_INT prime[2];
+    SIMD_INT seed[2];
+    SIMD_INT multiplier[2];
     SIMD_INT multiply(const SIMD_INT, const SIMD_INT, const SIMD_INT) const;
 #else
+    SIMD_INT init_seed;
+    SIMD_INT parameter;
+    SIMD_INT prime;
     SIMD_INT seed[2];
     SIMD_INT multiplier[4];
     void multiply(SIMD_INT * const, SIMD_INT * const, const SIMD_INT) const;

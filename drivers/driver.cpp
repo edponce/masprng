@@ -36,7 +36,7 @@
 #define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
 #define RNG_ELEMS SIMD_STREAMS_32 
-#define RNG_SHIFT 2
+#define RNG_SHIFT 1 
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
 #define RNG_TYPE_STR "Float"
@@ -46,7 +46,7 @@
 #define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS SIMD_STREAMS_32
-#define RNG_SHIFT 2
+#define RNG_SHIFT 1 
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
 #define RNG_TYPE_STR "Double"
@@ -92,7 +92,7 @@ int main_gen(int rng_lim)
 
     long int timers[2];
     double t1;
-    const int nstrms = SIMD_STREAMS_64;
+    const int nstrms = RNG_ELEMS;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
@@ -108,7 +108,7 @@ int main_gen(int rng_lim)
     int *m = NULL;
     rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
-        m[i] = 0;
+        m[i] = i;
 
     // Scalar
 #if defined(DEBUG)
