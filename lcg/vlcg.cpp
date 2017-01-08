@@ -38,13 +38,16 @@ VLCG::VLCG()
     prime_position = 0;
     prime_next = 0;
 #if defined(LONG_SPRNG) 
-    for (int i = 0; i < 2; ++i) {
-        simd_set_zero(init_seed+i);
-        simd_set_zero(parameter+i);
-        simd_set_zero(prime+i);
-        simd_set_zero(seed+i);
-        simd_set_zero(multiplier+i);
-    }
+    simd_set_zero(&init_seed[0]);
+    simd_set_zero(&init_seed[1]);
+    simd_set_zero(&parameter[0]);
+    simd_set_zero(&parameter[1]);
+    simd_set_zero(&prime[0]);
+    simd_set_zero(&prime[1]);
+    simd_set_zero(&seed[0]);
+    simd_set_zero(&seed[1]);
+    simd_set_zero(&multiplier[0]);
+    simd_set_zero(&multiplier[1]);
 #else
     simd_set_zero(&init_seed);
     simd_set_zero(&parameter);
@@ -52,7 +55,7 @@ VLCG::VLCG()
     simd_set_zero(&seed[0]);
     seed[1] = simd_set(0x1U);
     for (int i = 0; i < 4; ++i)
-        simd_set_zero(multiplier+i);
+        simd_set_zero(&multiplier[i]);
 #endif
 
     ++LCG_NGENS;
@@ -91,9 +94,9 @@ void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) co
     SIMD_INT s[4], res[4], vtmp[3];
 
     s[0] = simd_and(a[1], vmsk_fac[0]);
-    s[1] = simd_srl_32(a[1], 0xc);
     s[2] = simd_and(a[0], vmsk_fac[0]);
     s[3] = simd_srl_32(a[0], 0xc);
+    s[1] = simd_srl_32(a[1], 0xc);
 
     for (int i = 0; i < 4; ++i) {
         SIMD_INT * const res_ptr = res + i;

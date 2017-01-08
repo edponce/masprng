@@ -8,21 +8,21 @@
 
 void simd_print(const char * const str, const SIMD_INT va)
 {
-    int itmp[SIMD_STREAMS_32] SIMD_ALIGNED;
+    int itmp[SIMD_STREAMS_32] __SIMD_ALIGNED;
     simd_store(itmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_32; ++i)
       printf("%d\t", itmp[i]);
     printf("\n");
 
-    unsigned int utmp[SIMD_STREAMS_32] SIMD_ALIGNED; 
+    unsigned int utmp[SIMD_STREAMS_32] __SIMD_ALIGNED; 
     simd_store(utmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_32; ++i)
       printf("%u\t", utmp[i]);
     printf("\n");
 
-    unsigned long int lutmp[SIMD_STREAMS_64] SIMD_ALIGNED;
+    unsigned long int lutmp[SIMD_STREAMS_64] __SIMD_ALIGNED;
     simd_store(lutmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
@@ -33,7 +33,7 @@ void simd_print(const char * const str, const SIMD_INT va)
 
 void simd_print(const char * const str, const SIMD_FLT va)
 {
-    float tmp[SIMD_STREAMS_32] SIMD_ALIGNED;
+    float tmp[SIMD_STREAMS_32] __SIMD_ALIGNED;
     simd_store(tmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_32; ++i)
@@ -44,7 +44,7 @@ void simd_print(const char * const str, const SIMD_FLT va)
 
 void simd_print(const char * const str, const SIMD_DBL va)
 {
-    double tmp[SIMD_STREAMS_64] SIMD_ALIGNED;
+    double tmp[SIMD_STREAMS_64] __SIMD_ALIGNED;
     simd_store(tmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
