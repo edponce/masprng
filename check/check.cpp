@@ -6,16 +6,16 @@
 
 
 #if !defined(SIMD_MODE)
-#define SIMD_WIDTH_BYTES 8
-#define SIMD_STREAMS_32 1
-#define SIMD_STREAMS_64 1
+const int SIMD_WIDTH_BYTES = 8;
+const int SIMD_STREAMS_32 = 1;
+const int SIMD_STREAMS_64 = 1;
 #endif
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_gen(const int rng_type, const int vrng_type)
+int check_gen(const int rng_type)
 {
     int i;
     int rval;
@@ -57,7 +57,7 @@ int check_gen(const int rng_type, const int vrng_type)
     SIMD_DBL dvrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(vrng_type);
+    VSPRNG *vrng = selectTypeSIMD(rng_type);
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 

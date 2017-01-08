@@ -8,6 +8,7 @@
 
 /*!
  *  RNG identifiers
+ *  Uses same values as SPRNG interface for convenience user applications.
  */
 enum VSPRNG_TYPE
 {

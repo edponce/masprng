@@ -45,27 +45,16 @@
 
 
 /*
- *  Define additional SIMD global constants, alignment macro,
- *  and helper print functions.
- *  SIMD_ALIGNED macro has to be always defined.
+ *  (Mandatory) Define additional SIMD global constants
+ *  and alignment macro.
+ *  Uses SIMD_WIDTH_BYTES provided by SIMD modules.
  */
 #if defined(SIMD_MODE)
     #define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
     const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
     const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
-    void simd_print(const char * const, const SIMD_INT);
-    void simd_print(const char * const, const SIMD_FLT);
-    void simd_print(const char * const, const SIMD_DBL);
 #else
-    #define SIMD_ALIGNED
-
-    // NOTE: The following are not required but may be convenient.
-    #define SIMD_WIDTH_BYTES 8
-    #define SIMD_INT int
-    #define SIMD_FLT float 
-    #define SIMD_DBL double 
-    const int SIMD_STREAMS_32 = 1;
-    const int SIMD_STREAMS_64 = 1;
+    #define SIMD_ALIGNED // disable alignment for non-SIMD mode
 #endif
 
 

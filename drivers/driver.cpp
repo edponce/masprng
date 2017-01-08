@@ -8,13 +8,6 @@
 #include "check.h"
 
 
-#if !defined(SIMD_MODE)
-#define SIMD_WIDTH_BYTES 8
-#define SIMD_STREAMS_32 1
-#define SIMD_STREAMS_64 1
-#endif
-
-
 #if defined(DEBUG)
 #define RNG_LIM 1
 #else
@@ -22,41 +15,41 @@
 #endif
 
 
+#if !defined(SIMD_MODE)
+const int SIMD_WIDTH_BYTES = 8;
+const int SIMD_STREAMS_32 = 1;
+const int SIMD_STREAMS_64 = 1;
+#endif
+
+
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define VRNG_TYPE_NUM SPRNG_LCG
-//#define VRNG_TYPE_NUM VSPRNG_LCG
 #define TEST 1
+
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
 #define RNG_TYPE int 
 #define get_rn() get_rn_int()
 #define VRNG_TYPE SIMD_INT 
-#define get_vrn() get_vrn_int()
 #define RNG_FMT "%d"
 #define RNG_ELEMS SIMD_STREAMS_32 
-#define RNG_SHIFT 1 
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
 #define RNG_TYPE_STR "Float"
 #define RNG_TYPE float 
 #define get_rn() get_rn_flt()
 #define VRNG_TYPE SIMD_FLT 
-#define get_vrn() get_vrn_flt()
 #define RNG_FMT "%f"
 #define RNG_ELEMS SIMD_STREAMS_32
-#define RNG_SHIFT 1 
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
 #else 
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
 #define get_rn() get_rn_dbl()
 #define VRNG_TYPE SIMD_DBL 
-#define get_vrn() get_vrn_dbl()
 #define RNG_FMT "%f"
 #define RNG_ELEMS SIMD_STREAMS_64 
-#define RNG_SHIFT 1
 #define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif
 
@@ -79,7 +72,7 @@ int main(int argc, char **argv)
     if (rng_lim > 0)
         main_gen(rng_lim);
     else
-        check_gen(RNG_TYPE_NUM, VRNG_TYPE_NUM);
+        check_gen(RNG_TYPE_NUM);
 
     return 0;
 }
@@ -182,7 +175,7 @@ int main_gen(int rng_lim)
     VRNG_TYPE vrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(VRNG_TYPE_NUM);
+    VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
     vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel
@@ -203,9 +196,9 @@ int main_gen(int rng_lim)
     printf("Vector real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
 # if defined(DEBUG)
-        printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i*RNG_SHIFT], seeds2[i], mults2[i], primes2[i*2]);
+        printf("vector = " RNG_FMT "\t%lu\t%lu\t%u\n", rngs2[i], seeds2[i], mults2[i], primes2[i*2]);
 # else
-        printf("vector = " RNG_FMT "\n", rngs2[i*RNG_SHIFT]);
+        printf("vector = " RNG_FMT "\n", rngs2[i]);
 # endif
     printf("\n");
 
@@ -218,9 +211,9 @@ int main_gen(int rng_lim)
     int valid = 1;
     for (i = 0; i < nstrms; ++i) { 
 # if defined(DEBUG)
-        if (RNG_NEQ(rngs[i], rngs2[i*RNG_SHIFT]) || RNG_NEQ(seeds[i], seeds2[i])) {
+        if (RNG_NEQ(rngs[i], rngs2[i]) || RNG_NEQ(seeds[i], seeds2[i])) {
 # else
-        if (RNG_NEQ(rngs[i], rngs2[i*RNG_SHIFT])) {
+        if (RNG_NEQ(rngs[i], rngs2[i])) {
 # endif
             valid = 0;
             break;

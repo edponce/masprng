@@ -3,6 +3,7 @@
 
 
 #include <cstdio>
+#include "vutils.h" 
 
 
 void simd_print(const char * const str, const SIMD_INT va)
