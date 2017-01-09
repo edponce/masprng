@@ -1,5 +1,5 @@
-#include <cstdio>
-#include <cstdlib> // getenv
+#include <stdio.h>
+#include <stdlib.h> // getenv
 #include <unistd.h> // sysconf
 #include "utils.h"
 

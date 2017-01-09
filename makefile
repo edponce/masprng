@@ -21,8 +21,11 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-#CFLAGS := -pedantic -Wall -Wextra -std=c++11 -O3 -march=native -funroll-loops
-CFLAGS := -pedantic -Wall -Wextra -std=c++98 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=native -msse4.1 -funroll-loops
+CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -msse4.1 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=core-avx2 -mavx2 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=core-avx2 -mavx2 -funroll-loops
 #CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
@@ -49,8 +52,9 @@ LFLAGS :=
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
 #DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
-#DEFINES := -DSSE4_1_SPRNG
-DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
+DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
+#DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 

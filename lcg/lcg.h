@@ -10,7 +10,7 @@
  */
 class LCG: public SPRNG
 {
-    static unsigned long int LCG_NGENS;
+    static int LCG_NGENS;
 
   public:
     LCG();
@@ -20,7 +20,7 @@ class LCG: public SPRNG
     float get_rn_flt();
     double get_rn_dbl();
     int get_seed_rng() const;
-    unsigned long int get_ngens() const;
+    int get_ngens() const;
 #if defined(DEBUG)
     int get_prime() const;
 # if defined(LONG_SPRNG)

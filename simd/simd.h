@@ -45,16 +45,14 @@
 
 
 /*
- *  (Mandatory) Define additional SIMD global constants
- *  and alignment macro.
+ *  (Mandatory) Alignment macro.
  *  Uses SIMD_WIDTH_BYTES provided by SIMD modules.
  */
 #if defined(SIMD_MODE)
+    #include <stdint.h>
     #define __SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
-    const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
-    const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
 #else
-    #define __SIMD_ALIGNED // disable alignment for non-SIMD mode
+    #define __SIMD_ALIGNED // disable for scalar mode
 #endif
 
 

@@ -16,15 +16,14 @@
 /*************************************************************************/
 
 
-#include <cstdio>
-#include <cstring>
-#include <climits>
+#include <stdio.h>
+#include <string.h>
 #include "lcg.h"
 #include "lcg_globals.h"
 #include "primes_32.h"
 
 
-unsigned long int LCG::LCG_NGENS = 0;
+int LCG::LCG_NGENS = 0;
 
 
 /*!
@@ -204,7 +203,7 @@ double LCG::get_rn_dbl()
 
 int LCG::get_seed_rng() const { return init_seed; }
 
-unsigned long int LCG::get_ngens() const { return LCG_NGENS; }
+int LCG::get_ngens() const { return LCG_NGENS; }
 
 
 #if defined(DEBUG)

@@ -1,7 +1,7 @@
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <cfloat>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
 #include "masprng.h"
 #include "timers.h"
 #include "utils.h"
@@ -143,7 +143,7 @@ int main_gen(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-    printf("gen nums %lu\n", rng[nstrms-1]->get_ngens());
+    printf("gen nums %d\n", rng[nstrms-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < nstrms; ++i)
 #if defined(DEBUG)
@@ -193,7 +193,7 @@ int main_gen(int rng_lim)
 # endif
     simd_store(rngs2, vrngs);
 
-    printf("gen nums %lu\n", vrng->get_ngens());
+    printf("gen nums %d\n", vrng->get_ngens());
     printf("Vector real time = %.16f sec\n", t2);
     for (i = 0; i < nstrms; ++i)
 # if defined(DEBUG)
