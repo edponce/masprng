@@ -2,10 +2,7 @@
 #define __SIMD_H
 
 
-/*
- *  Compiler and architecture specific settings 
- */
-#include "arch.h"
+#include <stdint.h> // NOTE: remove this
 
 
 /*
@@ -41,32 +38,28 @@
 #elif defined(SSE4_1_SPRNG)
     #define SIMD_MODE
     #include "sse4_1.h"
+#else
+    // Disable SIMD for scalar mode
+    const int32_t SIMD_WIDTH_BYTES = 8; 
+    const int32_t SIMD_STREAMS_32 = 1;
+    const int32_t SIMD_STREAMS_64 = 1;
 #endif
 
 
 /*
- *  Define additional SIMD global constants, alignment macro,
- *  and helper print functions.
- *  SIMD_ALIGNED macro has to be always defined.
+ *  Compiler and architecture specific settings 
  */
-#if defined(SIMD_MODE)
-    #define SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
-    const int SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
-    const int SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
-    void simd_print(const char * const, const SIMD_INT);
-    void simd_print(const char * const, const SIMD_FLT);
-    void simd_print(const char * const, const SIMD_DBL);
-#else
-    #define SIMD_ALIGNED
+#include "arch.h"
 
-    // NOTE: The following are not required but may be convenient.
-    #define SIMD_WIDTH_BYTES 8
-    #define SIMD_INT int
-    #define SIMD_FLT float 
-    #define SIMD_DBL double 
-    const int SIMD_STREAMS_32 = 1;
-    const int SIMD_STREAMS_64 = 1;
-#endif
+
+/*
+ *  Alignment macros
+ *  Use SIMD_WIDTH_BYTES provided by SIMD modules and
+ *  macros provided by compiler/architecture settings.
+ */
+#define __SIMD_SET_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME_ALIGNED(a) ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME(a) ASSUME(a)
 
 
 #endif  // __SIMD_H

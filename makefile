@@ -21,7 +21,11 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=native -msse4.1 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -msse4.1 -funroll-loops
+#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=native -mavx2 -funroll-loops
+CFLAGS := -g -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -mavx2 -funroll-loops
 #CFLAGS += -pthread
 #CFLAGS += -pthread -fopenmp
 
@@ -45,11 +49,12 @@ LFLAGS :=
 # -DOMP_PROC_BIND=TRUE = thread/processor affinity
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG  # scalar mode
-#DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
+DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
 #DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
-DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
+#DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
@@ -67,7 +72,7 @@ LIBS := -lm
 
 # Source files to compile
 #SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
-SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp simd/simd.cpp check/check.cpp
+SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp utils/vutils.cpp check/check.cpp
 
 # Object files to link
 OBJECTS := $(SOURCES:.cpp=.o)

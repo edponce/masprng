@@ -1,36 +1,27 @@
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include "masprng.h"
-#include "utils.h"
 #include "check.h"
-
-
-#if !defined(SIMD_MODE)
-#define SIMD_WIDTH_BYTES 8
-#define SIMD_STREAMS_32 1
-#define SIMD_STREAMS_64 1
-#endif
 
 
 /*!
  *  Check errors with SPRNG data output found in file
  */
-int check_gen(const int rng_type, const int vrng_type)
+int check_gen(const int rng_type)
 {
     int i;
-    int rval;
 
     const int nstrms = SIMD_STREAMS_64;
 
     // Initial seeds
     int *iseeds = NULL;
-    rval = posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
     int *m = NULL;
-    rval = posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
@@ -46,18 +37,18 @@ int check_gen(const int rng_type, const int vrng_type)
 #if defined(SIMD_MODE)
     // SIMD
     int *irngs2 = NULL;
-    rval = posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
+    posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
     float *frngs2 = NULL;
-    rval = posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(float));
+    posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(float));
     double *drngs2 = NULL;
-    rval = posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_64 * sizeof(double));
+    posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_64 * sizeof(double));
 
     SIMD_INT ivrngs;
     SIMD_FLT fvrngs;
     SIMD_DBL dvrngs;
 
     // RNG object
-    VSPRNG *vrng = selectTypeSIMD(vrng_type);
+    VSPRNG *vrng = selectTypeSIMD(rng_type);
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 
@@ -68,7 +59,7 @@ int check_gen(const int rng_type, const int vrng_type)
     // Integer generator
     int valid = 1;
     for (i = 0; i < 200; ++i) {
-        rval = scanf("%d\n", &rn);
+        scanf("%d\n", &rn);
         irngs = rng->get_rn_int();
 
         if (rn != irngs) {
@@ -97,7 +88,7 @@ int check_gen(const int rng_type, const int vrng_type)
     // Float generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
-        rval = scanf("%d\n", &rn);
+        scanf("%d\n", &rn);
         frngs = rng->get_rn_flt();
 
         int rn1 = rn >> 11;
@@ -129,7 +120,7 @@ int check_gen(const int rng_type, const int vrng_type)
     // Double generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
-        rval = scanf("%d\n", &rn);
+        scanf("%d\n", &rn);
         drngs = rng->get_rn_dbl();
 
         int rn1 = rn >> 1;
@@ -167,6 +158,6 @@ int check_gen(const int rng_type, const int vrng_type)
     free(iseeds);
     free(m);
  
-    return rval;
+    return 0;
 }
 

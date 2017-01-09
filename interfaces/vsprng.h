@@ -8,7 +8,9 @@
 
 /*!
  *  RNG identifiers
+ *  Uses same values as SPRNG interface for convenience user applications.
  */
+/*
 enum VSPRNG_TYPE
 {
     VSPRNG_LFG = 0,
@@ -18,6 +20,8 @@ enum VSPRNG_TYPE
     VSPRNG_MLFG,
     VSPRNG_PMLCG
 };
+*/
+const int VSPRNG_LCG = 0;
 
 
 /*! \class VSPRNG
@@ -34,7 +38,7 @@ class VSPRNG
     virtual SIMD_FLT get_rn_flt() = 0;
     virtual SIMD_DBL get_rn_dbl() = 0;
     virtual SIMD_INT get_seed_rng() const = 0;
-    virtual unsigned long int get_ngens() const = 0;
+    virtual int get_ngens() const = 0;
 #if defined(DEBUG)
     virtual SIMD_INT get_seed() const = 0;
     virtual SIMD_INT get_prime() const = 0;

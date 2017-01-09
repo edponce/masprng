@@ -5,6 +5,7 @@
 /*!
  *  RNG identifiers
  */
+/*
 enum SPRNG_TYPE
 {
     SPRNG_LFG = 0,
@@ -14,6 +15,8 @@ enum SPRNG_TYPE
     SPRNG_MLFG,
     SPRNG_PMLCG
 };
+*/
+const int SPRNG_LCG = 0;
 
 
 /*! \class SPRNG
@@ -30,7 +33,7 @@ class SPRNG
     virtual float get_rn_flt() = 0;
     virtual double get_rn_dbl() = 0;
     virtual int get_seed_rng() const = 0;
-    virtual unsigned long int get_ngens() const = 0;
+    virtual int get_ngens() const = 0;
 #if defined(DEBUG)
     virtual int get_prime() const = 0;
 # if defined(LONG_SPRNG)

@@ -1,15 +1,12 @@
 put objects files in obj/
-change datatypes to int64_t standard conventions
-use typedef for aligned types, so aligned attribute is in one place
 for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 
+add 'extern "C"' to allow library linked from C/C++/MATLAB/other languages
 memory manager, output interface return primitive types instead of SIMD
 provide 2 modes for layout of random numbers: (1) interleaved streams, (2) independent streams with additional function to change between streams
 
-
+simd/simd.h:#include <stdint.h> // NOTE: remove this
+simd/sse4_1.h: *  NOTE: add type suffix to all functions to make interface C valid?
 lcg/vlcg.h:    // NOTE: thread-safe?
-lcg/lcg.cpp:    // NOTE: verify these checks
-lcg/vlcg.cpp:// NOTE: eventually would like only the single int version remains, since SPRNG interface uses int
-lcg/vlcg.cpp:    // NOTE: prime check/set is incomplete
-lcg/vlcg.cpp:// NOTE: should return contiguous ints?
-lcg/vlcg.cpp:    // NOTE: casting done with CPU, bad!!
+lcg/vlcg.cpp: *  NOTE: The gn parameter is the same for all streams since the generators are run
+lcg/vlcg.cpp: *  NOTE: int and float streams use all parameters from input arrays,

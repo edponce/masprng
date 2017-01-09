@@ -1,11 +1,11 @@
 #if defined(USE_SYSTIME)
 #include <sys/time.h>
 #else
-#include <ctime>
+#include <time.h>
 #endif
 
 
-#include <cstdlib>
+#include <stdlib.h>
 #include "timers.h"
 
 

@@ -73,5 +73,5 @@ long int getL3LineSz();
 long int getL3Assoc();
 
 
-#endif // __UTILS_H
+#endif  // __UTILS_H
 
