@@ -61,6 +61,15 @@ static inline SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb) __SIMD_NEE
 { return _mm256_add_pd(va, vb); }
 
 /*!
+ *  Fused multiply-add for 32/64-bit floating-point elements
+ */
+static inline SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) __SIMD_NEED__
+{ return _mm256_fmadd_ps(va, vb, vc); }
+
+static inline SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) __SIMD_NEED__
+{ return _mm256_fmadd_pd(va, vb, vc); }
+
+/*!
  *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
  *  and store the unsigned 64-bit results 
  */

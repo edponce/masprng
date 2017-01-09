@@ -37,30 +37,57 @@ int setOmpEnv(const int num_threads)
 }
 
 
-int printSIMDconf()
-{
 #if GNUC_VERSION > 40800
-    if (__builtin_cpu_supports("sse"))
-        puts("SSE");
-    if (__builtin_cpu_supports("sse2"))
-        puts("SSE2");
-    if (__builtin_cpu_supports("sse3"))
-        puts("SSE3");
-    if (__builtin_cpu_supports("ssse3"))
-        puts("SSSE3");
-    if (__builtin_cpu_supports("sse4.1"))
-        puts("SSE4.1");
-    if (__builtin_cpu_supports("sse4.2"))
-        puts("SSE4.2");
-    if (__builtin_cpu_supports("avx"))
-        puts("AVX");
-    if (__builtin_cpu_supports("avx2"))
-        puts("AVX2");
-    if (__builtin_cpu_supports("avx512f"))
-        puts("AVX512F");
+#define CPUsupports(a) (__builtin_cpu_supports(a)) ? (1) : (0)
+#else
+#define CPUsupports(a) 0 // NOTE: assume SIMD support is not available if no way of checking
+#endif
+int detectProcSIMD()
+{
+    int support = 1;
+
+#if defined(__FMA__) // NOTE: not sure of this macro
+    if (!CPUsupports("fma"))
+        support = 0;
+#endif
+#if defined(__SSE__)
+    if (!CPUsupports("sse"))
+        support = 0;
+#endif
+#if defined(__SSE2__)
+    if (!CPUsupports("sse2"))
+        support = 0;
+#endif
+#if defined(__SSE3__)
+    if (!CPUsupports("sse3"))
+        support = 0;
+#endif
+#if defined(__SSSE3__)
+    if (!CPUsupports("ssse3"))
+        support = 0;
+#endif
+#if defined(__SSE4_1__)
+    if (!CPUsupports("sse4.1"))
+        support = 0;
+#endif
+#if defined(__SSE4_2__)
+    if (!CPUsupports("sse4.2"))
+        support = 0;
+#endif
+#if defined(__AVX__)
+    if (!CPUsupports("avx"))
+        support = 0;
+#endif
+#if defined(__AVX2__)
+    if (!CPUsupports("avx2"))
+        support = 0;
+#endif
+#if defined(__AVX512BW__)
+    if (!CPUsupports("avx512BW"))
+        support = 0;
 #endif
 
-    return 0;
+    return support;
 }
 
 
