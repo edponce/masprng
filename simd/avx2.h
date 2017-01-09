@@ -24,8 +24,8 @@
 #define SIMD_FLT __m256
 #define SIMD_DBL __m256d
 const int32_t SIMD_WIDTH_BYTES = 32; 
-const int32_t SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
-const int32_t SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
+const int32_t SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES / sizeof(int32_t));
+const int32_t SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES / sizeof(int64_t));
 
 
 /*
@@ -70,15 +70,16 @@ static inline SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb) __SIMD
 /*!
  *  Multiply low signed 32-bit integers from each packed 64-bit elements
  *  and store the signed 64-bit results 
+ *  NOTE: requires at least AVX2 for _mm256_mul_epi32()
  */
 static inline SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb) __SIMD_RECOMMEND__
 { return _mm256_mul_epi32(va, vb); }
 
 /*!
  *  Perform 64-bit integer multiplication using 32-bit integers
- *  since SSE does not supports 64-bit integer multiplication.
+ *  since vector extensions do not support 64-bit integer multiplication.
  *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
+ *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
  */
 static inline SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __SIMD_NEED__
 {
@@ -98,7 +99,7 @@ static inline SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __SIMD
 /*!
  *  Multiply packed 32-bit integers, produce intermediate 64-bit integers, 
  *  and store the low 32-bit results
- *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
+ *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
  */
 static inline SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb) __SIMD_NEED__
 { return _mm256_mullo_epi32(va, vb); }
@@ -259,7 +260,7 @@ static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __SIMD_NEED__
 
 /*!
  *  Convert unsigned 64-bit integers to 32-bit floating-point elements.
- *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
+ *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
 {
@@ -279,7 +280,7 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
 
 /*!
  *  Convert unsigned 64-bit integers to 64-bit floating-point elements.
- *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
+ *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __SIMD_NEED__
 {
@@ -302,20 +303,38 @@ static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __SIMD_NEED__
 static inline SIMD_INT simd_load(const int32_t * const sa) __SIMD_NEED__
 { return _mm256_load_si256((SIMD_INT *)sa); }
 
+static inline SIMD_INT simd_loadu(const int32_t * const sa) __SIMD_RECOMMEND__
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+
 static inline SIMD_INT simd_load(const uint32_t * const sa) __SIMD_NEED__
 { return _mm256_load_si256((SIMD_INT *)sa); }
+
+static inline SIMD_INT simd_loadu(const uint32_t * const sa) __SIMD_RECOMMEND__
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
 
 static inline SIMD_INT simd_load(const int64_t * const sa) __SIMD_NEED__
 { return _mm256_load_si256((SIMD_INT *)sa); }
 
+static inline SIMD_INT simd_loadu(const int64_t * const sa) __SIMD_RECOMMEND__
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+
 static inline SIMD_INT simd_load(const uint64_t * const sa) __SIMD_NEED__
 { return _mm256_load_si256((SIMD_INT *)sa); }
+
+static inline SIMD_INT simd_loadu(const uint64_t * const sa) __SIMD_RECOMMEND__
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
 
 static inline SIMD_FLT simd_load(const float * const sa) __SIMD_NEED__ 
 { return _mm256_load_ps(sa); }
 
+static inline SIMD_FLT simd_loadu(const float * const sa) __SIMD_RECOMMEND__ 
+{ return _mm256_loadu_ps(sa); }
+
 static inline SIMD_DBL simd_load(const double * const sa) __SIMD_NEED__
 { return _mm256_load_pd(sa); }
+
+static inline SIMD_DBL simd_loadu(const double * const sa) __SIMD_RECOMMEND__
+{ return _mm256_loadu_pd(sa); }
 
 
 /*******************************
@@ -324,20 +343,38 @@ static inline SIMD_DBL simd_load(const double * const sa) __SIMD_NEED__
 static inline void simd_store(int32_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm256_store_si256((SIMD_INT *)sa, va); }
 
+static inline void simd_storeu(int32_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
+
 static inline void simd_store(uint32_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm256_store_si256((SIMD_INT *)sa, va); }
+
+static inline void simd_storeu(uint32_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
 
 static inline void simd_store(int64_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm256_store_si256((SIMD_INT *)sa, va); }
 
+static inline void simd_storeu(int64_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
+
 static inline void simd_store(uint64_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm256_store_si256((SIMD_INT *)sa, va); }
+
+static inline void simd_storeu(uint64_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
 
 static inline void simd_store(float * const sa, const SIMD_FLT va) __SIMD_NEED__
 { _mm256_store_ps(sa, va); }
 
+static inline void simd_storeu(float * const sa, const SIMD_FLT va) __SIMD_RECOMMEND__
+{ _mm256_storeu_ps(sa, va); }
+
 static inline void simd_store(double * const sa, const SIMD_DBL va) __SIMD_NEED__
 { _mm256_store_pd(sa, va); }
+
+static inline void simd_storeu(double * const sa, const SIMD_DBL va) __SIMD_RECOMMEND__
+{ _mm256_storeu_pd(sa, va); }
 
 
 #endif  // __AVX2_H

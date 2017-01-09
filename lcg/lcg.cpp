@@ -202,12 +202,9 @@ double LCG::get_rn_dbl()
 
 
 int LCG::get_seed_rng() const { return init_seed; }
-
 int LCG::get_ngens() const { return LCG_NGENS; }
-
-
 #if defined(DEBUG)
-int LCG::get_prime() const { return prime;}
+int LCG::get_prime() const { return prime; }
 # if defined(LONG_SPRNG)
 unsigned long int LCG::get_seed() const { return seed; }
 unsigned long int LCG::get_multiplier() const { return multiplier; }

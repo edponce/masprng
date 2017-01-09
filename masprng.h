@@ -2,6 +2,9 @@
 #define __MASPRNG_H
 
 
+#include <stdlib.h> // NULL
+
+
 #include "sprng.h"
 //#include "lfg.h"
 #include "lcg.h"

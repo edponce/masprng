@@ -24,8 +24,8 @@
 #define SIMD_FLT __m128
 #define SIMD_DBL __m128d
 const int32_t SIMD_WIDTH_BYTES = 16; 
-const int32_t SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES/4);
-const int32_t SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
+const int32_t SIMD_STREAMS_32 = (SIMD_WIDTH_BYTES / sizeof(int32_t));
+const int32_t SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES / sizeof(int64_t));
 
 
 /*
@@ -37,8 +37,6 @@ const int32_t SIMD_STREAMS_64 = (SIMD_WIDTH_BYTES/8);
  *  simd_*_XX  = unsigned/signed XX-bit integers
  *  simd_*_XX  = (set functions) specifies width to consider for integer types
  *  simd_*     = datatype obtained from function overloading and parameters
- *
- *  NOTE: add type suffix to all functions to make interface C valid?
  */
 
 
@@ -79,7 +77,7 @@ static inline SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb) __SIMD
 
 /*!
  *  Perform 64-bit integer multiplication using 32-bit integers
- *  since SSE does not supports 64-bit integer multiplication.
+ *  since vector extensions do not support 64-bit integer multiplication.
  *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
  *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
  */
@@ -258,7 +256,7 @@ static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __SIMD_NEED__
 
 /*!
  *  Convert unsigned 64-bit integers to 32-bit floating-point elements.
- *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
+ *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
 {
@@ -278,7 +276,7 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
 
 /*!
  *  Convert unsigned 64-bit integers to 64-bit floating-point elements.
- *  NOTE: type conversion performed with scalar FPU since SSE does not support 64-bit integer conversions.
+ *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __SIMD_NEED__
 {
@@ -301,20 +299,38 @@ static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __SIMD_NEED__
 static inline SIMD_INT simd_load(const int32_t * const sa) __SIMD_NEED__
 { return _mm_load_si128((SIMD_INT *)sa); }
 
+static inline SIMD_INT simd_loadu(const int32_t * const sa) __SIMD_RECOMMEND__
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
+
 static inline SIMD_INT simd_load(const uint32_t * const sa) __SIMD_NEED__
 { return _mm_load_si128((SIMD_INT *)sa); }
+
+static inline SIMD_INT simd_loadu(const uint32_t * const sa) __SIMD_RECOMMEND__
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
 
 static inline SIMD_INT simd_load(const int64_t * const sa) __SIMD_NEED__
 { return _mm_load_si128((SIMD_INT *)sa); }
 
+static inline SIMD_INT simd_loadu(const int64_t * const sa) __SIMD_RECOMMEND__
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
+
 static inline SIMD_INT simd_load(const uint64_t * const sa) __SIMD_NEED__
 { return _mm_load_si128((SIMD_INT *)sa); }
+
+static inline SIMD_INT simd_loadu(const uint64_t * const sa) __SIMD_RECOMMEND__
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
 
 static inline SIMD_FLT simd_load(const float * const sa) __SIMD_NEED__ 
 { return _mm_load_ps(sa); }
 
+static inline SIMD_FLT simd_loadu(const float * const sa) __SIMD_RECOMMEND__ 
+{ return _mm_loadu_ps(sa); }
+
 static inline SIMD_DBL simd_load(const double * const sa) __SIMD_NEED__
 { return _mm_load_pd(sa); }
+
+static inline SIMD_DBL simd_loadu(const double * const sa) __SIMD_RECOMMEND__
+{ return _mm_loadu_pd(sa); }
 
 
 /*******************************
@@ -323,20 +339,38 @@ static inline SIMD_DBL simd_load(const double * const sa) __SIMD_NEED__
 static inline void simd_store(int32_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm_store_si128((SIMD_INT *)sa, va); }
 
+static inline void simd_storeu(int32_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
+
 static inline void simd_store(uint32_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm_store_si128((SIMD_INT *)sa, va); }
+
+static inline void simd_storeu(uint32_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static inline void simd_store(int64_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm_store_si128((SIMD_INT *)sa, va); }
 
+static inline void simd_storeu(int64_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
+
 static inline void simd_store(uint64_t * const sa, const SIMD_INT va) __SIMD_NEED__
 { _mm_store_si128((SIMD_INT *)sa, va); }
+
+static inline void simd_storeu(uint64_t * const sa, const SIMD_INT va) __SIMD_RECOMMEND__
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static inline void simd_store(float * const sa, const SIMD_FLT va) __SIMD_NEED__
 { _mm_store_ps(sa, va); }
 
+static inline void simd_storeu(float * const sa, const SIMD_FLT va) __SIMD_RECOMMEND__
+{ _mm_storeu_ps(sa, va); }
+
 static inline void simd_store(double * const sa, const SIMD_DBL va) __SIMD_NEED__
 { _mm_store_pd(sa, va); }
+
+static inline void simd_storeu(double * const sa, const SIMD_DBL va) __SIMD_RECOMMEND__
+{ _mm_storeu_pd(sa, va); }
 
 
 #endif  // __SSE4_1_H

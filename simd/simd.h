@@ -2,10 +2,7 @@
 #define __SIMD_H
 
 
-/*
- *  Compiler and architecture specific settings 
- */
-#include "arch.h"
+#include <stdint.h> // NOTE: remove this
 
 
 /*
@@ -41,19 +38,28 @@
 #elif defined(SSE4_1_SPRNG)
     #define SIMD_MODE
     #include "sse4_1.h"
+#else
+    // Disable SIMD for scalar mode
+    const int32_t SIMD_WIDTH_BYTES = 8; 
+    const int32_t SIMD_STREAMS_32 = 1;
+    const int32_t SIMD_STREAMS_64 = 1;
 #endif
 
 
 /*
- *  (Mandatory) Alignment macro.
- *  Uses SIMD_WIDTH_BYTES provided by SIMD modules.
+ *  Compiler and architecture specific settings 
  */
-#if defined(SIMD_MODE)
-    #include <stdint.h>
-    #define __SIMD_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
-#else
-    #define __SIMD_ALIGNED // disable for scalar mode
-#endif
+#include "arch.h"
+
+
+/*
+ *  Alignment macros
+ *  Use SIMD_WIDTH_BYTES provided by SIMD modules and
+ *  macros provided by compiler/architecture settings.
+ */
+#define __SIMD_SET_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME_ALIGNED(a) ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME(a) ASSUME(a)
 
 
 #endif  // __SIMD_H

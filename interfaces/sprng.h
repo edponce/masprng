@@ -5,6 +5,7 @@
 /*!
  *  RNG identifiers
  */
+/*
 enum SPRNG_TYPE
 {
     SPRNG_LFG = 0,
@@ -14,6 +15,8 @@ enum SPRNG_TYPE
     SPRNG_MLFG,
     SPRNG_PMLCG
 };
+*/
+const int SPRNG_LCG = 0;
 
 
 /*! \class SPRNG
