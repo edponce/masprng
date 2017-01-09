@@ -53,13 +53,13 @@ int main_gen(int);
 
 int main(int argc, char **argv)
 {
-    printf("\n");
+    if (!detectProcSIMD()) {
+        printf("ERROR: current system does not supports requested vector extensions.\n");
+        return 0;
+    }
     printSysconf();
-    printSIMDconf();
-    printf("\n");
 
     int rng_lim = RNG_LIM;
-
     if (argc > 1)
         rng_lim = atoi(argv[1]);
 

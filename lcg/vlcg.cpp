@@ -91,7 +91,7 @@ void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) co
 {
     
     const SIMD_INT vmsk_fac[2] __SIMD_SET_ALIGNED = { simd_set(4095U),
-                                              simd_set(16777215U) };
+                                                  simd_set(16777215U) };
     SIMD_INT s[4] __SIMD_SET_ALIGNED;
     SIMD_INT res[4] __SIMD_SET_ALIGNED;
     SIMD_INT vtmp[3] __SIMD_SET_ALIGNED;
@@ -101,6 +101,8 @@ void VLCG::multiply(SIMD_INT * const a, SIMD_INT * const b, const SIMD_INT c) co
     s[3] = simd_srl_32(a[0], 0xc);
     s[1] = simd_srl_32(a[1], 0xc);
 
+    // NOTE: check info on vectorization compiler hints
+    //#pragma vector aligned
     for (int32_t i = 0; i < 4; ++i) {
         SIMD_INT * const res_ptr __SIMD_SET_ALIGNED = res + i;
 
@@ -237,7 +239,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     vtmp[1] = simd_and(vtmp[1], vmsk_msb8_24);
 
     const SIMD_INT vmsk_seed[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.INIT_SEED[0]),
-                                                   simd_set(GLOBALS.INIT_SEED[1]) };
+                                                       simd_set(GLOBALS.INIT_SEED[1]) };
     seed[0] = simd_xor(vmsk_seed[0], vtmp[0]);
     seed[1] = simd_xor(vmsk_seed[1], vtmp[1]);
 
@@ -295,7 +297,7 @@ SIMD_DBL VLCG::get_rn_dbl()
     return simd_mul(seed_dbl, vfac);
 #else
     const SIMD_DBL vfac[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.TWO_M24),
-                                              simd_set(GLOBALS.TWO_M48) };
+                                                  simd_set(GLOBALS.TWO_M48) };
     SIMD_DBL rn[2] __SIMD_SET_ALIGNED;
     SIMD_DBL seed_dbl[2] __SIMD_SET_ALIGNED;
 
@@ -308,6 +310,9 @@ SIMD_DBL VLCG::get_rn_dbl()
     rn[1] = simd_mul(seed_dbl[1], vfac[1]);
 
     return simd_add(rn[0], rn[1]);
+
+    // NOTE: can convert into fused multiply-add
+    //return simd_fmadd(seed_dbl[1], vfac[1], rn[0]);
 #endif
 }
 
@@ -331,7 +336,7 @@ SIMD_FLT VLCG::get_rn_flt()
     return simd_shuffle_f32(rn[0], rn[1], 0x88U);
 #else
     const SIMD_FLT vfac[2] __SIMD_SET_ALIGNED = { simd_set((float)GLOBALS.TWO_M24),
-                                              simd_set((float)GLOBALS.TWO_M48) };
+                                                  simd_set((float)GLOBALS.TWO_M48) };
     SIMD_FLT rn[2] __SIMD_SET_ALIGNED;
     SIMD_FLT seed_flt[2] __SIMD_SET_ALIGNED; 
 
@@ -344,6 +349,9 @@ SIMD_FLT VLCG::get_rn_flt()
     rn[1] = simd_mul(seed_flt[1], vfac[1]);
 
     return simd_add(rn[0], rn[1]);
+
+    // NOTE: can convert into fused multiply-add
+    //return simd_fmadd(seed_flt[1], vfac[1], rn[0]);
 #endif
 }
 
