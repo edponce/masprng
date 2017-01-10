@@ -10,7 +10,6 @@
  *  RNG identifiers
  *  Uses same values as SPRNG interface for convenience user applications.
  */
-/*
 enum VSPRNG_TYPE
 {
     VSPRNG_LFG = 0,
@@ -20,8 +19,6 @@ enum VSPRNG_TYPE
     VSPRNG_MLFG,
     VSPRNG_PMLCG
 };
-*/
-const int VSPRNG_LCG = 0;
 
 
 /*! \class VSPRNG

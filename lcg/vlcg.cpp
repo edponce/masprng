@@ -122,9 +122,9 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
     SIMD_INT vtmp[3] __SIMD_SET_ALIGNED;
 
     s[0] = simd_and(a[1], vmsk_fac[0]);
+    s[1] = simd_srl_32(a[1], 0xC);
     s[2] = simd_and(a[0], vmsk_fac[0]);
-    s[3] = simd_srl_32(a[0], 0xc);
-    s[1] = simd_srl_32(a[1], 0xc);
+    s[3] = simd_srl_32(a[0], 0xC);
 
     // NOTE: check info on vectorization compiler hints
     #pragma vector aligned
@@ -139,8 +139,8 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
     }
 
     vtmp[0] = simd_srl_32(a[1], 0x18); 
-    vtmp[1] = simd_srl_32(res[1], 0xc);
-    vtmp[2] = simd_sll_32(res[3], 0xc);
+    vtmp[1] = simd_srl_32(res[1], 0xC);
+    vtmp[2] = simd_sll_32(res[3], 0xC);
     vtmp[0] = simd_add_i32(vtmp[0], res[2]);
     vtmp[1] = simd_add_i32(vtmp[1], vtmp[2]);
     vtmp[0] = simd_add_i32(vtmp[0], vtmp[1]);
@@ -148,7 +148,7 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
 
     vtmp[0] = simd_and(res[1], vmsk_fac[0]);
     vtmp[1] = simd_add_i32(res[0], c[0]);
-    vtmp[0] = simd_sll_32(vtmp[0], 0xc);
+    vtmp[0] = simd_sll_32(vtmp[0], 0xC);
     vtmp[0] = simd_add_i32(vtmp[0], vtmp[1]);
     a[1] = simd_and(vtmp[0], vmsk_fac[1]);
 }
@@ -187,9 +187,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     getprime_32(1, &lprime, prime_position);
 
     if (!m) {
-        const int32_t m_default = 0;
-        printf("WARNING: no array for multipliers provided, default is %d\n", m_default);
-        memset(m, m_default, SIMD_STREAMS_32 * sizeof(int32_t));
+        printf("WARNING: no array for multipliers provided, default is zero.\n");
+        memset(m, 0, SIMD_STREAMS_32 * sizeof(int32_t));
     }
     else {
         for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm) {
@@ -201,9 +200,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     }
 
     if (!s) {
-        const int s_default = 0;
-        printf("WARNING: no array for seeds provided, default is %d\n", s_default);
-        memset(s, s_default, SIMD_STREAMS_32 * sizeof(int32_t));
+        printf("WARNING: no array for seeds provided, default is zero.\n");
+        memset(s, 0, SIMD_STREAMS_32 * sizeof(int32_t));
     }
 
 #if defined(LONG_SPRNG)
@@ -284,6 +282,9 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 }
 
 
+/*!
+ *  The high 31-bits out of the 48-bits are returned.
+ */
 SIMD_INT VLCG::get_rn_int()
 {
 #if defined(LONG_SPRNG)
