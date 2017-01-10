@@ -4,6 +4,7 @@ for now in LCG, init_rng datatypes do not necessarily match internal work variab
 add 'extern "C"' to allow library linked from C/C++/MATLAB/other languages
 memory manager, output interface return primitive types instead of SIMD
 provide 2 modes for layout of random numbers: (1) interleaved streams, (2) independent streams with additional function to change between streams
+fix builtin features support
 
 simd/simd.h:#include <stdint.h> // NOTE: remove this
 simd/sse4_1.h: *  NOTE: add type suffix to all functions to make interface C valid?
