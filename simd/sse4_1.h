@@ -245,11 +245,26 @@ static inline SIMD_INT simd_set(const uint64_t * const sa, const int32_t n) __SI
         return _mm_setzero_si128();
 }
 
-/*
- *  Merge lower parts of pair of SIMD into a single SIMD register
+/*!
+ *  Merge low parts of pair of SIMD into a single SIMD register
+ *  NOTE: need to validate this function
+ */
+//static inline SIMD_INT simd_set_lo(const SIMD_INT va, const SIMD_INT vb) __SIMD_NEED__
+//{ return va; }
+
+/*!
+ *  Merge low parts of pair of SIMD into a single SIMD register
  */
 static inline SIMD_FLT simd_set_lo(const SIMD_FLT va, const SIMD_FLT vb) __SIMD_NEED__
 { return _mm_movelh_ps(va, vb); }
+
+/*!
+ *  Merge high parts of pair of SIMD into a single SIMD register
+ *  NOTE: need to validate this function
+ */
+static inline SIMD_FLT simd_set_hi(const SIMD_FLT va, const SIMD_FLT vb) __SIMD_NEED__
+{ return _mm_movehl_ps(va, vb); }
+
 
 
 /***********************

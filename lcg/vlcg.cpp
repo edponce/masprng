@@ -317,7 +317,6 @@ SIMD_DBL VLCG::get_rn_dbl()
 }
 
 
-#include "vutils.h"
 SIMD_FLT VLCG::get_rn_flt()
 {
 #if defined(LONG_SPRNG)
