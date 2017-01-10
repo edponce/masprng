@@ -245,26 +245,33 @@ static inline SIMD_INT simd_set(const uint64_t * const sa, const int32_t n) __SI
         return _mm_setzero_si128();
 }
 
+/*
+ *  Merge lower parts of pair of SIMD into a single SIMD register
+ */
+static inline SIMD_FLT simd_set_lo(const SIMD_FLT va, const SIMD_FLT vb) __SIMD_NEED__
+{ return _mm_movelh_ps(va, vb); }
+
 
 /***********************
  *  Convert intrinsics 
  ***********************/
 /*!
  *  Convert packed 32-bit integer elements
- *  to packed single-precision floating-point elements.
+ *  to packed 64-bit floating-point elements.
  */
 static inline SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va) __SIMD_NEED__
 { return _mm_cvtepi32_ps(va); }
 
 /*!
  *  Convert packed 32-bit integer elements
- *  to packed double-precision floating-point elements.
+ *  to packed 64-bit floating-point elements.
  */
 static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __SIMD_NEED__
 { return _mm_cvtepi32_pd(va); }
 
 /*!
- *  Convert unsigned 64-bit integers to 32-bit floating-point elements.
+ *  Convert packed unsigned 64-bit integer elements
+ *  to packed 32-bit floating-point elements, the second half of the register is set to 0.0.
  *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
@@ -275,10 +282,10 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __SIMD_NEED__
     float *fa_ptr = fa; 
 
     _mm_store_si128((SIMD_INT *)sa, va);
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i) {
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         *(fa_ptr++) = (float)*(sa_ptr++);
+    for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
         *(fa_ptr++) = 0.0;
-    }
 
     return _mm_load_ps(fa);
 }

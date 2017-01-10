@@ -317,6 +317,7 @@ SIMD_DBL VLCG::get_rn_dbl()
 }
 
 
+#include "vutils.h"
 SIMD_FLT VLCG::get_rn_flt()
 {
 #if defined(LONG_SPRNG)
@@ -333,7 +334,7 @@ SIMD_FLT VLCG::get_rn_flt()
     rn[0] = simd_mul(seed_flt[0], vfac);
     rn[1] = simd_mul(seed_flt[1], vfac);
 
-    return simd_shuffle_f32(rn[0], rn[1], 0x88U);
+    return simd_set_lo(rn[0], rn[1]);
 #else
     const SIMD_FLT vfac[2] __SIMD_SET_ALIGNED = { simd_set((float)GLOBALS.TWO_M24),
                                                   simd_set((float)GLOBALS.TWO_M48) };
