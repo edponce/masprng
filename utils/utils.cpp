@@ -4,9 +4,6 @@
 #include "utils.h"
 
 
-#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-
-
 #if defined(_OPENMP)
     #include <omp.h>
 #endif
@@ -37,57 +34,69 @@ int setOmpEnv(const int num_threads)
 }
 
 
-#if GNUC_VERSION > 40800
-#define CPUsupports(a) (__builtin_cpu_supports(a)) ? (1) : (0)
-#else
-#define CPUsupports(a) 0 // NOTE: assume SIMD support is not available if no way of checking
-#endif
+#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 int detectProcSIMD()
 {
+#if GNUC_VERSION > 40800
+#define CPU_INIT_SUPPORT() __builtin_cpu_init()
+#define CPU_SUPPORTS(a) (__builtin_cpu_supports(a) ? 1 : 0)
+#else
+#define CPU_INIT_SUPPORT()
+#define CPU_SUPPORTS(a) 0 // NOTE: assume SIMD support is not available if no way of checking
+#endif
+
     int support = 1;
 
-#if defined(__FMA__) // NOTE: not sure of this macro
-    if (!CPUsupports("fma"))
+	CPU_INIT_SUPPORT();
+
+#if defined(__FMA4__)
+	// NOTE: need to add FMA detection
+#endif
+#if defined(__MMX__)
+    if (!CPU_SUPPORTS("mmx"))
         support = 0;
 #endif
 #if defined(__SSE__)
-    if (!CPUsupports("sse"))
+    if (!CPU_SUPPORTS("sse"))
         support = 0;
 #endif
 #if defined(__SSE2__)
-    if (!CPUsupports("sse2"))
+    if (!CPU_SUPPORTS("sse2"))
         support = 0;
 #endif
 #if defined(__SSE3__)
-    if (!CPUsupports("sse3"))
+    if (!CPU_SUPPORTS("sse3"))
         support = 0;
 #endif
 #if defined(__SSSE3__)
-    if (!CPUsupports("ssse3"))
+    if (!CPU_SUPPORTS("ssse3"))
         support = 0;
 #endif
 #if defined(__SSE4_1__)
-    if (!CPUsupports("sse4.1"))
+    if (!CPU_SUPPORTS("sse4.1"))
         support = 0;
 #endif
 #if defined(__SSE4_2__)
-    if (!CPUsupports("sse4.2"))
+    if (!CPU_SUPPORTS("sse4.2"))
         support = 0;
 #endif
 #if defined(__AVX__)
-    if (!CPUsupports("avx"))
+    if (!CPU_SUPPORTS("avx"))
         support = 0;
 #endif
 #if defined(__AVX2__)
-    if (!CPUsupports("avx2"))
+    if (!CPU_SUPPORTS("avx2"))
         support = 0;
 #endif
 #if defined(__AVX512BW__)
-    if (!CPUsupports("avx512BW"))
+    if (!CPU_SUPPORTS("avx512BW"))
         support = 0;
 #endif
 
     return support;
+
+#undef CPU_SUPPORTS
+#undef CPU_INIT_SUPPORT
 }
 
 

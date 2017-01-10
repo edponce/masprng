@@ -18,7 +18,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 0
+#define TEST 2
 
 
 #if TEST == 0
@@ -78,11 +78,11 @@ int main_gen(int rng_lim)
 
     long int timers[2];
     double t1;
-    const int nstrms = RNG_ELEMS;
+    const int nstrms = SIMD_STREAMS_32;
 
     // Info/speedup
     printf("RNG runs = %d\n", rng_lim);
-    printf("Number of streams = %d\n\n", nstrms);
+    printf("Number of streams = %d\n\n", RNG_ELEMS);
 
     // Initial seeds
     int *iseeds;
@@ -109,11 +109,11 @@ int main_gen(int rng_lim)
 #endif
 
     // Integer/float/double
-    RNG_TYPE rngs[nstrms];
+    RNG_TYPE rngs[RNG_ELEMS];
 
     // RNG object
-    SPRNG *rng[nstrms];
-    for (i = 0; i < nstrms; ++i) {
+    SPRNG *rng[RNG_ELEMS];
+    for (i = 0; i < RNG_ELEMS; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
     }
@@ -121,7 +121,7 @@ int main_gen(int rng_lim)
     // Run kernel
     startTime(timers);
     for (i = 0; i < rng_lim; ++i) {
-        for (j = 0; j < nstrms; ++j) {
+        for (j = 0; j < RNG_ELEMS; ++j) {
             rngs[j] = rng[j]->get_rn();
 
 #if defined(DEBUG)
@@ -134,9 +134,9 @@ int main_gen(int rng_lim)
     t1 = stopTime(timers);
 
     // Print results 
-    printf("gen nums %d\n", rng[nstrms-1]->get_ngens());
+    printf("gen nums %d\n", rng[RNG_ELEMS-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
-    for (i = 0; i < nstrms; ++i)
+    for (i = 0; i < RNG_ELEMS; ++i)
 #if defined(DEBUG)
 # if defined(LONG_SPRNG)
         printf("scalar = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs[i], seeds[i], mults[i], primes[i]);
@@ -188,10 +188,10 @@ int main_gen(int rng_lim)
 
     printf("gen nums %d\n", vrng->get_ngens());
     printf("Vector real time = %.16f sec\n", t2);
-    for (i = 0; i < nstrms; ++i) 
+    for (i = 0; i < RNG_ELEMS; ++i) 
 # if defined(DEBUG)
 #   if defined(LONG_SPRNG)
-        printf("vector = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[(i*nstrms/SIMD_STREAMS_32)%(1+nstrms/SIMD_STREAMS_32)]);
+        printf("vector = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[(i*RNG_ELEMS/SIMD_STREAMS_32)%(1+RNG_ELEMS/SIMD_STREAMS_32)]);
 #   else
         printf("vector = " RNG_FMT "\t%d\t%d\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[i]);
 #   endif
@@ -207,7 +207,7 @@ int main_gen(int rng_lim)
 
     // Validate run
     int valid = 1;
-    for (i = 0; i < nstrms; ++i) { 
+    for (i = 0; i < RNG_ELEMS; ++i) { 
 # if defined(DEBUG)
         if (RNG_NEQ(rngs[i], rngs2[i]) || RNG_NEQ(seeds[i], seeds2[i])) {
 # else
@@ -232,7 +232,7 @@ int main_gen(int rng_lim)
     free(m);
 
     // Clean SPRNG objects
-    for (i = 0; i < nstrms; ++i)
+    for (i = 0; i < RNG_ELEMS; ++i)
         delete rng[i];
 
     return 0;

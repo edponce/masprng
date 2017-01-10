@@ -3,7 +3,47 @@
 
 
 #include <stdio.h>
+#include <stdlib.h> // posix_memalign
+#include <errno.h> // errno
 #include "vutils.h" 
+
+
+int simd_malloc(SIMD_INT ** const va, const size_t align, const size_t nelems)
+{
+	int ierr;
+
+	//ierr = posix_memalign((void **)&va, align, nelems * sizeof(SIMD_FLT));
+	//ierr = posix_memalign((void **)&va, align, nelems * sizeof(SIMD_DBL));
+	ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_INT));
+	if (ierr)
+		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+
+	return ierr;
+}
+
+
+int simd_malloc(SIMD_FLT ** const va, const size_t align, const size_t nelems)
+{
+	int ierr;
+
+	ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_FLT));
+	if (ierr)
+		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+
+	return ierr;
+}
+
+
+int simd_malloc(SIMD_DBL ** const va, const size_t align, const size_t nelems)
+{
+	int ierr;
+
+	ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_DBL));
+	if (ierr)
+		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+
+	return ierr;
+}
 
 
 void simd_print(const char * const str, const SIMD_INT va)

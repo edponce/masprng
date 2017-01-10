@@ -1,5 +1,5 @@
 # Eduardo Ponce
-# 12/2016
+# 1/2017
 # Makefile for MASPRNG library.
 
 # Get name of makefile
@@ -21,18 +21,15 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=native -msse4.1 -funroll-loops
-CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -msse4.1 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unused-result -std=c++11 -O3 -march=native -mavx2 -funroll-loops
-#CFLAGS := -g -pedantic -Wall -Wextra -Wno-unused-result -std=c++98 -O3 -march=native -mavx2 -funroll-loops
-#CFLAGS += -pthread
+SIMDFLAG := -msse4.1
+#SIMDFLAG := -mavx2
+#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
+CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -msse4 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -march=core-avx2 -funroll-loops
-#CFLAGS := -pedantic -Wall -Wextra -Wno-unknown-pragmas -no-gcc -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -no-gcc -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -openmp
 
 # Linker options
@@ -51,8 +48,8 @@ LFLAGS :=
 #DEFINES := -DLONG_SPRNG  # scalar mode
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
-DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
-#DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
+DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
 #DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
@@ -78,7 +75,7 @@ SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils
 OBJECTS := $(SOURCES:.cpp=.o)
 
 # Header files (allow recompile if changed)
-HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h *.h simd/*.h primes/*.h lcg/*.h
+HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h masprng.h simd/*.h primes/primelist_32.h lcg/lcg_globals.h
 
 # Driver file
 #LCG_DRIVER := drivers/main_lcg.cpp
