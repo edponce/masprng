@@ -1,7 +1,6 @@
 put objects files in obj/
 for now in LCG, init_rng datatypes do not necessarily match internal work variables (and maybe others). Will have to wait until developing other RNGs.
 
-add 'extern "C"' to allow library linked from C/C++/MATLAB/other languages
 memory manager, output interface return primitive types instead of SIMD
 provide 2 modes for layout of random numbers: (1) interleaved streams, (2) independent streams with additional function to change between streams
 fix builtin features support

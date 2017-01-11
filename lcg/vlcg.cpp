@@ -196,8 +196,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     // Check multipliers 
     int *m = NULL;
     scalar_malloc(&m, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
-    for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm)
-        m[strm] = 0;
+    memset(m, 0, SIMD_STREAMS_32 * sizeof(int));
     if (!gm)
         printf("WARNING: no array for multipliers provided, default is zero.\n");
     else {
@@ -211,8 +210,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     // Check seeds 
     int *s = NULL;
     scalar_malloc(&s, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
-    for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm)
-        s[strm] = 0;
+    memset(s, 0, SIMD_STREAMS_32 * sizeof(int));
     if (!gs)
         printf("WARNING: no array for seeds provided, default is zero.\n");
     else {
