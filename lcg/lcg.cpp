@@ -69,7 +69,7 @@ unsigned long int LCG::multiply(const unsigned long int a, const unsigned long i
     unsigned long int res = a * b;
 
     res += c;
-    res &= 0xffffffffffffL;
+    res &= 0xFFFFFFFFFFFFUL;
 
     return res;
 }
@@ -81,10 +81,10 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
 {
     int s[4], res[4];
 
-    s[0] = a[1] & 4095;
-    s[1] = (unsigned int)a[1] >> 12;
-    s[2] = a[0] & 4095;
-    s[3] = (unsigned int)a[0] >> 12;
+    s[0] = a[1] & 4095U;
+    s[1] = (unsigned int)a[1] >> 0xC;
+    s[2] = a[0] & 4095U;
+    s[3] = (unsigned int)a[0] >> 0xC;
 
     for (int i = 0; i < 4; ++i) {
         res[i] = b[0] * s[i];
@@ -94,11 +94,11 @@ void LCG::multiply(int * const a, const int * const b, const int c) const
         }
     }
 
-    a[0] = ((unsigned int)a[1] >> 24) + res[2] + ((unsigned int)res[1] >> 12) + ((unsigned int)res[3] << 12);
-    a[0] &= 16777215;
+    a[0] = ((unsigned int)a[1] >> 0x18) + res[2] + ((unsigned int)res[1] >> 0xC) + ((unsigned int)res[3] << 0xC);
+    a[0] &= 16777215U;
 
-    a[1] = res[0] + ((unsigned int)(res[1] & 4095) << 12) + c;
-    a[1] &= 16777215;
+    a[1] = res[0] + ((unsigned int)(res[1] & 4095U) << 0xC) + c;
+    a[1] &= 16777215U;
 }
 #endif
 
@@ -134,7 +134,7 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     }
     parameter = m;
 
-    init_seed = s & 0x7fffffff;
+    init_seed = s & 0x7FFFFFFFUL;
 
 #if defined(LONG_SPRNG)
     multiplier = GLOBALS.MULT[parameter];
@@ -142,15 +142,15 @@ int LCG::init_rng(int gn, int tg, int s, int m)
     seed = GLOBALS.INIT_SEED ^ ((unsigned long int)init_seed << 16);
 
     if (prime == 0)
-        seed |= 1;
+        seed |= 0x1;
 #else
     memcpy(multiplier, GLOBALS.MULT[parameter], sizeof(multiplier));
 
-    seed[0] = GLOBALS.INIT_SEED[0] ^ (((unsigned int)init_seed >> 8) & 0xffffff);
-    seed[1] = GLOBALS.INIT_SEED[1] ^ (((unsigned int)init_seed << 16) & 0xff0000);
+    seed[0] = GLOBALS.INIT_SEED[0] ^ (((unsigned int)init_seed >> 0x8) & 0xFFFFFFU);
+    seed[1] = GLOBALS.INIT_SEED[1] ^ (((unsigned int)init_seed << 0x10) & 0xFF0000U);
 
     if (prime == 0)
-        seed[1] |= 1;
+        seed[1] |= 0x1;
 #endif
 
     for (int i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
@@ -161,22 +161,18 @@ int LCG::init_rng(int gn, int tg, int s, int m)
 
 
 /*!
- *  On machines with 32 bit integers, the Cray's 48 bit integer math
- *  is duplicated by breaking the problem into steps.
- *  The algorithm is linear congruential.
- *  M is the multiplier and S is the current seed.
- *  The 31 High order bits out of the 48 bits are returned.
+ *  The high 31-bits out of the 48-bits are returned.
  */
 int LCG::get_rn_int()
 {
 #if defined(LONG_SPRNG)
     seed = multiply(seed, multiplier, prime);
 
-    return (int)(seed >> 17);
+    return (int)(seed >> 0x11);
 #else
     multiply(seed, multiplier, prime);
 
-    return (seed[0] << 7) | (seed[1] >> 17);
+    return (seed[0] << 0x7) | (seed[1] >> 0x11);
 #endif
 }
 
@@ -201,16 +197,31 @@ double LCG::get_rn_dbl()
 }
 
 
-int LCG::get_seed_rng() const { return init_seed; }
-int LCG::get_ngens() const { return LCG_NGENS; }
+int LCG::get_seed_rng() const
+{ return init_seed; }
+
+
+int LCG::get_ngens() const
+{ return LCG_NGENS; }
+
+
 #if defined(DEBUG)
-int LCG::get_prime() const { return prime; }
+int LCG::get_prime() const
+{ return prime; }
+
 # if defined(LONG_SPRNG)
-unsigned long int LCG::get_seed() const { return seed; }
-unsigned long int LCG::get_multiplier() const { return multiplier; }
+unsigned long int LCG::get_seed() const
+{ return seed; }
+
+unsigned long int LCG::get_multiplier() const
+{ return multiplier; }
+
 # else
-int LCG::get_seed() const { return seed[0]; }
-int LCG::get_multiplier() const { return multiplier[0]; }
+int LCG::get_seed() const
+{ return seed[0]; }
+
+int LCG::get_multiplier() const
+{ return multiplier[0]; }
 # endif
 #endif
 

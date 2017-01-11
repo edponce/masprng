@@ -57,9 +57,9 @@
  *  Use SIMD_WIDTH_BYTES provided by SIMD modules and
  *  macros provided by compiler/architecture settings.
  */
-#define __SIMD_SET_ALIGNED SET_ALIGNED(SIMD_WIDTH_BYTES)
-#define __SIMD_ASSUME_ALIGNED(a) ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
-#define __SIMD_ASSUME(a) ASSUME(a)
+#define __SIMD_ALIGN__             ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME_ALIGNED__(a) ARCH_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME__(a)         ARCH_ASSUME(a)
 
 
 #endif  // __SIMD_H

@@ -2,7 +2,7 @@ MASPRNG - Intel MIC (vector) accelerated SPRNG library
 
 General requirements:
     GNU compilers, require 4.8 or greater for __builtin_cpu_supports()
-    C++ - function overloading, object-oriented 
+    C++98 - function overloading, object-oriented 
     C++11 - non-static initialization in struct/class
 
 SIMD requirements:
@@ -11,13 +11,15 @@ SIMD requirements:
           at least SSE2 _mm_shuffle_epi32() and _mm_or_epi32()
 
 Only a single SIMD technology is allowed per SPRNG object.
-All SIMD macro decisions are ordered from most recent technology backwards.
+All SIMD macro decisions are ordered from most recent technology to oldest.
 This allows the use of best available technology without the user having to specify.
 Note that the user is allowed to decide on a specific technology using a macro definition.
 
 Each VSPRNG object generates random numbers from multiple streams. The number of streams
-depends on the width of the vector unit and the SPRNG mode (LONG or not). The LONG_SPRNG
-mode is faster, but allows less streams per vector register, so there is a tradeoff.
+depends on the width of the vector unit and the type of random number considered.
+
+SPRNG provides a capability of performing 64-bit operations using 64-bit (LONG_SPRNG) or 32-bit registers.
+LONG_SPRNG mode is generally faster and the current implementation generates different set of random numbers.
 
 The scalar SPRNG objects are supported via the same interface as SPRNG v5.0. The vector SPRNG
 objects are supported via a very similar interface as SPRNG v5.0.
@@ -25,9 +27,7 @@ objects are supported via a very similar interface as SPRNG v5.0.
 As part of this project, a C interface for Intel SIMD intrinsics was developed. This interface
 allows applications to easily and systematically access the available vector technologies.
 
-The SIMD implementations uses fixed arrays of SIMD datatypes to allow input
-and output streams to be the same number (and order) regardless of the random numbers type.
-Changing these arrays from fixed to dynamic degrades performance significantly (stack vs heap).
-
 Arrays of SIMD intrinsics are allocated using posix_memalign(), using fixed arrays
-worked for SSE but not AVX. It seems this is due to compiler (GCC) default rules/bugs. 
+worked for SSE but not AVX. It seems this is due to compiler (GCC) not providing automatic
+support for large vector datatypes. 
+

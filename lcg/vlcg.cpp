@@ -37,6 +37,9 @@ VLCG::VLCG()
     rng_type = VSPRNG_LCG;
     prime_position = 0;
     prime_next = 0;
+    strm_mask32 = NULL;
+    strm_mask64 = NULL;
+
 #if defined(LONG_SPRNG) 
 	simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&init_seed[0]);
@@ -57,6 +60,7 @@ VLCG::VLCG()
 	simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&multiplier[0]);
     simd_set_zero(&multiplier[1]);
+
 #else
 	simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 1);
     simd_set_zero(&init_seed[0]);
@@ -85,11 +89,13 @@ VLCG::VLCG()
  */
 VLCG::~VLCG()
 {
-	free(init_seed);
-	free(parameter);
-	free(prime);
-	free(seed);
-	free(multiplier);
+	if (init_seed) free(init_seed);
+	if (parameter) free(parameter);
+	if (prime) free(prime);
+	if (seed) free(seed);
+	if (multiplier) free(multiplier);
+    if (strm_mask32) free(strm_mask32);
+    if (strm_mask64) free(strm_mask64);
 
     --LCG_NGENS;
 }
@@ -111,25 +117,24 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
 /*!
  *  \brief LCG multiply 48-bits using 32-bits.
  */
-// NOTE: const function?
 void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT * const c) const
 {
     
-    const SIMD_INT vmsk_fac[2] __SIMD_SET_ALIGNED = { simd_set(4095U),
-                                                  simd_set(16777215U) };
-    SIMD_INT s[4] __SIMD_SET_ALIGNED;
-    SIMD_INT res[4] __SIMD_SET_ALIGNED;
-    SIMD_INT vtmp[3] __SIMD_SET_ALIGNED;
+    const SIMD_INT vmsk_fac[2] __SIMD_ALIGN__ = { simd_set(4095U),
+                                              simd_set(16777215U) };
+    SIMD_INT s[4] __SIMD_ALIGN__;
+    SIMD_INT res[4] __SIMD_ALIGN__;
+    SIMD_INT vtmp[3] __SIMD_ALIGN__;
 
     s[0] = simd_and(a[1], vmsk_fac[0]);
+    s[1] = simd_srl_32(a[1], 0xC);
     s[2] = simd_and(a[0], vmsk_fac[0]);
-    s[3] = simd_srl_32(a[0], 0xc);
-    s[1] = simd_srl_32(a[1], 0xc);
+    s[3] = simd_srl_32(a[0], 0xC);
 
     // NOTE: check info on vectorization compiler hints
     #pragma vector aligned
     for (int32_t i = 0; i < 4; ++i) {
-        SIMD_INT * const res_ptr __SIMD_SET_ALIGNED = res + i;
+        SIMD_INT * const res_ptr __SIMD_ALIGN__ = res + i;
 
         *res_ptr = simd_mullo_i32(b[0], *(s+i));
         for (int32_t j = 0; j < i; ++j) {
@@ -139,8 +144,8 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
     }
 
     vtmp[0] = simd_srl_32(a[1], 0x18); 
-    vtmp[1] = simd_srl_32(res[1], 0xc);
-    vtmp[2] = simd_sll_32(res[3], 0xc);
+    vtmp[1] = simd_srl_32(res[1], 0xC);
+    vtmp[2] = simd_sll_32(res[3], 0xC);
     vtmp[0] = simd_add_i32(vtmp[0], res[2]);
     vtmp[1] = simd_add_i32(vtmp[1], vtmp[2]);
     vtmp[0] = simd_add_i32(vtmp[0], vtmp[1]);
@@ -148,7 +153,7 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
 
     vtmp[0] = simd_and(res[1], vmsk_fac[0]);
     vtmp[1] = simd_add_i32(res[0], c[0]);
-    vtmp[0] = simd_sll_32(vtmp[0], 0xc);
+    vtmp[0] = simd_sll_32(vtmp[0], 0xC);
     vtmp[0] = simd_add_i32(vtmp[0], vtmp[1]);
     a[1] = simd_and(vtmp[0], vmsk_fac[1]);
 }
@@ -164,53 +169,99 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
  *
  *  NOTE: int and float streams use all parameters from input arrays,
  *  double stream use the first half of the parameters from input arrays.
- *
- *  NOTE: need to validate s and m input arrays for sufficient values.
  */
-int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
+int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, const int ns)
 {
+    // Check total generators
     if (tg <= 0) {
         printf("ERROR: total_gen out of range, %d\n", tg);
         tg = 1;
     }
-    prime_next = tg;
 
+    // Check generator number
+    if (gn < 0 || gn >= tg) {
+        printf("ERROR: generator number is out of range, %d\n", gn);
+        gn = tg - 1;
+    }
     if (gn >= GLOBALS.LCG_MAX_STREAMS)
         printf("WARNING: generator number (%d) is greater than maximum number of independent streams (%d), independence of streams cannot be guaranteed.\n", gn, GLOBALS.LCG_MAX_STREAMS);
 
-    if (gn < 0 || gn >= tg) {
-        printf("ERROR: generator number is out of range, %d\n", gn);
-        return -1;
+    // Check number of streams requested
+    int nstrms = ns;
+    if (nstrms <= 0 || nstrms > SIMD_STREAMS_32) {
+        printf("ERROR: number of streams is out of range, %d, default is to use all available streams.\n", nstrms);
+        nstrms = SIMD_STREAMS_32;
     }
+
+    // Check multipliers 
+    int *m = NULL;
+    scalar_malloc(&m, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
+    for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm)
+        m[strm] = 0;
+    if (!gm)
+        printf("WARNING: no array for multipliers provided, default is zero.\n");
+    else {
+        for (int32_t strm = 0; strm < nstrms; ++strm)
+            if (gm[strm] < 0 || gm[strm] >= GLOBALS.NPARAMS)
+                printf("ERROR: multiplier out of range, %d\n", gm[strm]);
+            else
+                m[strm] = gm[strm];
+    }
+
+    // Check seeds 
+    int *s = NULL;
+    scalar_malloc(&s, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
+    for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm)
+        s[strm] = 0;
+    if (!gs)
+        printf("WARNING: no array for seeds provided, default is zero.\n");
+    else {
+        for (int32_t strm = 0; strm < nstrms; ++strm)
+            s[strm] = gs[strm];
+    }
+
+    // Generate prime number
     int32_t lprime;
+    prime_next = tg;
     prime_position = gn;
     getprime_32(1, &lprime, prime_position);
 
-    if (!m) {
-        const int32_t m_default = 0;
-        printf("WARNING: no array for multipliers provided, default is %d\n", m_default);
-        memset(m, m_default, SIMD_STREAMS_32 * sizeof(int32_t));
-    }
-    else {
-        for (int32_t strm = 0; strm < SIMD_STREAMS_32; ++strm) {
-            if (m[strm] < 0 || m[strm] >= GLOBALS.NPARAMS) {
-                printf("ERROR: multiplier out of range, %d\n", m[strm]);
-                m[strm] = 0;
-            }
-        }
-    }
+    // Activate 32-bit global output masks, only if not using maximum number of streams
+    int *mask32 = NULL;
+    if (nstrms < SIMD_STREAMS_32) {
+    	simd_malloc(&strm_mask32, SIMD_WIDTH_BYTES, 1);
 
-    if (!s) {
-        const int s_default = 0;
-        printf("WARNING: no array for seeds provided, default is %d\n", s_default);
-        memset(s, s_default, SIMD_STREAMS_32 * sizeof(int32_t));
-    }
+        scalar_malloc(&mask32, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
+        for (int32_t strm = 0; strm < nstrms; ++strm)
+            mask32[strm] = 0xFFFFFFFF;
+        for (int32_t strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
+            mask32[strm] = 0x00000000;
+
+        strm_mask32[0] = simd_set(&mask32[0], SIMD_STREAMS_32);
+        if (mask32) free(mask32);
+    } 
+    
+    // Activate 64-bit global output masks, only if not using maximum number of streams
+    long int *mask64 = NULL;
+    if (nstrms < SIMD_STREAMS_32) {
+    	simd_malloc(&strm_mask64, SIMD_WIDTH_BYTES, 2);
+
+        scalar_malloc(&mask64, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
+        for (int32_t strm = 0; strm < nstrms; ++strm)
+            mask64[strm] = 0xFFFFFFFFFFFFFFFFL;
+        for (int32_t strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
+            mask64[strm] = 0x0000000000000000L;
+
+        strm_mask64[0] = simd_set(&mask64[0], SIMD_STREAMS_64);
+        strm_mask64[1] = simd_set(&mask64[SIMD_STREAMS_64], SIMD_STREAMS_64);
+        if (mask64) free(mask64);
+    } 
 
 #if defined(LONG_SPRNG)
     parameter[0] = simd_set(&m[0], SIMD_STREAMS_64);
     parameter[1] = simd_set(&m[SIMD_STREAMS_64], SIMD_STREAMS_64);
 
-    int64_t lmultiplier[2][SIMD_STREAMS_64] __SIMD_SET_ALIGNED;
+    int64_t lmultiplier[2][SIMD_STREAMS_64] __SIMD_ALIGN__;
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i) {
         lmultiplier[0][i] = GLOBALS.MULT[m[i]];
         lmultiplier[1][i] = GLOBALS.MULT[m[i+SIMD_STREAMS_64]];
@@ -218,7 +269,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     multiplier[0] = simd_set(lmultiplier[0], SIMD_STREAMS_64);
     multiplier[1] = simd_set(lmultiplier[1], SIMD_STREAMS_64);
 
-    SIMD_INT vs[2] __SIMD_SET_ALIGNED;
+    SIMD_INT vs[2] __SIMD_ALIGN__;
     vs[0] = simd_set(&s[0], SIMD_STREAMS_64);
     vs[1] = simd_set(&s[SIMD_STREAMS_64], SIMD_STREAMS_64);
 
@@ -244,7 +295,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 #else
     parameter[0] = simd_set(m, SIMD_STREAMS_32);
 
-    int32_t lmultiplier[SIMD_STREAMS_32] __SIMD_SET_ALIGNED;
+    int32_t lmultiplier[SIMD_STREAMS_32] __SIMD_ALIGN__;
     for (int32_t j = 0; j < 4; ++j) {
         for (int32_t i = 0; i < SIMD_STREAMS_32; ++i) {
             lmultiplier[i] = GLOBALS.MULT[m[i]][j]; 
@@ -257,7 +308,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     init_seed[0] = simd_and(vs, vmsk_lsb31);
 
     const SIMD_INT vmsk_lsb24 = simd_set(0xFFFFFFU); 
-    SIMD_INT vtmp[2] __SIMD_SET_ALIGNED;
+    SIMD_INT vtmp[2] __SIMD_ALIGN__;
     vtmp[0] = simd_srl_32(init_seed[0], 0x8); 
     vtmp[0] = simd_and(vtmp[0], vmsk_lsb24);
 
@@ -265,8 +316,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     vtmp[1] = simd_sll_32(init_seed[0], 0x10); 
     vtmp[1] = simd_and(vtmp[1], vmsk_msb8_24);
 
-    const SIMD_INT vmsk_seed[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.INIT_SEED[0]),
-                                                       simd_set(GLOBALS.INIT_SEED[1]) };
+    const SIMD_INT vmsk_seed[2] __SIMD_ALIGN__ = { simd_set(GLOBALS.INIT_SEED[0]),
+                                                   simd_set(GLOBALS.INIT_SEED[1]) };
     seed[0] = simd_xor(vmsk_seed[0], vtmp[0]);
     seed[1] = simd_xor(vmsk_seed[1], vtmp[1]);
 
@@ -280,14 +331,20 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     for (int32_t i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
+    if (m) free(m);
+    if (s) free(s);
+
     return 0;
 }
 
 
-SIMD_INT VLCG::get_rn_int()
+/*!
+ *  The high 31-bits out of the 48-bits are returned.
+ */
+SIMD_INT VLCG::get_rn_int() const
 {
 #if defined(LONG_SPRNG)
-    SIMD_INT rn[2] __SIMD_SET_ALIGNED;
+    SIMD_INT rn[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
     multiply(&seed[1], &multiplier[1], &prime[1]);
@@ -295,21 +352,29 @@ SIMD_INT VLCG::get_rn_int()
     rn[0] = simd_srl_64(seed[0], 0x11);
     rn[1] = simd_srl_64(seed[1], 0x11);
 
-    return simd_packmerge_i32(rn[0], rn[1]);
+    rn[0] = simd_packmerge_i32(rn[0], rn[1]);
+    if (strm_mask32)
+        return simd_and(rn[0], strm_mask32[0]);
+
+    return rn[0];
 #else
-    SIMD_INT rn[2] __SIMD_SET_ALIGNED;
+    SIMD_INT rn[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
     rn[0] = simd_sll_32(seed[0], 0x7);
     rn[1] = simd_srl_32(seed[1], 0x11);
 
-    return simd_or(rn[0], rn[1]);
+    rn[0] = simd_or(rn[0], rn[1]);
+    if (strm_mask32)
+        return simd_and(rn[0], strm_mask32[0]);
+    
+    return rn[0];
 #endif
 }
 
 
-SIMD_DBL VLCG::get_rn_dbl()
+SIMD_DBL VLCG::get_rn_dbl() const
 {
 #if defined(LONG_SPRNG)
     const SIMD_DBL vfac = simd_set(GLOBALS.TWO_M48);
@@ -318,12 +383,16 @@ SIMD_DBL VLCG::get_rn_dbl()
     multiply(&seed[0], &multiplier[0], &prime[0]);
     seed_dbl = simd_cvt_u64_f64(seed[0]);
 
-    return simd_mul(seed_dbl, vfac);
+    seed_dbl = simd_mul(seed_dbl, vfac);
+    if (strm_mask64)
+        return simd_and(seed_dbl, strm_mask64[0]);
+
+    return seed_dbl;
 #else
-    const SIMD_DBL vfac[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.TWO_M24),
-                                                  simd_set(GLOBALS.TWO_M48) };
-    SIMD_DBL rn[2] __SIMD_SET_ALIGNED;
-    SIMD_DBL seed_dbl[2] __SIMD_SET_ALIGNED;
+    const SIMD_DBL vfac[2] __SIMD_ALIGN__ = { simd_set(GLOBALS.TWO_M24),
+                                              simd_set(GLOBALS.TWO_M48) };
+    SIMD_DBL rn[2] __SIMD_ALIGN__;
+    SIMD_DBL seed_dbl[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
@@ -333,7 +402,11 @@ SIMD_DBL VLCG::get_rn_dbl()
     rn[0] = simd_mul(seed_dbl[0], vfac[0]);
     rn[1] = simd_mul(seed_dbl[1], vfac[1]);
 
-    return simd_add(rn[0], rn[1]);
+    rn[0] = simd_add(rn[0], rn[1]);
+    if (strm_mask64)
+        return simd_and(rn[0], strm_mask64[0]);
+
+    return rn[0];
 
     // NOTE: can convert into fused multiply-add
     //return simd_fmadd(seed_dbl[1], vfac[1], rn[0]);
@@ -341,12 +414,12 @@ SIMD_DBL VLCG::get_rn_dbl()
 }
 
 
-SIMD_FLT VLCG::get_rn_flt()
+SIMD_FLT VLCG::get_rn_flt() const
 {
 #if defined(LONG_SPRNG)
     const SIMD_FLT vfac = simd_set((float)GLOBALS.TWO_M48);
-    SIMD_FLT rn[2] __SIMD_SET_ALIGNED;
-    SIMD_FLT seed_flt[2] __SIMD_SET_ALIGNED; 
+    SIMD_FLT rn[2] __SIMD_ALIGN__;
+    SIMD_FLT seed_flt[2] __SIMD_ALIGN__; 
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
     multiply(&seed[1], &multiplier[1], &prime[1]);
@@ -357,12 +430,16 @@ SIMD_FLT VLCG::get_rn_flt()
     rn[0] = simd_mul(seed_flt[0], vfac);
     rn[1] = simd_mul(seed_flt[1], vfac);
 
-    return simd_merge_lo(rn[0], rn[1]);
+    rn[0] = simd_merge_lo(rn[0], rn[1]);
+    if (strm_mask32)
+        return simd_and(rn[0], strm_mask32[0]);
+
+    return rn[0];
 #else
-    const SIMD_FLT vfac[2] __SIMD_SET_ALIGNED = { simd_set((float)GLOBALS.TWO_M24),
-                                                  simd_set((float)GLOBALS.TWO_M48) };
-    SIMD_FLT rn[2] __SIMD_SET_ALIGNED;
-    SIMD_FLT seed_flt[2] __SIMD_SET_ALIGNED; 
+    const SIMD_FLT vfac[2] __SIMD_ALIGN__ = { simd_set((float)GLOBALS.TWO_M24),
+                                              simd_set((float)GLOBALS.TWO_M48) };
+    SIMD_FLT rn[2] __SIMD_ALIGN__;
+    SIMD_FLT seed_flt[2] __SIMD_ALIGN__; 
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
@@ -372,7 +449,11 @@ SIMD_FLT VLCG::get_rn_flt()
     rn[0] = simd_mul(seed_flt[0], vfac[0]);
     rn[1] = simd_mul(seed_flt[1], vfac[1]);
 
-    return simd_add(rn[0], rn[1]);
+    rn[0] = simd_add(rn[0], rn[1]);
+    if (strm_mask32)
+        return simd_and(rn[0], strm_mask32[0]);
+
+    return rn[0];
 
     // NOTE: can convert into fused multiply-add
     //return simd_fmadd(seed_flt[1], vfac[1], rn[0]);
@@ -381,18 +462,86 @@ SIMD_FLT VLCG::get_rn_flt()
 
 
 #if defined(LONG_SPRNG)
-SIMD_INT VLCG::get_seed_rng() const { return init_seed[0]; }
+SIMD_INT VLCG::get_seed_rng() const
+{ 
+    const SIMD_INT va = simd_packmerge_i32(init_seed[0], init_seed[1]);
+    if (strm_mask32)
+        return simd_and(va, strm_mask32[0]);
+    return va;
+}
 #else
-SIMD_INT VLCG::get_seed_rng() const { return init_seed[0]; }
+SIMD_INT VLCG::get_seed_rng() const
+{
+    if (strm_mask32)
+        return simd_and(init_seed[0], strm_mask32[0]);
+    return init_seed[0];
+}
 #endif
-int VLCG::get_ngens() const { return LCG_NGENS; }
+
+
+int VLCG::get_ngens() const
+{ return LCG_NGENS; }
+
+
 #if defined(DEBUG)
-SIMD_INT VLCG::get_seed() const { return seed[0]; }
-SIMD_INT VLCG::get_multiplier() const { return multiplier[0]; }
 # if defined(LONG_SPRNG)
-SIMD_INT VLCG::get_prime() const { return prime[0]; }
+SIMD_INT VLCG::get_seed() const
+{
+    if (strm_mask64)
+        return simd_and(seed[0], strm_mask64[0]);
+    return seed[0];
+}
+
+SIMD_INT VLCG::get_seed2() const
+{
+    if (strm_mask64)
+        return simd_and(seed[1], strm_mask64[1]);
+    return seed[1];
+}
+
+SIMD_INT VLCG::get_multiplier() const
+{
+    if (strm_mask64)
+        return simd_and(multiplier[0], strm_mask64[0]);
+    return multiplier[0];
+}
+
+SIMD_INT VLCG::get_multiplier2() const
+{
+    if (strm_mask64)
+        return simd_and(multiplier[1], strm_mask64[1]);
+    return multiplier[1];
+}
+
+SIMD_INT VLCG::get_prime() const
+{
+    const SIMD_INT va = simd_packmerge_i32(prime[0], prime[1]);
+    if (strm_mask32)
+        return simd_and(va, strm_mask32[0]);
+    return va;
+}
+
 # else
-SIMD_INT VLCG::get_prime() const { return prime[0]; }
+SIMD_INT VLCG::get_seed() const
+{
+    if (strm_mask32)
+        return simd_and(seed[0], strm_mask32[0]);
+    return seed[0];
+}
+
+SIMD_INT VLCG::get_multiplier() const
+{
+    if (strm_mask32)
+        return simd_and(multiplier[0], strm_mask32[0]);
+    return multiplier[0];
+}
+
+SIMD_INT VLCG::get_prime() const
+{
+    if (strm_mask32)
+        return simd_and(prime[0], strm_mask32[0]);
+    return prime[0];
+}
 # endif
 #endif
 

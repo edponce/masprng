@@ -25,9 +25,12 @@
 #define SIMD_FLT __m256
 #define SIMD_DBL __m256d
 #define SIMD_WIDTH_BYTES 32
-#define SIMD_STREAMS_32 8 
-#define SIMD_STREAMS_64 4 
-#define __VSPRNG_REQUIRED__ // identify SIMD functions required for VSPRNG
+#define SIMD_STREAMS_32  8 
+#define SIMD_STREAMS_64  4 
+
+
+// NOTE: this macro has no behavior, it simply identifies SIMD functions required for VSPRNG
+#define __VSPRNG_REQUIRED__
 
 
 /*
@@ -128,6 +131,20 @@ static inline SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_R
 
 static inline SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
 { return _mm256_and_si256(va, vb); }
+
+static inline SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm256_castps_si256(va);
+    vc = _mm256_and_si256(vc, vb);
+    return _mm256_castsi256_ps(vc);
+}
+
+static inline SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm256_castpd_si256(va);
+    vc = _mm256_and_si256(vc, vb);
+    return _mm256_castsi256_pd(vc);
+}
 
 
 /*****************************
@@ -336,9 +353,9 @@ static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    uint64_t sa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t *sa_ptr = sa;
-    float fa[SIMD_STREAMS_32] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    float fa[SIMD_STREAMS_32] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     float *fa_ptr = fa; 
 
     _mm256_store_si256((SIMD_INT *)sa, va);
@@ -360,9 +377,9 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    uint64_t sa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t *sa_ptr = sa;
-    double fa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    double fa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     double *fa_ptr = fa; 
 
     _mm256_store_si256((SIMD_INT *)sa, va);
