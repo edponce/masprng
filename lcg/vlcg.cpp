@@ -41,41 +41,41 @@ VLCG::VLCG()
     strm_mask64 = NULL;
 
 #if defined(LONG_SPRNG) 
-	simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&init_seed[0]);
     simd_set_zero(&init_seed[1]);
 
-	simd_malloc(&parameter, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&parameter, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&parameter[0]);
     simd_set_zero(&parameter[1]);
 
-	simd_malloc(&prime, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&prime, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&prime[0]);
     simd_set_zero(&prime[1]);
 
-	simd_malloc(&seed, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&seed, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&seed[0]);
     simd_set_zero(&seed[1]);
 
-	simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&multiplier[0]);
     simd_set_zero(&multiplier[1]);
 
 #else
-	simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 1);
+    simd_malloc(&init_seed, SIMD_WIDTH_BYTES, 1);
     simd_set_zero(&init_seed[0]);
 
-	simd_malloc(&parameter, SIMD_WIDTH_BYTES, 1);
+    simd_malloc(&parameter, SIMD_WIDTH_BYTES, 1);
     simd_set_zero(&parameter[0]);
 
-	simd_malloc(&prime, SIMD_WIDTH_BYTES, 1);
+    simd_malloc(&prime, SIMD_WIDTH_BYTES, 1);
     simd_set_zero(&prime[0]);
 
-	simd_malloc(&seed, SIMD_WIDTH_BYTES, 2);
+    simd_malloc(&seed, SIMD_WIDTH_BYTES, 2);
     simd_set_zero(&seed[0]);
     seed[1] = simd_set(0x1U);
 
-	simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 4);
+    simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 4);
     for (int32_t i = 0; i < 4; ++i)
         simd_set_zero(multiplier+i);
 #endif
@@ -89,11 +89,11 @@ VLCG::VLCG()
  */
 VLCG::~VLCG()
 {
-	if (init_seed) free(init_seed);
-	if (parameter) free(parameter);
-	if (prime) free(prime);
-	if (seed) free(seed);
-	if (multiplier) free(multiplier);
+    if (init_seed) free(init_seed);
+    if (parameter) free(parameter);
+    if (prime) free(prime);
+    if (seed) free(seed);
+    if (multiplier) free(multiplier);
     if (strm_mask32) free(strm_mask32);
     if (strm_mask64) free(strm_mask64);
 
@@ -229,7 +229,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     // Activate 32-bit global output masks, only if not using maximum number of streams
     int *mask32 = NULL;
     if (nstrms < SIMD_STREAMS_32) {
-    	simd_malloc(&strm_mask32, SIMD_WIDTH_BYTES, 1);
+        simd_malloc(&strm_mask32, SIMD_WIDTH_BYTES, 1);
 
         scalar_malloc(&mask32, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
         for (int32_t strm = 0; strm < nstrms; ++strm)
@@ -244,7 +244,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     // Activate 64-bit global output masks, only if not using maximum number of streams
     long int *mask64 = NULL;
     if (nstrms < SIMD_STREAMS_32) {
-    	simd_malloc(&strm_mask64, SIMD_WIDTH_BYTES, 2);
+        simd_malloc(&strm_mask64, SIMD_WIDTH_BYTES, 2);
 
         scalar_malloc(&mask64, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
         for (int32_t strm = 0; strm < nstrms; ++strm)

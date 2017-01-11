@@ -40,9 +40,9 @@
     #include "sse4_1.h"
 #else
     // Disable SIMD for scalar mode
-    const int32_t SIMD_WIDTH_BYTES = 8; 
-    const int32_t SIMD_STREAMS_32 = 1;
-    const int32_t SIMD_STREAMS_64 = 1;
+    #define SIMD_WIDTH_BYTES 8
+    #define SIMD_STREAMS_32  1
+    #define SIMD_STREAMS_64  1
 #endif
 
 
