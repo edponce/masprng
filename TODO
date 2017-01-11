@@ -9,5 +9,3 @@ fix builtin features support
 simd/simd.h:#include <stdint.h> // NOTE: remove this
 simd/sse4_1.h: *  NOTE: add type suffix to all functions to make interface C valid?
 lcg/vlcg.h:    // NOTE: thread-safe?
-lcg/vlcg.cpp: *  NOTE: The gn parameter is the same for all streams since the generators are run
-lcg/vlcg.cpp: *  NOTE: int and float streams use all parameters from input arrays,

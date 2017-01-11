@@ -18,7 +18,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 0
+#define TEST 2
 
 
 #if TEST == 0
@@ -180,9 +180,13 @@ int main_gen(int rng_lim)
 
     // Print results 
 # if defined(DEBUG)
+    simd_storeu(primes2, vrng->get_prime());
     simd_storeu(seeds2, vrng->get_seed());
     simd_storeu(mults2, vrng->get_multiplier());
-    simd_storeu(primes2, vrng->get_prime());
+#   if defined(LONG_SPRNG)
+    simd_storeu(seeds2+SIMD_STREAMS_64, vrng->get_seed2());
+    simd_storeu(mults2+SIMD_STREAMS_64, vrng->get_multiplier2());
+#   endif
 # endif
     simd_storeu(rngs2, vrngs);
 
@@ -191,7 +195,7 @@ int main_gen(int rng_lim)
     for (i = 0; i < RNG_ELEMS; ++i) 
 # if defined(DEBUG)
 #   if defined(LONG_SPRNG)
-        printf("vector = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[(i*RNG_ELEMS/SIMD_STREAMS_32)%(1+RNG_ELEMS/SIMD_STREAMS_32)]);
+        printf("vector = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[i]);
 #   else
         printf("vector = " RNG_FMT "\t%d\t%d\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[i]);
 #   endif

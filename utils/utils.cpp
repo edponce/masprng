@@ -5,7 +5,7 @@
 
 
 #if defined(_OPENMP)
-    #include <omp.h>
+#include <omp.h>
 #endif
 
 
@@ -39,13 +39,13 @@ int detectProcSIMD()
 {
 #if GNUC_VERSION > 40800
 #define CPU_INIT_SUPPORT() __builtin_cpu_init()
-#define CPU_SUPPORTS(a) (__builtin_cpu_supports(a) ? 1 : 0)
+#define CPU_SUPPORTS(a)   (__builtin_cpu_supports(a) ? 1 : 0)
 #else
 #define CPU_INIT_SUPPORT()
 #define CPU_SUPPORTS(a) 0 // NOTE: assume SIMD support is not available if no way of checking
 #endif
 
-    int support = 1;
+    int support = 0;
 
 	CPU_INIT_SUPPORT();
 
@@ -53,44 +53,44 @@ int detectProcSIMD()
 	// NOTE: need to add FMA detection
 #endif
 #if defined(__MMX__)
-    if (!CPU_SUPPORTS("mmx"))
-        support = 0;
+    if (CPU_SUPPORTS("mmx"))
+        support = 1;
 #endif
 #if defined(__SSE__)
-    if (!CPU_SUPPORTS("sse"))
-        support = 0;
+    if (CPU_SUPPORTS("sse"))
+        support = 1;
 #endif
 #if defined(__SSE2__)
-    if (!CPU_SUPPORTS("sse2"))
-        support = 0;
+    if (CPU_SUPPORTS("sse2"))
+        support = 1;
 #endif
 #if defined(__SSE3__)
-    if (!CPU_SUPPORTS("sse3"))
-        support = 0;
+    if (CPU_SUPPORTS("sse3"))
+        support = 1;
 #endif
 #if defined(__SSSE3__)
-    if (!CPU_SUPPORTS("ssse3"))
-        support = 0;
+    if (CPU_SUPPORTS("ssse3"))
+        support = 1;
 #endif
 #if defined(__SSE4_1__)
-    if (!CPU_SUPPORTS("sse4.1"))
-        support = 0;
+    if (CPU_SUPPORTS("sse4.1"))
+        support = 1;
 #endif
 #if defined(__SSE4_2__)
-    if (!CPU_SUPPORTS("sse4.2"))
-        support = 0;
+    if (CPU_SUPPORTS("sse4.2"))
+        support = 1;
 #endif
 #if defined(__AVX__)
-    if (!CPU_SUPPORTS("avx"))
-        support = 0;
+    if (CPU_SUPPORTS("avx"))
+        support = 1;
 #endif
 #if defined(__AVX2__)
-    if (!CPU_SUPPORTS("avx2"))
-        support = 0;
+    if (CPU_SUPPORTS("avx2"))
+        support = 1;
 #endif
 #if defined(__AVX512BW__)
-    if (!CPU_SUPPORTS("avx512BW"))
-        support = 0;
+    if (CPU_SUPPORTS("avx512BW"))
+        support = 1;
 #endif
 
     return support;

@@ -111,15 +111,14 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
 /*!
  *  \brief LCG multiply 48-bits using 32-bits.
  */
-// NOTE: const function?
 void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT * const c) const
 {
     
-    const SIMD_INT vmsk_fac[2] __SIMD_SET_ALIGNED = { simd_set(4095U),
-                                                  simd_set(16777215U) };
-    SIMD_INT s[4] __SIMD_SET_ALIGNED;
-    SIMD_INT res[4] __SIMD_SET_ALIGNED;
-    SIMD_INT vtmp[3] __SIMD_SET_ALIGNED;
+    const SIMD_INT vmsk_fac[2] __SIMD_ALIGN__ = { simd_set(4095U),
+                                              simd_set(16777215U) };
+    SIMD_INT s[4] __SIMD_ALIGN__;
+    SIMD_INT res[4] __SIMD_ALIGN__;
+    SIMD_INT vtmp[3] __SIMD_ALIGN__;
 
     s[0] = simd_and(a[1], vmsk_fac[0]);
     s[1] = simd_srl_32(a[1], 0xC);
@@ -129,7 +128,7 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
     // NOTE: check info on vectorization compiler hints
     #pragma vector aligned
     for (int32_t i = 0; i < 4; ++i) {
-        SIMD_INT * const res_ptr __SIMD_SET_ALIGNED = res + i;
+        SIMD_INT * const res_ptr __SIMD_ALIGN__ = res + i;
 
         *res_ptr = simd_mullo_i32(b[0], *(s+i));
         for (int32_t j = 0; j < i; ++j) {
@@ -208,7 +207,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     parameter[0] = simd_set(&m[0], SIMD_STREAMS_64);
     parameter[1] = simd_set(&m[SIMD_STREAMS_64], SIMD_STREAMS_64);
 
-    int64_t lmultiplier[2][SIMD_STREAMS_64] __SIMD_SET_ALIGNED;
+    int64_t lmultiplier[2][SIMD_STREAMS_64] __SIMD_ALIGN__;
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i) {
         lmultiplier[0][i] = GLOBALS.MULT[m[i]];
         lmultiplier[1][i] = GLOBALS.MULT[m[i+SIMD_STREAMS_64]];
@@ -216,7 +215,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     multiplier[0] = simd_set(lmultiplier[0], SIMD_STREAMS_64);
     multiplier[1] = simd_set(lmultiplier[1], SIMD_STREAMS_64);
 
-    SIMD_INT vs[2] __SIMD_SET_ALIGNED;
+    SIMD_INT vs[2] __SIMD_ALIGN__;
     vs[0] = simd_set(&s[0], SIMD_STREAMS_64);
     vs[1] = simd_set(&s[SIMD_STREAMS_64], SIMD_STREAMS_64);
 
@@ -242,7 +241,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 #else
     parameter[0] = simd_set(m, SIMD_STREAMS_32);
 
-    int32_t lmultiplier[SIMD_STREAMS_32] __SIMD_SET_ALIGNED;
+    int32_t lmultiplier[SIMD_STREAMS_32] __SIMD_ALIGN__;
     for (int32_t j = 0; j < 4; ++j) {
         for (int32_t i = 0; i < SIMD_STREAMS_32; ++i) {
             lmultiplier[i] = GLOBALS.MULT[m[i]][j]; 
@@ -255,7 +254,7 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     init_seed[0] = simd_and(vs, vmsk_lsb31);
 
     const SIMD_INT vmsk_lsb24 = simd_set(0xFFFFFFU); 
-    SIMD_INT vtmp[2] __SIMD_SET_ALIGNED;
+    SIMD_INT vtmp[2] __SIMD_ALIGN__;
     vtmp[0] = simd_srl_32(init_seed[0], 0x8); 
     vtmp[0] = simd_and(vtmp[0], vmsk_lsb24);
 
@@ -263,8 +262,8 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
     vtmp[1] = simd_sll_32(init_seed[0], 0x10); 
     vtmp[1] = simd_and(vtmp[1], vmsk_msb8_24);
 
-    const SIMD_INT vmsk_seed[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.INIT_SEED[0]),
-                                                       simd_set(GLOBALS.INIT_SEED[1]) };
+    const SIMD_INT vmsk_seed[2] __SIMD_ALIGN__ = { simd_set(GLOBALS.INIT_SEED[0]),
+                                                   simd_set(GLOBALS.INIT_SEED[1]) };
     seed[0] = simd_xor(vmsk_seed[0], vtmp[0]);
     seed[1] = simd_xor(vmsk_seed[1], vtmp[1]);
 
@@ -285,10 +284,10 @@ int VLCG::init_rng(int gn, int tg, int * const s, int * const m)
 /*!
  *  The high 31-bits out of the 48-bits are returned.
  */
-SIMD_INT VLCG::get_rn_int()
+SIMD_INT VLCG::get_rn_int() const
 {
 #if defined(LONG_SPRNG)
-    SIMD_INT rn[2] __SIMD_SET_ALIGNED;
+    SIMD_INT rn[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
     multiply(&seed[1], &multiplier[1], &prime[1]);
@@ -298,7 +297,7 @@ SIMD_INT VLCG::get_rn_int()
 
     return simd_packmerge_i32(rn[0], rn[1]);
 #else
-    SIMD_INT rn[2] __SIMD_SET_ALIGNED;
+    SIMD_INT rn[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
@@ -310,7 +309,7 @@ SIMD_INT VLCG::get_rn_int()
 }
 
 
-SIMD_DBL VLCG::get_rn_dbl()
+SIMD_DBL VLCG::get_rn_dbl() const
 {
 #if defined(LONG_SPRNG)
     const SIMD_DBL vfac = simd_set(GLOBALS.TWO_M48);
@@ -321,10 +320,10 @@ SIMD_DBL VLCG::get_rn_dbl()
 
     return simd_mul(seed_dbl, vfac);
 #else
-    const SIMD_DBL vfac[2] __SIMD_SET_ALIGNED = { simd_set(GLOBALS.TWO_M24),
-                                                  simd_set(GLOBALS.TWO_M48) };
-    SIMD_DBL rn[2] __SIMD_SET_ALIGNED;
-    SIMD_DBL seed_dbl[2] __SIMD_SET_ALIGNED;
+    const SIMD_DBL vfac[2] __SIMD_ALIGN__ = { simd_set(GLOBALS.TWO_M24),
+                                              simd_set(GLOBALS.TWO_M48) };
+    SIMD_DBL rn[2] __SIMD_ALIGN__;
+    SIMD_DBL seed_dbl[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
@@ -342,12 +341,12 @@ SIMD_DBL VLCG::get_rn_dbl()
 }
 
 
-SIMD_FLT VLCG::get_rn_flt()
+SIMD_FLT VLCG::get_rn_flt() const
 {
 #if defined(LONG_SPRNG)
     const SIMD_FLT vfac = simd_set((float)GLOBALS.TWO_M48);
-    SIMD_FLT rn[2] __SIMD_SET_ALIGNED;
-    SIMD_FLT seed_flt[2] __SIMD_SET_ALIGNED; 
+    SIMD_FLT rn[2] __SIMD_ALIGN__;
+    SIMD_FLT seed_flt[2] __SIMD_ALIGN__; 
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
     multiply(&seed[1], &multiplier[1], &prime[1]);
@@ -360,10 +359,10 @@ SIMD_FLT VLCG::get_rn_flt()
 
     return simd_merge_lo(rn[0], rn[1]);
 #else
-    const SIMD_FLT vfac[2] __SIMD_SET_ALIGNED = { simd_set((float)GLOBALS.TWO_M24),
-                                                  simd_set((float)GLOBALS.TWO_M48) };
-    SIMD_FLT rn[2] __SIMD_SET_ALIGNED;
-    SIMD_FLT seed_flt[2] __SIMD_SET_ALIGNED; 
+    const SIMD_FLT vfac[2] __SIMD_ALIGN__ = { simd_set((float)GLOBALS.TWO_M24),
+                                              simd_set((float)GLOBALS.TWO_M48) };
+    SIMD_FLT rn[2] __SIMD_ALIGN__;
+    SIMD_FLT seed_flt[2] __SIMD_ALIGN__; 
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
 
@@ -382,18 +381,38 @@ SIMD_FLT VLCG::get_rn_flt()
 
 
 #if defined(LONG_SPRNG)
-SIMD_INT VLCG::get_seed_rng() const { return init_seed[0]; }
+SIMD_INT VLCG::get_seed_rng() const
+{ return simd_packmerge_i32(init_seed[0], init_seed[1]); }
 #else
-SIMD_INT VLCG::get_seed_rng() const { return init_seed[0]; }
+SIMD_INT VLCG::get_seed_rng() const
+{ return init_seed[0]; }
 #endif
-int VLCG::get_ngens() const { return LCG_NGENS; }
+
+
+int VLCG::get_ngens() const
+{ return LCG_NGENS; }
+
+
 #if defined(DEBUG)
-SIMD_INT VLCG::get_seed() const { return seed[0]; }
-SIMD_INT VLCG::get_multiplier() const { return multiplier[0]; }
+SIMD_INT VLCG::get_seed() const
+{ return seed[0]; }
+
+SIMD_INT VLCG::get_multiplier() const
+{ return multiplier[0]; }
+
 # if defined(LONG_SPRNG)
-SIMD_INT VLCG::get_prime() const { return prime[0]; }
+SIMD_INT VLCG::get_seed2() const
+{ return seed[1]; }
+
+SIMD_INT VLCG::get_multiplier2() const
+{ return multiplier[1]; }
+
+SIMD_INT VLCG::get_prime() const
+{ return simd_packmerge_i32(prime[0], prime[1]); }
+
 # else
-SIMD_INT VLCG::get_prime() const { return prime[0]; }
+SIMD_INT VLCG::get_prime() const
+{ return prime[0]; }
 # endif
 #endif
 

@@ -31,15 +31,19 @@ class VSPRNG
   public:
     virtual ~VSPRNG() {} /*!< virtual destructor allows polymorphism to invoke derived destructors */
     virtual int init_rng(int, int, int * const, int * const) = 0;
-    virtual SIMD_INT get_rn_int() = 0;
-    virtual SIMD_FLT get_rn_flt() = 0;
-    virtual SIMD_DBL get_rn_dbl() = 0;
+    virtual SIMD_INT get_rn_int() const = 0;
+    virtual SIMD_FLT get_rn_flt() const = 0;
+    virtual SIMD_DBL get_rn_dbl() const = 0;
     virtual SIMD_INT get_seed_rng() const = 0;
     virtual int get_ngens() const = 0;
 #if defined(DEBUG)
-    virtual SIMD_INT get_seed() const = 0;
     virtual SIMD_INT get_prime() const = 0;
+    virtual SIMD_INT get_seed() const = 0;
     virtual SIMD_INT get_multiplier() const = 0;
+# if defined(LONG_SPRNG)
+    virtual SIMD_INT get_seed2() const = 0;
+    virtual SIMD_INT get_multiplier2() const = 0;
+# endif
 #endif
 };
 

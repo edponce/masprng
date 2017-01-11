@@ -24,9 +24,12 @@
 #define SIMD_FLT __m128
 #define SIMD_DBL __m128d
 #define SIMD_WIDTH_BYTES 16
-#define SIMD_STREAMS_32 4 
-#define SIMD_STREAMS_64 2 
-#define __VSPRNG_REQUIRED__ // identify SIMD functions required for VSPRNG
+#define SIMD_STREAMS_32  4 
+#define SIMD_STREAMS_64  2 
+
+
+// NOTE: this macro has no behavior, it simply identifies SIMD functions required for VSPRNG
+#define __VSPRNG_REQUIRED__
 
 
 /*
@@ -301,9 +304,9 @@ static inline SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
  */
 static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    uint64_t sa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t *sa_ptr = sa;
-    float fa[SIMD_STREAMS_32] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    float fa[SIMD_STREAMS_32] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     float *fa_ptr = fa; 
 
     _mm_store_si128((SIMD_INT *)sa, va);
@@ -325,9 +328,9 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
  */
 static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    uint64_t sa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t *sa_ptr = sa;
-    double fa[SIMD_STREAMS_64] SET_ALIGNED(SIMD_WIDTH_BYTES);
+    double fa[SIMD_STREAMS_64] ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES);
     double *fa_ptr = fa; 
 
     _mm_store_si128((SIMD_INT *)sa, va);
