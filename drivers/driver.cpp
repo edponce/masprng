@@ -18,7 +18,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 2
+#define TEST 0
 
 
 #if TEST == 0
@@ -170,7 +170,8 @@ int main_gen(int rng_lim)
 
     // RNG object
     VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
-    vrng->init_rng(0, 1, iseeds, m);
+    //vrng->init_rng(0, 1, iseeds, m);
+    vrng->init_rng(0, 1, iseeds, m, 3);
 
     // Run kernel
     startTime(timers);

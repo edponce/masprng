@@ -132,6 +132,20 @@ static inline SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_R
 static inline SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
 { return _mm256_and_si256(va, vb); }
 
+static inline SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm256_castps_si256(va);
+    vc = _mm256_and_si256(vc, vb);
+    return _mm256_castsi256_ps(vc);
+}
+
+static inline SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm256_castpd_si256(va);
+    vc = _mm256_and_si256(vc, vb);
+    return _mm256_castsi256_pd(vc);
+}
+
 
 /*****************************
  *  Shift/Shuffle intrinsics 

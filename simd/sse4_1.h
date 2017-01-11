@@ -44,10 +44,6 @@
  */
 
 
-// NOTE: use 'extern inline' for SIMD functions?
-// __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-
-
 /**************************
  *  Arithmetic intrinsics
  **************************/
@@ -134,6 +130,20 @@ static inline SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_R
 
 static inline SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
 { return _mm_and_si128(va, vb); }
+
+static inline SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm_castps_si128(va);
+    vc = _mm_and_si128(vc, vb);
+    return _mm_castsi128_ps(vc);
+}
+
+static inline SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+{
+    SIMD_INT vc = _mm_castpd_si128(va);
+    vc = _mm_and_si128(vc, vb);
+    return _mm_castsi128_pd(vc);
+}
 
 
 /*****************************

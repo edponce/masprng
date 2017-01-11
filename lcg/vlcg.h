@@ -20,7 +20,7 @@ class VLCG: public VSPRNG
   public:
     VLCG();
     ~VLCG();
-    int init_rng(int, int, int * const, int * const);
+    int init_rng(int, int, const int * const, const int * const, const int = SIMD_STREAMS_32);
     SIMD_INT get_rn_int() const;
     SIMD_FLT get_rn_flt() const;
     SIMD_DBL get_rn_dbl() const;
@@ -46,6 +46,8 @@ class VLCG: public VSPRNG
     SIMD_INT *prime;
     SIMD_INT *seed;
     SIMD_INT *multiplier;
+    SIMD_INT *strm_mask32;
+    SIMD_INT *strm_mask64;
     void multiply(SIMD_INT * const, const SIMD_INT * const, const SIMD_INT * const) const;
 } __SIMD_ALIGN__;
 
