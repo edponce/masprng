@@ -321,11 +321,11 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm_store_si128((SIMD_INT *)sa, va);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         *(fa_ptr++) = (float)*(sa_ptr++);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
         *(fa_ptr++) = 0.0;
 
@@ -345,7 +345,7 @@ static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm_store_si128((SIMD_INT *)sa, va);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         *(fa_ptr++) = (double)*(sa_ptr++);
 

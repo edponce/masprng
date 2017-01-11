@@ -10,82 +10,82 @@
 
 int scalar_malloc(int ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(int));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(int));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int scalar_malloc(unsigned int ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(unsigned int));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(unsigned int));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int scalar_malloc(long int ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(long int));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(long int));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int scalar_malloc(unsigned long int ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(unsigned long int));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(unsigned long int));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int scalar_malloc(float ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(float));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(float));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int scalar_malloc(double ** const sa, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)sa, align, nelems * sizeof(double));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)sa, align, nelems * sizeof(double));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int simd_malloc(SIMD_INT ** const va, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_INT));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_INT));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int simd_malloc(SIMD_FLT ** const va, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_FLT));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_FLT));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 
 int simd_malloc(SIMD_DBL ** const va, const size_t align, const size_t nelems)
 {
-	int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_DBL));
-	if (ierr)
-		printf("ERROR: failed to allocate aligned memory, %d\n", errno);
-	return ierr;
+    int ierr = posix_memalign((void **)va, align, nelems * sizeof(SIMD_DBL));
+    if (ierr)
+        printf("ERROR: failed to allocate aligned memory, %d\n", errno);
+    return ierr;
 }
 
 

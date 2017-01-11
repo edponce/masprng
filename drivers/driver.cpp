@@ -170,8 +170,7 @@ int main_gen(int rng_lim)
 
     // RNG object
     VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
-    //vrng->init_rng(0, 1, iseeds, m);
-    vrng->init_rng(0, 1, iseeds, m, 3);
+    vrng->init_rng(0, 1, iseeds, m);
 
     // Run kernel
     startTime(timers);

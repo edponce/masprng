@@ -181,37 +181,37 @@ static inline SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, co
 static inline SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb) 
 {
     const __m128i vb128 = _mm256_castsi256_si128(vb);
-	return _mm256_inserti128_si256(va, vb128, 0x1);
+    return _mm256_inserti128_si256(va, vb128, 0x1);
 }
 
 static inline SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb) __VSPRNG_REQUIRED__
 {
     const __m128 vb128 = _mm256_castps256_ps128(vb);
-	return _mm256_insertf128_ps(va, vb128, 0x1);
+    return _mm256_insertf128_ps(va, vb128, 0x1);
 }
 
 static inline SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb) 
 {
     const __m128d vb128 = _mm256_castpd256_pd128(vb);
-	return _mm256_insertf128_pd(va, vb128, 0x1);
+    return _mm256_insertf128_pd(va, vb128, 0x1);
 }
 
 static inline SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb) 
 {
     const __m128i va128 = _mm256_extracti128_si256(va, 0x1);
-	return _mm256_inserti128_si256(vb, va128, 0x0);
+    return _mm256_inserti128_si256(vb, va128, 0x0);
 }
 
 static inline SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb) 
 {
     const __m128 va128 = _mm256_extractf128_ps(va, 0x1);
-	return _mm256_insertf128_ps(vb, va128, 0x0);
+    return _mm256_insertf128_ps(vb, va128, 0x0);
 }
 
 static inline SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb) 
 {
     const __m128d va128 = _mm256_extractf128_pd(va, 0x1);
-	return _mm256_insertf128_pd(vb, va128, 0x0);
+    return _mm256_insertf128_pd(vb, va128, 0x0);
 }
 
 /*!
@@ -224,20 +224,20 @@ static inline SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb) 
     const __m128i vbl = _mm256_castsi256_si128(vb);
     const __m128i vbh = _mm256_extracti128_si256(vb, 0x1);
 
-	// Pack va
+    // Pack va
     __m128i tmp1 = _mm_shuffle_epi32(val, 0x58);
     __m128i tmp2 = _mm_shuffle_epi32(vah, 0x85);
-	tmp2 = _mm_or_si128(tmp1, tmp2);
-	const SIMD_INT vc = _mm256_castsi128_si256(tmp2);
+    tmp2 = _mm_or_si128(tmp1, tmp2);
+    const SIMD_INT vc = _mm256_castsi128_si256(tmp2);
 
 
-	// Pack vb
+    // Pack vb
     tmp1 = _mm_shuffle_epi32(vbl, 0x58);
     tmp2 = _mm_shuffle_epi32(vbh, 0x85);
-	tmp2 = _mm_or_si128(tmp1, tmp2);
+    tmp2 = _mm_or_si128(tmp1, tmp2);
 
-	// Merge
-	return _mm256_inserti128_si256(vc, tmp2, 0x1);
+    // Merge
+    return _mm256_inserti128_si256(vc, tmp2, 0x1);
 }
 
 
@@ -360,11 +360,11 @@ static inline SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm256_store_si256((SIMD_INT *)sa, va);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         *(fa_ptr++) = (float)*(sa_ptr++);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
         *(fa_ptr++) = 0.0;
 
@@ -384,7 +384,7 @@ static inline SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm256_store_si256((SIMD_INT *)sa, va);
 
-	#pragma vector aligned
+    #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         *(fa_ptr++) = (double)*(sa_ptr++);
 
