@@ -63,10 +63,10 @@ __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb) __VSPRNG_REQUIRED__
 { return _mm_add_pd(va, vb); }
 
-#if defined(__FMA__)
 /*!
  *  Fused multiply-add for 32/64-bit floating-point elements
  */
+#if defined(__FMA__)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
 { return _mm_fmadd_ps(va, vb, vc); }
@@ -74,6 +74,21 @@ SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
 { return _mm_fmadd_pd(va, vb, vc); }
+
+#else
+__SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
+{
+	const SIMD_FLT vtmp = _mm_mul_ps(va, vb);
+	return _mm_add_ps(vtmp, vc);
+}
+
+__SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
+{
+	const SIMD_DBL vtmp = _mm_mul_pd(va, vb);
+	return _mm_add_pd(vtmp, vc);
+}
 #endif
 
 /*!
