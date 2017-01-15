@@ -2,9 +2,6 @@
 #define __SIMD_H
 
 
-#include <stdint.h> // NOTE: remove this
-
-
 /*
  *  If SIMD_MODE is enabled, use compiler flags to
  *  check automatically for best SIMD mode supported.
@@ -57,7 +54,7 @@
  *  Use SIMD_WIDTH_BYTES provided by SIMD modules and
  *  macros provided by compiler/architecture settings.
  */
-#define __SIMD_ALIGN__             ARCH_SET_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ALIGN__             ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME_ALIGNED__(a) ARCH_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME__(a)         ARCH_ASSUME(a)
 

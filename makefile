@@ -48,8 +48,8 @@ LFLAGS :=
 #DEFINES := -DLONG_SPRNG  # scalar mode
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
-DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
-#DEFINES := -DSSE4_1_SPRNG
+#DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
+DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
 #DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
@@ -71,14 +71,18 @@ LIBS := -lm
 #SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
 SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp utils/vutils.cpp check/check.cpp
 
-# Object files to link
-OBJECTS := $(SOURCES:.cpp=.o)
+# Set makefile's VPATH to search for target/dependency files, sort to remove duplicates
+VPATH := $(sort $(dir $(SOURCES)))
 
-# Header files (allow recompile if changed)
+# Object files to link
+OBJDIR := obj
+OBJECTS := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SOURCES)))
+
+# Header files
+# NOTE: allow recompile if changed
 HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h masprng.h simd/*.h primes/primelist_32.h lcg/lcg_globals.h
 
 # Driver file
-#LCG_DRIVER := drivers/main_lcg.cpp
 LCG_DRIVER := drivers/driver.cpp
 
 # Executable
@@ -101,12 +105,13 @@ debug:
 	@$(MAKE) force DEFINES="-DDEBUG $(DEFINES)" -f $(MKFILE)
 
 # Compile sources into object files
-%.o: %.cpp $(LCG_DRIVER) $(HEADERS) $(MKFILE) 
+# NOTE: HEADERS and MKFILE are placed here to allow recompilation after their modification
+$(OBJDIR)/%.o: %.cpp $(LCG_DRIVER) $(HEADERS) $(MKFILE)
 	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS) 
 
 # Link object files
 $(LCG_EXE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS) 
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $^ $(LIBS) 
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)
