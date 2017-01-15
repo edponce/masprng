@@ -76,7 +76,7 @@ VLCG::VLCG()
     seed[1] = simd_set(0x1U);
 
     simd_malloc(&multiplier, SIMD_WIDTH_BYTES, 4);
-    for (int32_t i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; ++i)
         simd_set_zero(multiplier+i);
 #endif
 
@@ -133,11 +133,11 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
 
     // NOTE: check info on vectorization compiler hints
     #pragma vector aligned
-    for (int32_t i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {
         SIMD_INT * const res_ptr __SIMD_ALIGN__ = res + i;
 
         *res_ptr = simd_mullo_i32(b[0], *(s+i));
-        for (int32_t j = 0; j < i; ++j) {
+        for (int j = 0; j < i; ++j) {
             const SIMD_INT vmul = simd_mullo_i32(*(b+i-j), *(s+j));
             *res_ptr = simd_add_i32(*res_ptr, vmul);
         }
@@ -200,7 +200,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     if (!gm)
         printf("WARNING: no array for multipliers provided, default is zero.\n");
     else {
-        for (int32_t strm = 0; strm < nstrms; ++strm)
+        for (int strm = 0; strm < nstrms; ++strm)
             if (gm[strm] < 0 || gm[strm] >= GLOBALS.NPARAMS)
                 printf("ERROR: multiplier out of range, %d\n", gm[strm]);
             else
@@ -214,12 +214,12 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     if (!gs)
         printf("WARNING: no array for seeds provided, default is zero.\n");
     else {
-        for (int32_t strm = 0; strm < nstrms; ++strm)
+        for (int strm = 0; strm < nstrms; ++strm)
             s[strm] = gs[strm];
     }
 
     // Generate prime number
-    int32_t lprime;
+    int lprime;
     prime_next = tg;
     prime_position = gn;
     getprime_32(1, &lprime, prime_position);
@@ -230,9 +230,9 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
         simd_malloc(&strm_mask32, SIMD_WIDTH_BYTES, 1);
 
         scalar_malloc(&mask32, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
-        for (int32_t strm = 0; strm < nstrms; ++strm)
+        for (int strm = 0; strm < nstrms; ++strm)
             mask32[strm] = 0xFFFFFFFF;
-        for (int32_t strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
+        for (int strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
             mask32[strm] = 0x00000000;
 
         strm_mask32[0] = simd_set(&mask32[0], SIMD_STREAMS_32);
@@ -245,9 +245,9 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
         simd_malloc(&strm_mask64, SIMD_WIDTH_BYTES, 2);
 
         scalar_malloc(&mask64, SIMD_WIDTH_BYTES, SIMD_STREAMS_32);
-        for (int32_t strm = 0; strm < nstrms; ++strm)
+        for (int strm = 0; strm < nstrms; ++strm)
             mask64[strm] = 0xFFFFFFFFFFFFFFFFL;
-        for (int32_t strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
+        for (int strm = nstrms; strm < SIMD_STREAMS_32; ++strm)
             mask64[strm] = 0x0000000000000000L;
 
         strm_mask64[0] = simd_set(&mask64[0], SIMD_STREAMS_64);
@@ -259,8 +259,8 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     parameter[0] = simd_set(&m[0], SIMD_STREAMS_64);
     parameter[1] = simd_set(&m[SIMD_STREAMS_64], SIMD_STREAMS_64);
 
-    int64_t lmultiplier[2][SIMD_STREAMS_64] __SIMD_ALIGN__;
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i) {
+    long int lmultiplier[2][SIMD_STREAMS_64] __SIMD_ALIGN__;
+    for (int i = 0; i < SIMD_STREAMS_64; ++i) {
         lmultiplier[0][i] = GLOBALS.MULT[m[i]];
         lmultiplier[1][i] = GLOBALS.MULT[m[i+SIMD_STREAMS_64]];
     }
@@ -293,9 +293,9 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
 #else
     parameter[0] = simd_set(m, SIMD_STREAMS_32);
 
-    int32_t lmultiplier[SIMD_STREAMS_32] __SIMD_ALIGN__;
-    for (int32_t j = 0; j < 4; ++j) {
-        for (int32_t i = 0; i < SIMD_STREAMS_32; ++i) {
+    int lmultiplier[SIMD_STREAMS_32] __SIMD_ALIGN__;
+    for (int j = 0; j < 4; ++j) {
+        for (int i = 0; i < SIMD_STREAMS_32; ++i) {
             lmultiplier[i] = GLOBALS.MULT[m[i]][j]; 
         }
         multiplier[j] = simd_set(lmultiplier, SIMD_STREAMS_32);
@@ -326,7 +326,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
 #endif
 
     // Run generator several times
-    for (int32_t i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
+    for (int i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
     if (m) free(m);
