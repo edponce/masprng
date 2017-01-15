@@ -17,12 +17,13 @@ CC := g++
 # -march= = target architecture (implies -mtune=cpu-type)
 # -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4 = SIMD extensions
 # -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd = SIMD extensions
+# -mno-fma = disable fused-multiply add (FMA)
 # -funroll-loops = enable loop unrolling
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-SIMDFLAG := -msse4.1
-#SIMDFLAG := -mavx2
+#SIMDFLAG := -msse4.1
+SIMDFLAG := -mavx2
 #CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
 CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
@@ -49,10 +50,11 @@ LFLAGS :=
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
 #DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
-DEFINES := -DSSE4_1_SPRNG
-#DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
+#DEFINES := -DSSE4_1_SPRNG
+DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
 #DEFINES := -DAVX2_SPRNG
-#DEFINES := -DAVX512BW_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
+#DEFINES := -DAVX512_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
+#DEFINES := -DAVX512_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
 
 # Define header paths in addition to /usr/include
@@ -106,12 +108,13 @@ debug:
 
 # Compile sources into object files
 # NOTE: HEADERS and MKFILE are placed here to allow recompilation after their modification
-$(OBJDIR)/%.o: %.cpp $(LCG_DRIVER) $(HEADERS) $(MKFILE)
+$(OBJDIR)/%.o: %.cpp $(HEADERS) $(MKFILE)
+	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
 	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS) 
 
 # Link object files
-$(LCG_EXE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $^ $(LIBS) 
+$(LCG_EXE): $(OBJECTS) $(LCG_DRIVER)
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS) 
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)

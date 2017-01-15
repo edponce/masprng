@@ -18,7 +18,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 2
+#define TEST 1
 
 
 #if TEST == 0
@@ -60,13 +60,17 @@ int main(int argc, char **argv)
     printSysconf();
 
     int rng_lim = RNG_LIM;
+	int retval = 0;
     if (argc > 1)
         rng_lim = atoi(argv[1]);
 
     if (rng_lim > 0)
-        main_gen(rng_lim);
+        retval = main_gen(rng_lim);
     else
-        check_gen(RNG_TYPE_NUM);
+        retval = check_gen(RNG_TYPE_NUM);
+
+	if (retval)
+		printf("ERROR: program could not run successfully.\n");
 
     return 0;
 }

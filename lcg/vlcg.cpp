@@ -389,25 +389,26 @@ SIMD_DBL VLCG::get_rn_dbl() const
 #else
     const SIMD_DBL vfac[2] __SIMD_ALIGN__ = { simd_set(GLOBALS.TWO_M24),
                                               simd_set(GLOBALS.TWO_M48) };
-    SIMD_DBL rn[2] __SIMD_ALIGN__;
     SIMD_DBL seed_dbl[2] __SIMD_ALIGN__;
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
-
     seed_dbl[0] = simd_cvt_i32_f64(seed[0]);
     seed_dbl[1] = simd_cvt_i32_f64(seed[1]);
 
+# if defined(__FMA__)
+    SIMD_DBL rn[1] __SIMD_ALIGN__;
+    rn[0] = simd_mul(seed_dbl[0], vfac[0]);
+    rn[0] = simd_fmadd(seed_dbl[1], vfac[1], rn[0]);
+# else
+    SIMD_DBL rn[2] __SIMD_ALIGN__;
     rn[0] = simd_mul(seed_dbl[0], vfac[0]);
     rn[1] = simd_mul(seed_dbl[1], vfac[1]);
-
     rn[0] = simd_add(rn[0], rn[1]);
+# endif
     if (strm_mask64)
         return simd_and(rn[0], strm_mask64[0]);
 
     return rn[0];
-
-    // NOTE: can convert into fused multiply-add
-    //return simd_fmadd(seed_dbl[1], vfac[1], rn[0]);
 #endif
 }
 
@@ -436,25 +437,26 @@ SIMD_FLT VLCG::get_rn_flt() const
 #else
     const SIMD_FLT vfac[2] __SIMD_ALIGN__ = { simd_set((float)GLOBALS.TWO_M24),
                                               simd_set((float)GLOBALS.TWO_M48) };
-    SIMD_FLT rn[2] __SIMD_ALIGN__;
     SIMD_FLT seed_flt[2] __SIMD_ALIGN__; 
 
     multiply(&seed[0], &multiplier[0], &prime[0]);
-
     seed_flt[0] = simd_cvt_i32_f32(seed[0]);
     seed_flt[1] = simd_cvt_i32_f32(seed[1]);
 
+# if defined(__FMA__)
+    SIMD_FLT rn[1] __SIMD_ALIGN__;
+    rn[0] = simd_mul(seed_flt[0], vfac[0]);
+    rn[0] = simd_fmadd(seed_flt[1], vfac[1], rn[0]);
+# else
+    SIMD_FLT rn[2] __SIMD_ALIGN__;
     rn[0] = simd_mul(seed_flt[0], vfac[0]);
     rn[1] = simd_mul(seed_flt[1], vfac[1]);
-
     rn[0] = simd_add(rn[0], rn[1]);
+# endif
     if (strm_mask32)
         return simd_and(rn[0], strm_mask32[0]);
 
     return rn[0];
-
-    // NOTE: can convert into fused multiply-add
-    //return simd_fmadd(seed_flt[1], vfac[1], rn[0]);
 #endif
 }
 

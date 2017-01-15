@@ -64,6 +64,7 @@ __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb) __VSPRNG_REQUIRED__
 { return _mm256_add_pd(va, vb); }
 
+#if defined(__FMA__)
 /*!
  *  Fused multiply-add for 32/64-bit floating-point elements
  */
@@ -74,6 +75,7 @@ SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
 { return _mm256_fmadd_pd(va, vb, vc); }
+#endif
 
 /*!
  *  Multiply low unsigned 32-bit integers from each packed 64-bit elements

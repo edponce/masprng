@@ -10,7 +10,6 @@
 int check_gen(const int rng_type)
 {
     int i;
-
     const int nstrms = SIMD_STREAMS_64;
 
     // Initial seeds
@@ -32,6 +31,7 @@ int check_gen(const int rng_type)
 
     // RNG object
     SPRNG *rng = selectType(rng_type);
+	if (!rng) return -1;
     rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
@@ -49,6 +49,7 @@ int check_gen(const int rng_type)
 
     // RNG object
     VSPRNG *vrng = selectTypeSIMD(rng_type);
+	if (!vrng) return -1;
     vrng->init_rng(0, 1, iseeds, m);
 #endif
 
