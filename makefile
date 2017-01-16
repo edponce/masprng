@@ -22,8 +22,8 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-#SIMDFLAG := -msse4.1
-SIMDFLAG := -mavx2
+SIMDFLAG := -msse4.1
+#SIMDFLAG := -mavx2
 #CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
 CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
@@ -49,9 +49,9 @@ LFLAGS :=
 #DEFINES := -DLONG_SPRNG  # scalar mode
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
 #DEFINES := -DSIMD_MODE
-#DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
+DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
 #DEFINES := -DSSE4_1_SPRNG
-DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
+#DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
 #DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
 #DEFINES := -DAVX512_SPRNG
