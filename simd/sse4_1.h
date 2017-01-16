@@ -79,15 +79,15 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
 {
-	const SIMD_FLT vtmp = _mm_mul_ps(va, vb);
-	return _mm_add_ps(vtmp, vc);
+	const SIMD_FLT vab = _mm_mul_ps(va, vb);
+	return _mm_add_ps(vab, vc);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
 {
-	const SIMD_DBL vtmp = _mm_mul_pd(va, vb);
-	return _mm_add_pd(vtmp, vc);
+	const SIMD_DBL vab = _mm_mul_pd(va, vb);
+	return _mm_add_pd(vab, vc);
 }
 #endif
 
@@ -117,17 +117,17 @@ SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
-    const SIMD_INT vfac = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vtmp, vh, vl;
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vtmp, vhi, vlo;
 
     vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier 
-    vh = _mm_mullo_epi32(va, vtmp);     // xl * yh, xh * yl
-    vtmp = _mm_slli_epi64(vh, 0x20);    // shift << 32 
-    vh = _mm_add_epi64(vh, vtmp);       // h = h1 + h2 
-    vh = _mm_and_si128(vh, vfac);       // h & 0xFFFFFFFF00000000
-    vl = _mm_mul_epu32(va, vb);         // l = xl * yl
+    vhi = _mm_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
+    vtmp = _mm_slli_epi64(vhi, 0x20);   // shift << 32 
+    vhi = _mm_add_epi64(vhi, vtmp);     // h = h1 + h2 
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
 
-    return _mm_add_epi64(vl, vh);       // l + h
+    return _mm_add_epi64(vlo, vhi);     // l + h
 }
 
 /*!
@@ -166,17 +166,17 @@ SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
 {
-    SIMD_INT vc = _mm_castps_si128(va);
-    vc = _mm_and_si128(vc, vb);
-    return _mm_castsi128_ps(vc);
+    SIMD_INT va_int = _mm_castps_si128(va);
+    va_int = _mm_and_si128(va_int, vb);
+    return _mm_castsi128_ps(va_int);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
 {
-    SIMD_INT vc = _mm_castpd_si128(va);
-    vc = _mm_and_si128(vc, vb);
-    return _mm_castsi128_pd(vc);
+    SIMD_INT va_int = _mm_castpd_si128(va);
+    va_int = _mm_and_si128(va_int, vb);
+    return _mm_castsi128_pd(va_int);
 }
 
 
@@ -210,8 +210,8 @@ SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl) __VSPRNG_REQUIRED__
 { return _mm_shuffle_epi32(va, ctrl); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const unsigned int ctrl) __VSPRNG_REQUIRED__
-{ return _mm_shuffle_ps(va, vb, ctrl); }
+SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl) __VSPRNG_REQUIRED__
+{ return _mm_shuffle_ps(va, vb, (unsigned int)ctrl); }
 
 /*
  *  Merge either low/high parts from pair of registers
@@ -247,9 +247,9 @@ SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
-    const SIMD_INT vap = _mm_shuffle_epi32(va, 0x58); // pack va
-    const SIMD_INT vbp = _mm_shuffle_epi32(vb, 0x85); // pack vb
-    return _mm_or_si128(vap, vbp); // merge
+    const SIMD_INT va_pk = _mm_shuffle_epi32(va, 0x58); // pack va
+    const SIMD_INT vb_pk = _mm_shuffle_epi32(vb, 0x85); // pack vb
+    return _mm_or_si128(va_pk, vb_pk); // merge
 }
 
 
@@ -379,22 +379,22 @@ SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    unsigned long int sa[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    unsigned long int *sa_ptr = sa;
-    float fa[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    float *fa_ptr = fa; 
+    unsigned long int sa_ul[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    unsigned long int *sa_ul_ptr = sa_ul;
+    float sa_flt[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    float *sa_flt_ptr = sa_flt; 
 
-    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
-        *(fa_ptr++) = (float)*(sa_ptr++);
+        *(sa_flt_ptr++) = (float)*(sa_ul_ptr++);
 
     #pragma vector aligned
     for (int i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
-        *(fa_ptr++) = 0.0;
+        *(sa_flt_ptr++) = 0.0;
 
-    return _mm_load_ps(fa);
+    return _mm_load_ps(sa_flt);
 }
 
 /*!
@@ -404,18 +404,18 @@ SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 {
-    unsigned long int sa[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    unsigned long int *sa_ptr = sa;
-    double fa[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    double *fa_ptr = fa; 
+    unsigned long int sa_ul[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    unsigned long int *sa_ul_ptr = sa_ul;
+    double sa_dbl[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    double *sa_dbl_ptr = sa_dbl; 
 
-    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
-        *(fa_ptr++) = (double)*(sa_ptr++);
+        *(sa_dbl_ptr++) = (double)*(sa_ul_ptr++);
 
-    return _mm_load_pd(fa);
+    return _mm_load_pd(sa_dbl);
 }
 
 

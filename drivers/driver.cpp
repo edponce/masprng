@@ -18,7 +18,7 @@
 
 // Control type of test
 #define RNG_TYPE_NUM SPRNG_LCG
-#define TEST 2
+#define TEST 1
 
 
 #if TEST == 0

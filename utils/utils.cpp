@@ -102,9 +102,11 @@ int detectProcSIMD()
 
 int detectIntelProcSIMD()
 {
-    unsigned long int features;
     int avail = 0;
-    
+
+#if defined(__INTEL_COMPILER)
+    unsigned long int features;
+
     features = _FEATURE_SSE | _FEATURE_SSE2 | _FEATURE_SSE3 | _FEATURE_SSSE3 | _FEATURE_SSE4_1 | _FEATURE_SSE4_2;
     avail = _may_i_use_cpu_feature(features);
     printf("SSE - SSE4.2 = %s\n", (avail) ? "YES" : "NO");
@@ -124,6 +126,7 @@ int detectIntelProcSIMD()
     features = _FEATURE_KNCNI;
     avail = _may_i_use_cpu_feature(features);
     printf("KNCNI = %s\n", (avail) ? "YES" : "NO");
+#endif
 
     return avail;
 }

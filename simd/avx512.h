@@ -80,15 +80,15 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
 {
-	const SIMD_FLT vtmp = _mm512_mul_ps(va, vb);
-	return _mm512_add_ps(vtmp, vc);
+	const SIMD_FLT vab = _mm512_mul_ps(va, vb);
+	return _mm512_add_ps(vab, vc);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
 {
-	const SIMD_DBL vtmp = _mm512_mul_pd(va, vb);
-	return _mm512_add_pd(vtmp, vc);
+	const SIMD_DBL vab = _mm512_mul_pd(va, vb);
+	return _mm512_add_pd(vab, vc);
 }
 #endif
 
@@ -165,20 +165,20 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__
  *  Shift left (logical) packed 32/64-bit integers
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_sll_32(const SIMD_INT va, const unsigned int shft) __VSPRNG_REQUIRED__
-{ return _mm512_slli_epi32(va, shft); }
+SIMD_INT simd_sll_32(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
+{ return _mm512_slli_epi32(va, (unsigned int)shft); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_srl_32(const SIMD_INT va, const unsigned int shft) __VSPRNG_REQUIRED__ 
-{ return _mm512_srli_epi32(va, shft); }
+SIMD_INT simd_srl_32(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__ 
+{ return _mm512_srli_epi32(va, (unsigned int)shft); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_sll_64(const SIMD_INT va, const unsigned int shft) __VSPRNG_REQUIRED__
-{ return _mm512_slli_epi64(va, shft); }
+SIMD_INT simd_sll_64(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
+{ return _mm512_slli_epi64(va, (unsigned int)shft); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_srl_64(const SIMD_INT va, const unsigned int shft) __VSPRNG_REQUIRED__
-{ return _mm512_srli_epi64(va, shft); }
+SIMD_INT simd_srl_64(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
+{ return _mm512_srli_epi64(va, (unsigned int)shft); }
 
 /*
  *  Shuffle 32-bit elements using control value 
@@ -246,14 +246,14 @@ __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
     // Pack va
-    const int SIMD_INT vap = _mm512_maskz_compress_epi32(0x5555U, va);
+    const int SIMD_INT va_pk = _mm512_maskz_compress_epi32(0x5555U, va);
 
     // Pack vb
-    const int SIMD_INT vbp = _mm512_maskz_compress_epi32(0x5555U, vb);
+    const int SIMD_INT vb_pk = _mm512_maskz_compress_epi32(0x5555U, vb);
 
     // Merge
-    const __m256i vbp_lo = _mm512_castsi512_si256(vbp);
-    return _mm512_inserti64x4(vpa, vbp_lo, 0x1);
+    const __m256i vb_pk_lo = _mm512_castsi512_si256(vb_pk);
+    return _mm512_inserti64x4(va_pk, vb_pk_lo, 0x1);
 }
 
 
@@ -373,11 +373,7 @@ SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
-{
-    const SIMD_FLT fa = _mm512_cvtepi32_ps(va);
-    const __m128 da = _mm512_castps512_ps128(fa);
-    return _mm512_cvtps_pd(da);
-}
+{ return _mm512_cvtepi32lo_pd(va); }
 
 /*!
  *  Convert packed unsigned 64-bit integer elements
@@ -395,8 +391,8 @@ SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
     const SIMD_FLT zero = _mm512_setzero_ps();
     return _mm512_mask_mov_ps(fa, 0xFF00U, zero);
 */
-    const __m256 fa = _mm512_cvtepu64_ps(va);
-    return _mm512_mask_xor_ps(fa, 0xFF00U, fa);
+    const __m256 va_flt = _mm512_cvtepu64_ps(va);
+    return _mm512_mask_xor_ps(va_flt, 0xFF00U, va_flt);
 }
 
 /*!
