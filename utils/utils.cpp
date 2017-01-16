@@ -100,6 +100,35 @@ int detectProcSIMD()
 }
 
 
+int detectIntelProcSIMD()
+{
+    unsigned long int features;
+    int avail = 0;
+    
+    features = _FEATURE_SSE | _FEATURE_SSE2 | _FEATURE_SSE3 | _FEATURE_SSSE3 | _FEATURE_SSE4_1 | _FEATURE_SSE4_2;
+    avail = _may_i_use_cpu_feature(features);
+    printf("SSE - SSE4.2 = %s\n", (avail) ? "YES" : "NO");
+
+    features = _FEATURE_AVX | _FEATURE_AVX2;
+    avail = _may_i_use_cpu_feature(features);
+    printf("AVX - AVX2 = %s\n", (avail) ? "YES" : "NO");
+
+    features = _FEATURE_FMA;
+    avail = _may_i_use_cpu_feature(features);
+    printf("FMA = %s\n", (avail) ? "YES" : "NO");
+
+    features = _FEATURE_AVX512F | _FEATURE_AVX512PF | _FEATURE_AVX512CD | _FEATURE_AVX512ER;
+    avail = _may_i_use_cpu_feature(features);
+    printf("AVX512 - AVX512xx = %s\n", (avail) ? "YES" : "NO");
+
+    features = _FEATURE_KNCNI;
+    avail = _may_i_use_cpu_feature(features);
+    printf("KNCNI = %s\n", (avail) ? "YES" : "NO");
+
+    return avail;
+}
+
+
 void printSysconf()
 {
     printf("Number of processors online = %ld\n", getNumProcOnline());

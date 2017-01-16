@@ -11,6 +11,7 @@ int setOmpEnv(const int);
  *  Detect CPU SIMD features
  */
 int detectProcSIMD();
+int detectIntelProcSIMD();
 
 /*!
  *  Print some system configurations

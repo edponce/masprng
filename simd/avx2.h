@@ -221,43 +221,43 @@ SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const unsigned i
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb) 
 {
-    const __m128i vb128 = _mm256_castsi256_si128(vb);
-    return _mm256_inserti128_si256(va, vb128, 0x1);
+    const __m128i vb_lo = _mm256_castsi256_si128(vb);
+    return _mm256_inserti128_si256(va, vb_lo, 0x1);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb) __VSPRNG_REQUIRED__
 {
-    const __m128 vb128 = _mm256_castps256_ps128(vb);
-    return _mm256_insertf128_ps(va, vb128, 0x1);
+    const __m128 vb_lo = _mm256_castps256_ps128(vb);
+    return _mm256_insertf128_ps(va, vb_lo, 0x1);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb) 
 {
-    const __m128d vb128 = _mm256_castpd256_pd128(vb);
-    return _mm256_insertf128_pd(va, vb128, 0x1);
+    const __m128d vb_lo = _mm256_castpd256_pd128(vb);
+    return _mm256_insertf128_pd(va, vb_lo, 0x1);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb) 
 {
-    const __m128i va128 = _mm256_extracti128_si256(va, 0x1);
-    return _mm256_inserti128_si256(vb, va128, 0x0);
+    const __m128i va_hi = _mm256_extracti128_si256(va, 0x1);
+    return _mm256_inserti128_si256(vb, va_hi, 0x0);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb) 
 {
-    const __m128 va128 = _mm256_extractf128_ps(va, 0x1);
-    return _mm256_insertf128_ps(vb, va128, 0x0);
+    const __m128 va_hi = _mm256_extractf128_ps(va, 0x1);
+    return _mm256_insertf128_ps(vb, va_hi, 0x0);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb) 
 {
-    const __m128d va128 = _mm256_extractf128_pd(va, 0x1);
-    return _mm256_insertf128_pd(vb, va128, 0x0);
+    const __m128d va_hi = _mm256_extractf128_pd(va, 0x1);
+    return _mm256_insertf128_pd(vb, va_hi, 0x0);
 }
 
 /*!
@@ -412,7 +412,7 @@ SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
 /*!
  *  Convert packed unsigned 64-bit integer elements
- *  to packed 32-bit floating-point elements, the second half of the register is set to 0.0.
+ *  to packed 32-bit floating-point elements, the high half of the register is set to 0.0.
  *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__

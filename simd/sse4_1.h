@@ -373,7 +373,7 @@ SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
 /*!
  *  Convert packed unsigned 64-bit integer elements
- *  to packed 32-bit floating-point elements, the second half of the register is set to 0.0.
+ *  to packed 32-bit floating-point elements, the high half of the register is set to 0.0.
  *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
