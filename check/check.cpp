@@ -10,17 +10,15 @@
 int check_gen(const int rng_type)
 {
     int i;
-    const int nstrms = SIMD_STREAMS_64;
+    const int nstrms = SIMD_STREAMS_32;
 
     // Initial seeds
-    int *iseeds = NULL;
-    posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    int iseeds[nstrms];
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
-    int *m = NULL;
-    posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    int m[nstrms];
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
 
@@ -31,17 +29,15 @@ int check_gen(const int rng_type)
 
     // RNG object
     SPRNG *rng = selectType(rng_type);
-	if (!rng) return -1;
+	if (!rng)
+		return -1;
     rng->init_rng(0, 1, iseeds[0], m[0]);
 
 #if defined(SIMD_MODE)
     // SIMD
-    int *irngs2 = NULL;
-    posix_memalign((void **)&irngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(int));
-    float *frngs2 = NULL;
-    posix_memalign((void **)&frngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_32 * sizeof(float));
-    double *drngs2 = NULL;
-    posix_memalign((void **)&drngs2, SIMD_WIDTH_BYTES, SIMD_STREAMS_64 * sizeof(double));
+    int irngs2[nstrms];
+    float frngs2[nstrms];
+    double drngs2[nstrms];
 
     SIMD_INT ivrngs;
     SIMD_FLT fvrngs;
@@ -49,8 +45,9 @@ int check_gen(const int rng_type)
 
     // RNG object
     VSPRNG *vrng = selectTypeSIMD(rng_type);
-	if (!vrng) return -1;
-    vrng->init_rng(0, 1, iseeds, m);
+	if (!vrng)
+		return -1;
+    vrng->init_rng(0, 1, iseeds, m, nstrms);
 #endif
 
 
@@ -70,7 +67,7 @@ int check_gen(const int rng_type)
 
 #if defined(SIMD_MODE)
         ivrngs = vrng->get_rn_int();
-        simd_store(irngs2, ivrngs);
+        simd_storeu(irngs2, ivrngs);
 
         if (irngs != irngs2[0]) {
             valid = 0;
@@ -101,7 +98,7 @@ int check_gen(const int rng_type)
 
 #if defined(SIMD_MODE)
         fvrngs = vrng->get_rn_flt();
-        simd_store(frngs2, fvrngs);
+        simd_storeu(frngs2, fvrngs);
 
         int rn3 = (int)(frngs2[0] * fltmult);
         if (rn2 != rn3) {
@@ -133,7 +130,7 @@ int check_gen(const int rng_type)
 
 #if defined(SIMD_MODE)
         dvrngs = vrng->get_rn_dbl();
-        simd_store(drngs2, dvrngs);
+        simd_storeu(drngs2, dvrngs);
 
         int rn3 = (int)(drngs2[0] * dblmult);
         if (rn2 != rn3) {
@@ -149,16 +146,12 @@ int check_gen(const int rng_type)
         printf("FAILED: Double generator does not reproduce correct stream.\n");
     printf("\n");
 
-
 #if defined(SIMD_MODE)
-    free(irngs2);
-    free(frngs2);
-    free(drngs2);
+    // Clean SPRNG objects
+    delete vrng;
 #endif
+    delete rng;
 
-    free(iseeds);
-    free(m);
- 
     return 0;
 }
 

@@ -89,14 +89,12 @@ int main_gen(int rng_lim)
     printf("Number of streams = %d\n\n", RNG_ELEMS);
 
     // Initial seeds
-    int *iseeds;
-    posix_memalign((void **)&iseeds, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    int iseeds[nstrms];
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
     // Initial multiplier indices 
-    int *m;
-    posix_memalign((void **)&m, SIMD_WIDTH_BYTES, nstrms * sizeof(int));
+    int m[nstrms];
     for (i = 0; i < nstrms; ++i)
         m[i] = i % 7;
 
@@ -120,6 +118,8 @@ int main_gen(int rng_lim)
     for (i = 0; i < RNG_ELEMS; ++i) {
         rng[i] = selectType(RNG_TYPE_NUM);
         rng[i]->init_rng(0, 1, iseeds[i], m[i]);
+		if (!rng[i])
+			return -1;
     }
 
     // Run kernel
@@ -174,7 +174,9 @@ int main_gen(int rng_lim)
 
     // RNG object
     VSPRNG *vrng = selectTypeSIMD(RNG_TYPE_NUM);
-    vrng->init_rng(0, 1, iseeds, m);
+	if (!vrng)
+		return -1;
+    vrng->init_rng(0, 1, iseeds, m, nstrms);
 
     // Run kernel
     startTime(timers);
@@ -235,9 +237,6 @@ int main_gen(int rng_lim)
     // Clean SPRNG objects
     delete vrng;
 #endif // SIMD_MODE
-
-    free(iseeds);
-    free(m);
 
     // Clean SPRNG objects
     for (i = 0; i < RNG_ELEMS; ++i)
