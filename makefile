@@ -120,5 +120,5 @@ asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)
 
 clean:
-	rm -f $(LCG_EXE) $(OBJECTS)
+	rm -rf $(LCG_EXE) $(OBJDIR)
 
