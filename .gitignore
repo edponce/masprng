@@ -9,3 +9,6 @@ tests/test_simd
 obj/
 tests/obj
 html/
+
+# Extra files
+tests/travel_agent.cpp
