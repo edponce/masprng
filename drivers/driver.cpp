@@ -51,7 +51,7 @@
 int main_gen(int);
 
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     if (!detectProcSIMD()) {
         printf("ERROR: current system does not supports requested vector extensions.\n");

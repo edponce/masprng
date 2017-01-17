@@ -60,18 +60,22 @@ DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
 INCDIR := -I. -Iarch -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
+TINCDIR := -I. -Iarch -Isimd -Itests
 
 # Define library paths in addition to /usr/lib
 #LIBDIR := -L/dir1 -L/dir2
 LIBDIR :=
+TLIBDIR :=
 
 # Define libraries to link into executable
 # -lm = math library
 LIBS := -lm
+TLIBS := -lm
 
 # Source files to compile
 #SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
 SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp utils/vutils.cpp check/check.cpp
+TSOURCES := tests/test_simd.cpp
 
 # Set makefile's VPATH to search for target/dependency files, sort to remove duplicates
 VPATH := $(sort $(dir $(SOURCES)))
@@ -79,16 +83,22 @@ VPATH := $(sort $(dir $(SOURCES)))
 # Object files to link
 OBJDIR := obj
 OBJECTS := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SOURCES)))
+TTOPDIR := tests
+TOBJDIR := $(TTOPDIR)/$(OBJDIR)
+TOBJECTS := $(patsubst %.cpp, $(TOBJDIR)/%.o, $(notdir $(TSOURCES)))
 
 # Header files
 # NOTE: allow recompile if changed
 HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h masprng.h simd/*.h primes/primelist_32.h lcg/lcg_globals.h
+THEADERS := $(TSOURCES:.cpp=.h) arch/*.h simd/*.h
 
 # Driver file
 LCG_DRIVER := drivers/driver.cpp
+TEST_DRIVER := $(TTOPDIR)/driver.cpp
 
 # Executable
 LCG_EXE := rng
+TEST_EXE := $(TTOPDIR)/test_simd 
 
 #######################################
 
@@ -97,6 +107,8 @@ LCG_EXE := rng
 
 
 all: $(LCG_EXE)
+
+test: $(TEST_EXE)
 
 # Allows to recompile (useful to vary options using environment variables)
 force:
@@ -112,13 +124,20 @@ $(OBJDIR)/%.o: %.cpp $(HEADERS) $(MKFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
 	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS) 
 
+$(TOBJDIR)/%.o: $(TTOPDIR)/%.cpp $(THEADERS) $(MKFILE)
+	@test ! -d $(TOBJDIR) && mkdir $(TOBJDIR) || true
+	$(CC) $(CFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) -c $< -o $@ $(TLIBS) 
+
 # Link object files
 $(LCG_EXE): $(OBJECTS) $(LCG_DRIVER)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS) 
+
+$(TEST_EXE): $(TOBJECTS) $(TEST_DRIVER)
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(TOBJECTS) $(TLIBS) 
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)
 
 clean:
-	rm -rf $(LCG_EXE) $(OBJDIR)
+	rm -rf $(LCG_EXE) $(OBJDIR) $(TEST_EXE) $(TOBJDIR)
 
