@@ -6,9 +6,10 @@ int main()
 {
     int tval;
 
-    printf("Testing\n");
-
+    printf("SIMD TEST SUITE\n");
     tval = test_simd_loadstore();
+
+    tval = test_spawn();
 
     return tval;
 }

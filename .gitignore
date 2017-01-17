@@ -1,8 +1,11 @@
-# Binary file 
+# Binary files
 rng
+tests/test_simd
 
 # Object files
 *.o
 
 # Documentation
+obj/
+tests/obj
 html/
