@@ -21,11 +21,15 @@ typedef int (*test_handler)();
 test_handler tests[] =
 {
     test_simd_loadstore,
+    test_simd_loadstore,
+    test_simd_loadstore,
+    test_simd_loadstore,
+    test_simd_loadstore,
     test_simd_loadstore
 }; 
 
 
-#define NUM_WORKERS 10
+#define MAX_WORKERS 1 
 
 
 // Pipe management constants
@@ -43,36 +47,37 @@ enum PIPE_PORTS { PIPE_READ_PORT = 0, PIPE_WRITE_PORT, NUM_PIPE_PORTS };
 int test_spawn()
 {
     const int NUM_TESTS = sizeof(tests) / sizeof(test_handler);
+    const int NUM_WORKERS = (MAX_WORKERS > NUM_TESTS) ? (NUM_TESTS) : (MAX_WORKERS);
+    const int CANCEL_TEST = 0;
     int manager_to_worker[NUM_PIPE_PORTS];
     int worker_to_manager[NUM_PIPE_PORTS];
+    pid_t manager_pid, worker_pid, wait_pid;
+    pid_t *workers = NULL;
+    int worker_status;
 
     // Create unnamed pipe for IPC
     if (pipe(manager_to_worker) == -1) {
-        printf("(MANAGER) ERROR: failed to create manager to worker pipe.\n");
+        printf("(MANAGER %d) ERROR: failed to create manager to worker pipe.\n", manager_pid);
         return -1;
     }
     if (pipe(worker_to_manager) == -1) {
-        printf("(MANAGER) ERROR: failed to create worker to manager pipe.\n");
+        printf("(MANAGER %d) ERROR: failed to create worker to manager pipe.\n", manager_pid);
         return -1;
     }
 
     // Spawn pool of worker processes
-    const int CANCEL_TEST = 0;
-    pid_t manager_pid, worker_pid, sync_pid;
-    pid_t workers[NUM_WORKERS];
-    int worker_status;
+    workers = (pid_t *)calloc(NUM_WORKERS, sizeof(pid_t));
     for (int current_worker = 0; current_worker < NUM_WORKERS; ++current_worker) {
 
         worker_pid = fork();
         if (worker_pid < 0) {
-            printf("(MANAGER) ERROR: failed to fork worker #%d.\n", current_worker + 1);
+            printf("(MANAGER %d) ERROR: failed to fork worker #%d.\n", manager_pid, current_worker + 1);
 
             // Cancel all forked worker processes
-            printf("(MANAGER) Cancelling forked workers ...\n");
             for (int previous_worker = current_worker - 1; previous_worker >= 0; --previous_worker) {
                 write(manager_to_worker[PIPE_WRITE_PORT], &CANCEL_TEST, sizeof(int));
-                sync_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
-                printf("(MANAGER) Worker %d cancelled.\n", sync_pid);
+                wait_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
+                printf("(MANAGER %d) Worker %d cancelled.\n", manager_pid, wait_pid);
             }
 
             break; 
@@ -84,140 +89,91 @@ int test_spawn()
         workers[current_worker] = worker_pid;
     }
 
-    int current_test;
-    
     // Worker process
     if (worker_pid == 0) {
+        
+        int current_test;
+        int result_test;
 
         worker_pid = getpid();
-        printf("(WORKER  %d)\n", (int)worker_pid);
+        printf("(WORKER  %d) Active\n", (int)worker_pid);
 
         // Receive test ID from manager
         read(manager_to_worker[PIPE_READ_PORT], &current_test, sizeof(int));
 
-        if (current_test == 0) {
-            printf("(WORKER  %d) cancelled\n", (int)worker_pid);
-            close(worker_to_manager[PIPE_WRITE_PORT]);
-            close(worker_to_manager[PIPE_READ_PORT]);
-            close(manager_to_worker[PIPE_WRITE_PORT]);
-            close(manager_to_worker[PIPE_READ_PORT]);
+        while (current_test > 0) {
+            printf("(WORKER  %d) Running test %d ...\n", (int)worker_pid, current_test);
+
+            // Run test
+            result_test = tests[current_test - 1](); 
+            if (result_test != 0)
+                current_test = -current_test;
+
+            // Send test result ID to manager
+            write(worker_to_manager[PIPE_WRITE_PORT], &current_test, sizeof(int));
+
+            // Receive test ID from manager
+            read(manager_to_worker[PIPE_READ_PORT], &current_test, sizeof(int));
         }
-        else
-            printf("(WORKER  %d) still running\n", (int)worker_pid);
+
+        printf("(WORKER  %d) Cancelled by manager ...\n", (int)worker_pid);
+        close(worker_to_manager[PIPE_WRITE_PORT]);
+        close(worker_to_manager[PIPE_READ_PORT]);
+        close(manager_to_worker[PIPE_WRITE_PORT]);
+        close(manager_to_worker[PIPE_READ_PORT]);
+
+        // Flush C user-space buffers to disk
+        fflush(stdout);
+
+        // Flush kernel buffers to disk
+        fsync(fileno(stdout));
 
         // _exit does not call any functions registered with atexit() or on_exit().
         // Close file descriptors (may flush I/O buffers and remove temporary files)
         _exit(0);
     }
     // Manager process
+    // Distributes tests among workers using a fair approach, FCFS (first-come, first-served)
     else {
-        printf("(MANAGER)  Configuration:\n"); 
-        printf("           Total tests = %d\n", NUM_TESTS);
-        printf("           Total workers = %d\n", NUM_WORKERS);
+        int current_test;
+        int result_test;
 
         manager_pid = getpid();
-        printf("(MANAGER %d)\n", (int)manager_pid);
+        printf("(MANAGER %d) Total tests = %d\n", manager_pid, NUM_TESTS);
+        printf("(MANAGER %d) Total workers = %d\n", manager_pid, NUM_WORKERS);
 
-        // Wait for all forked worker processes
-        printf("(MANAGER) Waiting for forked workers ...\n");
+        // Send test IDs to all workers
+        for (current_test = 1; current_test <= NUM_WORKERS; ++current_test) {
+            write(manager_to_worker[PIPE_WRITE_PORT], &current_test, sizeof(int));
+        }
+
+        // Get test result from a worker
+        // Send a remaining test ID
+        for (; current_test <= NUM_TESTS; ++current_test) {
+            read(worker_to_manager[PIPE_READ_PORT], &result_test, sizeof(int));
+            write(manager_to_worker[PIPE_WRITE_PORT], &current_test, sizeof(int));
+        }
+        
+        // Get test result from all workers
+        // Cancel all workers 
         for (int current_worker = 0; current_worker < NUM_WORKERS; ++current_worker) {
+            read(worker_to_manager[PIPE_READ_PORT], &result_test, sizeof(int));
             write(manager_to_worker[PIPE_WRITE_PORT], &CANCEL_TEST, sizeof(int));
-            sync_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
-            printf("(MANAGER) Worker %d completed.\n", sync_pid);
+        }
+
+        for (int current_worker = 0; current_worker < NUM_WORKERS; ++current_worker) {
+            wait_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
+            printf("(MANAGER %d) Worker %d completed.\n", manager_pid, wait_pid);
         }
     }
-       
-/*    
- 
-    // Worker  PID = 0
-    // Manager PID > 0
-    // NOTE: test IDs begin at 1, so +- ID are symmetric
-    // If successful, +ID
-    // If error, -ID
-    int *complete_tests = NULL;
-    int result_test = 0;
-        // Worker process
-        if (current_worker == 0) {
-            current_worker = getpid();
-            printf("(WORKER %d) ", (int)current_worker);
-
-            // Close pipe ports not used
-            close(manager_to_worker[PIPE_WRITE_PORT]);
-            close(worker_to_manager[PIPE_READ_PORT]); 
-     
-            // Receive test ID from manager
-            read(manager_to_worker[PIPE_READ_PORT], &current_test, sizeof(int));
-            if (current_test != 0) {
-                // Run test
-                result_test = tests[current_test - 1](); 
-
-                // Send test ID of completed run
-                if (result_test == 0)
-                    write(worker_to_manager[PIPE_WRITE_PORT], &current_test, sizeof(int));
-                else {
-                    current_test = -current_test;
-                    write(worker_to_manager[PIPE_WRITE_PORT], &current_test, sizeof(int));
-                }
-            }
-
-            // Close pipe ports not used
-            close(manager_to_worker[PIPE_READ_PORT]);
-            close(worker_to_manager[PIPE_WRITE_PORT]); 
-
-            return 0;
-        }  
-    }
-
-        // Manager process
-    //    else {
-    for (int current_test = 1; current_test <= NUM_TESTS; ++current_test) {
-       
-            // Track worker's PIDs 
-            workers[0] = current_worker; 
-
-            // Close pipe ports not used
-            close(manager_to_worker[PIPE_READ_PORT]);
-            close(worker_to_manager[PIPE_WRITE_PORT]); 
-     
-            complete_tests = (int *)calloc(NUM_TESTS, sizeof(int));
-
-            // Send test ID to worker 
-            write(manager_to_worker[PIPE_WRITE_PORT], &current_test, sizeof(int));
-
-            // Receive test ID from workers
-            read(worker_to_manager[PIPE_READ_PORT], &result_test, sizeof(int));
-            if (result_test == 0)
-                printf("ERROR: the program should never enter here.\n");
-            else if (result_test > 0)
-                complete_tests[result_test - 1] = 1;
-            else
-                complete_tests[-result_test - 1] = 0;
-
-            for (int i = 0; i < NUM_TESTS; ++i) {
-                if (complete_tests[i] > 0)
-                    printf("test %d successful\n", i+1);
-                else
-                    printf("test %d unsuccessful\n", i+1);
-            }
-
-            // Sync worker processes
-            pid_t sync_worker;
-            for (int i = 0; i < NUM_WORKERS; ++i) {
-                //sync_worker = waitpid(workers[i], &worker_status, WUNTRACED | WCONTINUED);
-                sync_worker = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
-                printf("(MANAGER) Worker %d completed successfully.\n", workers[i]);
-            }
-
-            free(complete_tests);
-    //    }
-   // }
-*/
 
     close(worker_to_manager[PIPE_WRITE_PORT]);
     close(worker_to_manager[PIPE_READ_PORT]);
     close(manager_to_worker[PIPE_WRITE_PORT]);
     close(manager_to_worker[PIPE_READ_PORT]);
  
+    free(workers);
+
     return 0;
 }
 
@@ -230,8 +186,10 @@ int test_simd_loadstore()
     int *failed = NULL;
     int *inp_int = NULL;
     int *out_int = NULL;
+    int result_test = 0;
 
-    printf("%s ... ", test_name);
+    pid_t worker_pid = getpid();
+    printf("(WORKER  %d)  %s\n", worker_pid, test_name);
 
     // Create test arrays
     failed = (int *)malloc(SIMD_STREAMS_32 * sizeof(int));
@@ -250,19 +208,25 @@ int test_simd_loadstore()
     simd_store(out_int, v_int);
 
     // Validate test
-    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+    for (int i = 0; i < SIMD_STREAMS_32; ++i) {
         if (inp_int[i] != out_int[i])
             failed[num_failed++] = i;
+    }
 
     // Print results
-    if (num_failed == 0)
-        printf("PASSED\n");
+    if (num_failed == 0) {
+        result_test = 0;
+        //printf("PASSED\n");
+    }
     else {
+        result_test = -1;
+        /*
         printf("FAILED\n");
         printf("\tfailed streams:");
         for (int i = 0; i < num_failed; ++i)
             printf(" %d", failed[i]);
         printf("\n");
+        */
     }
 
     // Free test arrays
@@ -270,7 +234,7 @@ int test_simd_loadstore()
     free(inp_int);
     free(out_int);
 
-    return 0;
+    return result_test;
 }
 
 
