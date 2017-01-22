@@ -41,8 +41,8 @@ enum PIPE_PORTS { PIPE_READ_PORT = 0, PIPE_WRITE_PORT, NUM_PIPE_PORTS };
 
 
 /*!
- *  Create pool of worker processes to run test cases requested.
- *  Tests are available via an array of function pointers.
+ *  Create pool of worker processes to run test cases.
+ *  Tests are accessed via an array of function pointers.
  *
  *  Use pipe for inter-process communication. Pipes provide support
  *  for critical section which is used to control the number of tests
@@ -66,9 +66,12 @@ int test_spawn()
     int test_result;
     int *test_results = NULL;
 
+    manager_pid = getpid();
+
     // Plus 1 since test IDs are offset by 1.
     // Use entry 0 for status of manager process.
     test_results = (int *)malloc((NUM_TESTS + 1) * sizeof(int));
+    test_results[0] = 0;
 
     // Create unnamed pipe for IPC
     if (pipe(manager_to_worker) == -1) {
@@ -116,7 +119,6 @@ int test_spawn()
         free(test_results);
 
         worker_pid = getpid();
-        //printf("(WORKER  %d) Active\n", (int)worker_pid);
 
         // Receive test ID from manager
         read(manager_to_worker[PIPE_READ_PORT], &current_test, sizeof(int));
@@ -136,7 +138,7 @@ int test_spawn()
             read(manager_to_worker[PIPE_READ_PORT], &current_test, sizeof(int));
         }
 
-        //printf("(WORKER  %d) Cancelled by manager\n", (int)worker_pid);
+        // Close pipes
         close(worker_to_manager[PIPE_WRITE_PORT]);
         close(worker_to_manager[PIPE_READ_PORT]);
         close(manager_to_worker[PIPE_WRITE_PORT]);
@@ -155,7 +157,6 @@ int test_spawn()
     // Manager process
     // Distributes tests among workers using a fair approach, FCFS (first-come, first-served)
     else if (worker_pid > 0) {
-        manager_pid = getpid();
         printf("(MANAGER %d) Total tests = %d\n", manager_pid, NUM_TESTS);
         printf("(MANAGER %d) Total workers = %d\n", manager_pid, NUM_WORKERS);
 
@@ -186,8 +187,7 @@ int test_spawn()
             printf("(MANAGER %d) Worker %d completed\n", manager_pid, wait_pid);
         }
 
-        // Dummy value
-        test_results[0] = 0;
+        // Validate test results
         const char *str_result = NULL;
         for (current_test = 1; current_test <= NUM_TESTS; ++current_test) {
             if (test_results[current_test] > 0)
@@ -198,6 +198,7 @@ int test_spawn()
         }
     }
 
+    // Close pipes
     close(worker_to_manager[PIPE_WRITE_PORT]);
     close(worker_to_manager[PIPE_READ_PORT]);
     close(manager_to_worker[PIPE_WRITE_PORT]);
