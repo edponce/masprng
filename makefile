@@ -24,8 +24,8 @@ CC := g++
 # -std= = C/C++ language standard
 SIMDFLAG := -msse4.1
 #SIMDFLAG := -mavx2
-#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
-CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
+#CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
+CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
 # INTEL compiler and linker options
@@ -62,7 +62,7 @@ DEFINES += -D_POSIX_C_SOURCE=200112L
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
 INCDIR := -I. -Iarch -Iinterfaces -Iprimes -Itimers -Ilcg -Iutils -Isimd -Icheck
-TINCDIR := -I. -Iarch -Isimd -Itests
+TINCDIR := -I. -Iarch -Isimd -Itests -Iutils
 
 # Define library paths in addition to /usr/lib
 #LIBDIR := -L/dir1 -L/dir2
@@ -134,8 +134,8 @@ $(TOBJDIR)/%.o: $(TTOPDIR)/%.cpp $(THEADERS) $(MKFILE)
 $(LCG_EXE): $(OBJECTS) $(LCG_DRIVER)
 	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS) 
 
-$(TEST_EXE): $(TOBJECTS) $(TEST_DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(TOBJECTS) $(TLIBS) 
+$(TEST_EXE): $(OBJECTS) $(TOBJECTS) $(TEST_DRIVER)
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(OBJECTS) $(TOBJECTS) $(TLIBS) 
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)

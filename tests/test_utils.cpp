@@ -1,4 +1,4 @@
-#include <stdlib.h>    // posix_memalign
+#include <stdlib.h>    // posix_memalign, rand
 #include <float.h>     // floating-point epsilons
 #include "test_utils.h"
 
@@ -11,7 +11,7 @@ void create_test_array(const int arr_type, void ** const arr, const int num_elem
             posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned int));
             break;
         case TEST_U64:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(long unsigned int));
+            posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned long int));
             break;
         case TEST_I32:
             posix_memalign((void **)arr, alignment, num_elems * sizeof(int));
@@ -30,27 +30,27 @@ void create_test_array(const int arr_type, void ** const arr, const int num_elem
     switch (arr_type) {
         case TEST_U32:
             for (int i = 0; i < num_elems; ++i)
-                ((unsigned int *)*arr)[i] = i + 1;
+                ((unsigned int *)*arr)[i] = rand() % (RAND_MAX-1) + 1;
             break;
         case TEST_U64:
             for (int i = 0; i < num_elems; ++i)
-                ((long unsigned int *)*arr)[i] = i + 1;
+                ((unsigned long int *)*arr)[i] = rand() % (RAND_MAX-1) + 1;
             break;
         case TEST_I32:
             for (int i = 0; i < num_elems; ++i)
-                ((int *)*arr)[i] = i - num_elems/2;
+                ((int *)*arr)[i] = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
             break;
         case TEST_I64:
             for (int i = 0; i < num_elems; ++i)
-                ((long int *)*arr)[i] = i - num_elems/2;
+                ((long int *)*arr)[i] = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
             break;
         case TEST_FLT:
             for (int i = 0; i < num_elems; ++i)
-                ((float *)*arr)[i] = i * 3.14;
+                ((float *)*arr)[i] = ((rand() % (RAND_MAX-1) + 1) - RAND_MAX/2) / (float)RAND_MAX;
             break;
         case TEST_DBL:
             for (int i = 0; i < num_elems; ++i)
-                ((double *)*arr)[i] = i * 3.14;
+                ((double *)*arr)[i] = ((rand() % (RAND_MAX-1) + 1) - RAND_MAX/2) / (float)RAND_MAX;
     }
 }
 
@@ -68,7 +68,7 @@ int validate_test_arrays(const int arr_type, const void * const arr1, const void
             break;
         case TEST_U64:
             for (int i = 0; i < num_elems; ++i)
-                if (((long unsigned int *)arr1)[i] != ((long unsigned int *)arr2)[i])
+                if (((unsigned long int *)arr1)[i] != ((unsigned long int *)arr2)[i])
                     num_failed++;
             break;
         case TEST_I32:

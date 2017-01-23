@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>    // malloc, abs
+#include <stdlib.h>    // malloc, abs, srand
+#include <time.h>      // time
 #include <sys/types.h> // wait
 #include <sys/wait.h>  // wait
 #include <errno.h>     // errno
@@ -14,6 +15,9 @@ int main()
     int retval = 0;
     const int NUM_TESTS = sizeof(TESTS) / sizeof(struct TEST_T);
     const int NUM_WORKERS = (MAX_WORKERS > NUM_TESTS) ? (NUM_TESTS) : (MAX_WORKERS);
+
+    // Seed RNG
+    srand(time(NULL));
 
     printf("SIMD TEST SUITE\n");
     retval = test_suite(TESTS, NUM_TESTS, NUM_WORKERS);
@@ -117,7 +121,7 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
        
         // Validate test ID
         if (current_test > 0 && current_test <= num_tests) {
-            printf("(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+            //printf("(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
 
             // Run test
             const int test_result = tests[current_test - 1].test_func(); 

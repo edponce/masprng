@@ -242,14 +242,35 @@ SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_unpackhi_pd(va, vb); }
 
 /*!
- *  Pack and merge a pair of registers
+ *  Pack and merge the low 32-bits of 64-bit integers
+ *  from a pair of registers.
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
-    const SIMD_INT va_pk = _mm_shuffle_epi32(va, 0x58); // pack va
-    const SIMD_INT vb_pk = _mm_shuffle_epi32(vb, 0x85); // pack vb
-    return _mm_or_si128(va_pk, vb_pk); // merge
+    // Mask unused elements
+    const SIMD_INT vmsk = _mm_set_epi32(0x0, 0xFFFFFFFF, 0x0, 0xFFFFFFFF);
+    SIMD_INT va_pk = _mm_and_si128(va, vmsk);
+    SIMD_INT vb_pk = _mm_and_si128(vb, vmsk);
+
+    // Pack registers
+    va_pk = _mm_shuffle_epi32(va_pk, 0x58);
+    vb_pk = _mm_shuffle_epi32(vb_pk, 0x85);
+
+    // Merge
+    return _mm_or_si128(va_pk, vb_pk);
+
+/*
+    // This implementation requires that the input vectors
+    // already have to be of the form [#, 0, #, 0 ...]
+
+    // Pack registers
+    const SIMD_INT va_pk = _mm_shuffle_epi32(va, 0x58);
+    const SIMD_INT vb_pk = _mm_shuffle_epi32(vb, 0x85);
+
+    // Merge
+    return _mm_or_si128(va_pk, vb_pk);
+*/
 }
 
 
