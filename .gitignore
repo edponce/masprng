@@ -1,6 +1,6 @@
 # Binary files
 rng
-tests/test_simd
+testsuite
 
 # Object files
 *.o
@@ -11,4 +11,3 @@ tests/obj
 html/
 
 # Extra files
-tests/travel_agent.cpp

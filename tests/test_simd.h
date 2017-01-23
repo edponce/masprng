@@ -7,7 +7,7 @@
 
 
 int test_simd_loadstore();
-int test_spawn();
+int test_simd_fmadd();
 
 
 #endif // SIMD_MODE

@@ -41,6 +41,7 @@ LFLAGS :=
 # -DDEBUG = enable debugging
 #
 # -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
+# -D_POSIX_C_SOURCE=200112L
 #
 # -DOMP_NUM_THREADS=x = number of OpenMP threads
 # -DOMP_NESTED=TRUE = enables nested parallelism
@@ -56,6 +57,7 @@ DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
 #DEFINES := -DAVX512_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
 #DEFINES := -DAVX512_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
+DEFINES += -D_POSIX_C_SOURCE=200112L
 
 # Define header paths in addition to /usr/include
 #INCDIR := -I/dir1 -I/dir2
@@ -75,7 +77,7 @@ TLIBS := -lm
 # Source files to compile
 #SOURCES := lcg/lcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp check/check.cpp
 SOURCES := lcg/lcg.cpp lcg/vlcg.cpp primes/primes_32.cpp timers/timers.cpp utils/utils.cpp utils/vutils.cpp check/check.cpp
-TSOURCES := tests/test_simd.cpp
+TSOURCES := tests/test_simd.cpp tests/test_utils.cpp
 
 # Set makefile's VPATH to search for target/dependency files, sort to remove duplicates
 VPATH := $(sort $(dir $(SOURCES)))
@@ -90,15 +92,15 @@ TOBJECTS := $(patsubst %.cpp, $(TOBJDIR)/%.o, $(notdir $(TSOURCES)))
 # Header files
 # NOTE: allow recompile if changed
 HEADERS := $(SOURCES:.cpp=.h) arch/*.h interfaces/*.h masprng.h simd/*.h primes/primelist_32.h lcg/lcg_globals.h
-THEADERS := $(TSOURCES:.cpp=.h) arch/*.h simd/*.h
+THEADERS := $(TSOURCES:.cpp=.h) arch/*.h simd/*.h $(TTOPDIR)/test_suite.h
 
 # Driver file
 LCG_DRIVER := drivers/driver.cpp
-TEST_DRIVER := $(TTOPDIR)/driver.cpp
+TEST_DRIVER := $(TTOPDIR)/test_suite.cpp
 
 # Executable
 LCG_EXE := rng
-TEST_EXE := $(TTOPDIR)/test_simd 
+TEST_EXE := $(TTOPDIR)/testsuite 
 
 #######################################
 
