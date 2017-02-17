@@ -32,6 +32,7 @@ struct TEST_T TESTS[] =
 
 
 #define MAX_WORKERS 4 
+#define MAX_RUNS_PER_TEST 10 
 
 
 int test_suite(const struct TEST_T * const, const int, const int);

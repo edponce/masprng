@@ -34,7 +34,9 @@ int main()
 
 // Pipe management constants
 enum PIPE_PORTS { PIPE_READ_PORT = 0, PIPE_WRITE_PORT, NUM_PIPE_PORTS };
-enum PIPE_MSGS { CANCEL_TEST = 0 };
+// NOTE: Both have to be 0 because of no-sign property and used as accumulator
+// NOTE: need to move this somewhere accessible for everyone
+enum PIPE_MSGS { FAILED_TEST = -1, CANCEL_TEST = 0, SUCCESS_TEST = 0 };
 
 
 /*!
@@ -124,10 +126,12 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
             //printf("(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
 
             // Run test
-            const int test_result = tests[current_test - 1].test_func(); 
+            int test_result = SUCCESS_TEST;
+            for (int i = 0; i < MAX_RUNS_PER_TEST; ++i)
+                test_result += tests[current_test - 1].test_func(); 
 
             // Validate test
-            if (test_result != 0) {
+            if (test_result != SUCCESS_TEST) {
                 printf("(WORKER  %d) FAILED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
                 current_test = -current_test;
             }
@@ -159,7 +163,7 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
     // Plus 1 since test IDs are offset by 1.
     // Use entry 0 for status of manager process.
     int *test_results = (int *)malloc((num_tests + 1) * sizeof(int));
-    test_results[0] = 0;
+    test_results[0] = SUCCESS_TEST;
 
     printf("(MANAGER %d) Total tests = %d\n", manager_pid, num_tests);
     printf("(MANAGER %d) Total workers = %d\n", manager_pid, num_workers);
