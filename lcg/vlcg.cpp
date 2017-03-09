@@ -89,13 +89,13 @@ VLCG::VLCG()
  */
 VLCG::~VLCG()
 {
-    if (init_seed) free(init_seed);
-    if (parameter) free(parameter);
-    if (prime) free(prime);
-    if (seed) free(seed);
-    if (multiplier) free(multiplier);
-    if (strm_mask32) free(strm_mask32);
-    if (strm_mask64) free(strm_mask64);
+    simd_free(&init_seed);
+    simd_free(&parameter);
+    simd_free(&prime);
+    simd_free(&seed);
+    simd_free(&multiplier);
+    simd_free(&strm_mask32);
+    simd_free(&strm_mask64);
 
     --LCG_NGENS;
 }
@@ -236,7 +236,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
             mask32[strm] = 0x00000000;
 
         strm_mask32[0] = simd_set(&mask32[0], SIMD_STREAMS_32);
-        if (mask32) free(mask32);
+        scalar_free(&mask32);
     } 
     
     // Activate 64-bit global output masks, only if not using maximum number of streams
@@ -252,7 +252,7 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
 
         strm_mask64[0] = simd_set(&mask64[0], SIMD_STREAMS_64);
         strm_mask64[1] = simd_set(&mask64[SIMD_STREAMS_64], SIMD_STREAMS_64);
-        if (mask64) free(mask64);
+        scalar_free(&mask64);
     } 
 
 #if defined(LONG_SPRNG)
@@ -329,8 +329,8 @@ int VLCG::init_rng(int gn, int tg, const int * const gs, const int * const gm, c
     for (int i = 0; i < (GLOBALS.LCG_RUNUP * prime_position); ++i)
         get_rn_dbl();
  
-    if (m) free(m);
-    if (s) free(s);
+    scalar_free(&m);
+    scalar_free(&s);
 
     return 0;
 }

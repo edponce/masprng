@@ -3,7 +3,6 @@
 
 
 #include <stdio.h>
-#include "vutils.h"   // simd_print
 #include "test_utils.h"
 #include "test_simd.h"
 

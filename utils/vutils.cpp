@@ -89,6 +89,69 @@ int simd_malloc(SIMD_DBL ** const va, const size_t align, const size_t nelems)
 }
 
 
+void scalar_free(int ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void scalar_free(unsigned int ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void scalar_free(long int ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void scalar_free(unsigned long int ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void scalar_free(float ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void scalar_free(double ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void simd_free(SIMD_INT ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void simd_free(SIMD_FLT ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
+void simd_free(SIMD_DBL ** const va)
+{
+    if (va) free(*va);
+    *va = NULL;
+}
+
+
 void simd_print(const char * const str, const SIMD_INT va)
 {
     int itmp[SIMD_STREAMS_32] __SIMD_ALIGN__;

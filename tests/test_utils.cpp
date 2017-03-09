@@ -5,26 +5,30 @@
 
 void create_test_array(const int arr_type, void ** const arr, const int num_elems, const int alignment)
 {
+    int mflag = -1;
+
     // Array allocation
     switch (arr_type) {
         case TEST_U32:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned int));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned int));
             break;
         case TEST_U64:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned long int));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(unsigned long int));
             break;
         case TEST_I32:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(int));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(int));
             break;
         case TEST_I64:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(long int));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(long int));
             break;
         case TEST_FLT:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(float));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(float));
             break;
         case TEST_DBL:
-            posix_memalign((void **)arr, alignment, num_elems * sizeof(double));
+            mflag = posix_memalign((void **)arr, alignment, num_elems * sizeof(double));
     }
+
+    if (mflag) return;
 
     // Array initialization
     switch (arr_type) {
