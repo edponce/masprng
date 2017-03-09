@@ -69,23 +69,23 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb) __VSPRNG_REQUIRED__
  */
 #if defined(__FMA__)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 { return _mm256_fmadd_ps(va, vb, vc); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm256_fmadd_pd(va, vb, vc); }
 
 #else
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
 	const SIMD_FLT vab = _mm256_mul_ps(va, vb);
 	return _mm256_add_ps(vab, vc);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
 	const SIMD_DBL vab = _mm256_mul_pd(va, vb);
 	return _mm256_add_pd(vab, vc);
@@ -97,7 +97,7 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
  *  and store the unsigned 64-bit results 
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_mul_epu32(va, vb); }
 
 /*!
@@ -106,7 +106,7 @@ SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
  *  NOTE: requires at least AVX2 for _mm256_mul_epi32()
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_mul_epi32(va, vb); }
 
 /*!
@@ -123,8 +123,8 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 
     vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier 
     vhi = _mm256_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
-    vtmp = _mm256_slli_epi64(vhi, 0x20);   // shift << 32 
-    vhi = _mm256_add_epi64(vhi, vtmp);     // h = h1 + h2 
+    vtmp = _mm256_slli_epi64(vhi, 0x20);   // shift << 32
+    vhi = _mm256_add_epi64(vhi, vtmp);     // h = h1 + h2
     vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
     vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
 
@@ -173,7 +173,7 @@ SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
     SIMD_INT va_int = _mm256_castpd_si256(va);
     va_int = _mm256_and_si256(va_int, vb);
@@ -219,7 +219,7 @@ SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl) 
  *  into a single register
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
 {
     const __m128i vb_lo = _mm256_castsi256_si128(vb);
     return _mm256_inserti128_si256(va, vb_lo, 0x1);
@@ -233,7 +233,7 @@ SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb) __VSPRNG_REQUIRED__
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb) 
+SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
 {
     const __m128d vb_lo = _mm256_castpd256_pd128(vb);
     return _mm256_insertf128_pd(va, vb_lo, 0x1);
@@ -421,7 +421,7 @@ SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
     unsigned long int sa_ul[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
     unsigned long int *sa_ul_ptr = sa_ul;
     float sa_flt[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    float *sa_flt_ptr = sa_flt; 
+    float *sa_flt_ptr = sa_flt;
 
     _mm256_store_si256((SIMD_INT *)sa_ul, va);
 
@@ -446,7 +446,7 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
     unsigned long int sa_ul[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
     unsigned long int *sa_ul_ptr = sa_ul;
     double sa_dbl[SIMD_STREAMS_64] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
-    double *sa_dbl_ptr = sa_dbl; 
+    double *sa_dbl_ptr = sa_dbl;
 
     _mm256_store_si256((SIMD_INT *)sa_ul, va);
 
