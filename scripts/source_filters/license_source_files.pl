@@ -74,7 +74,8 @@ sub licenseFile {
     close $fh;
 
     if (! $check) {
-        if (! $mflag) {
+        # Add new license
+        if (! $mflag and ! $remove) {
             # Load license
             open my $lh, '<', $license or die "ERROR! failed to open $license: $!\n";
             my @lines = <$lh>;
@@ -94,6 +95,7 @@ sub licenseFile {
             }
             close $fh;
         }
+        # Remove existing license
         elsif ($mflag and $remove) {
             # Load file
             open $fh, '<', $file or die "ERROR! failed to open $file: $!\n";
