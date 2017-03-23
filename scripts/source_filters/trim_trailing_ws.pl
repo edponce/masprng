@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Getopt::Long;
 use File::Basename;
-use Cwd;
 
 
 # Command line arguments
@@ -13,14 +12,14 @@ my $help = '';
 my $check = '';
 my @infiles;
 my @roots;
-GetOptions("help"    => \$help,
-           "check"   => \$check,
-           "file=s"  => \@infiles,
-           "dir=s"   => \@roots
+GetOptions("help"   => \$help,
+           "check"  => \$check,
+           "file=s" => \@infiles,
+           "dir=s"  => \@roots
           ) or $invalid = 1;
-$invalid = 1 if scalar @ARGV;
+$invalid = 1 if scalar @ARGV;  # catch invalid options without '-' or '--'
 if ($invalid) {
-    print "Unknown option: $_\n" for @ARGV;
+    warn "Unknown option: $_\n" for @ARGV;
     usage();
     exit 0;
 }
@@ -67,7 +66,7 @@ sub processFile {
     my @lines;
     while (<$fh>) {
         my $flag = trim $_;
-        $mflag |= $flag;
+        $mflag = 1 if $flag;
         warn "$file: $.: $_" if $flag;
         push @lines, $_;
     }
@@ -121,4 +120,6 @@ elsif (@roots) {
 else {
     usage();
 }
+
+exit 0;
 
