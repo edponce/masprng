@@ -9,14 +9,16 @@ use File::Basename;
 # Command line arguments
 my $invalid = 0;
 my $help = '';
-my $check = '';
+my $add = '';
 my $remove = '';
+my $overwrite = '';
 my $license = '';
 my @infiles;
 my @roots;
 GetOptions("help"      => \$help,
-           "check"     => \$check,
+           "add"       => \$add,
            "remove"    => \$remove,
+           "overwrite" => \$overwrite,
            "license=s" => \$license,
            "file=s"    => \@infiles,
            "dir=s"     => \@roots
@@ -36,7 +38,7 @@ elsif ($help) {
 # Print script usage
 sub usage {
     print "\n",
-    basename($0), " [--help] [--check] [--remove] [--license=file.lic] [--file=input.cpp | --dir=input/]\n\n",
+    basename($0), " [--help] [--add] [--remove] [--overwrite] [--license=file.lic] [--file=input.cpp | --dir=input/]\n\n",
     "\tAdd/remove license to/from source files.\n",
     "\tLicense should be given as a file.\n",
     "\tIf a file is provided, it can be of any type.\n",
@@ -65,95 +67,85 @@ sub licenseFile {
     my $lcount = 0;  # count lines used by license, if existing
     while (<$fh>) {
         $mflag |= hasLicense $_;
-        warn "$file: $.: $_" if $mflag;
         last if ! $mflag and $. == 5;
         last if ! /^\/\//;  # all license lines are single line comments
         $lcount++;
     }
-    $lcount = 0 if ! $mflag;
     close $fh;
 
-    if (! $check) {
-        # Add new license
-        if (! $mflag and ! $remove) {
-            # Load license
-            open my $lh, '<', $license or die "ERROR! failed to open $license: $!\n";
-            my @lines = <$lh>;
-            close $lh;
+    $lcount = 0 if ! $mflag;
 
-            # Load file
-            open $fh, '<', $file or die "ERROR! failed to open $file: $!\n";
-            while (<$fh>) {
-                push @lines, $_;
-            }
-            close $fh;
+    # Print file status
+    print "$file: ", ($mflag ? "YES" : "NO"), " license with $lcount lines.\n";
 
-            # Overwrite file
-            open $fh, '>', $file or die "ERROR! failed to open $file: $!\n";
-            foreach (@lines) {
-                print $fh $_;
-            }
-            close $fh;
+    return if (! $add and ! $remove and ! $overwrite);
+    return if ($mflag and $add);
+    return if (! $mflag and $remove);
+
+    # Load new license
+    my @lines;
+    #if ((! $mflag and $add) or $overwrite) {
+    if ($add or $overwrite) {
+        open my $lh, '<', $license or die "ERROR! failed to open $license: $!\n";
+        while (<$lh>) {
+            push @lines, $_;
         }
-        # Remove existing license
-        elsif ($mflag and $remove) {
-            # Load file
-            open $fh, '<', $file or die "ERROR! failed to open $file: $!\n";
-            my @lines;
-            while (<$fh>) {
-                next if $. <= $lcount;  # skip existing license 
-                push @lines, $_;
-            }
-            close $fh;
-
-            # Overwrite file
-            open $fh, '>', $file or die "ERROR! failed to open $file: $!\n";
-            foreach (@lines) {
-                print $fh $_;
-            }
-            close $fh;
-        }
+        close $lh;
     }
+
+    # Remove existing license
+    # Load file
+    #if ($mflag and ($remove or $overwrite)) {
+    #if ($remove or $overwrite) {
+        open $fh, '<', $file or die "ERROR! failed to open $file: $!\n";
+        while (<$fh>) {
+            next if $mflag and $. <= $lcount;  # skip existing license 
+            push @lines, $_;
+        }
+        close $fh;
+    #}
+
+    # Overwrite file
+    open $fh, '>', $file or die "ERROR! failed to open $file: $!\n";
+    foreach (@lines) {
+        print $fh $_;
+    }
+    close $fh;
 }
 
 
 ########
 # Main #
 ########
-if ($license and -f $license) {
-    if (@infiles) {
-        # Process files
-        foreach (@infiles) {
-            next if /^\./;  # ignore anything that starts with '.'
-            licenseFile $_ if -f;
-        }
+if (@infiles) {
+    # Process files
+    foreach (@infiles) {
+        next if /^\./;  # ignore anything that starts with '.'
+        licenseFile $_ if -f;
     }
-    elsif (@roots) {
-        # Traverse entire directory trees
-        # Select source files only for processing
-        foreach my $root (@roots) {
-            my @dirs = ($root);
-            while (my $dir = shift @dirs) {
-                opendir DIR, $dir or die "ERROR! failed to open $dir: $!\n";
-                my @files = readdir DIR;
-                closedir DIR;
+}
+elsif (@roots) {
+    # Traverse entire directory trees
+    # Select source files only for processing
+    foreach my $root (@roots) {
+        my @dirs = ($root);
+        while (my $dir = shift @dirs) {
+            opendir DIR, $dir or die "ERROR! failed to open $dir: $!\n";
+            my @files = readdir DIR;
+            closedir DIR;
 
-                foreach (@files) {
-                    next if /^\./;  # ignore anything that starts with '.'
+            foreach (@files) {
+                next if /^\./;  # ignore anything that starts with '.'
 
-                    my $file = "$dir/$_";
-                    if (-d $file) {
-                        push @dirs, $file;
-                    }
-                    elsif (-f $file) {
-                        licenseFile $file if $file =~ /(\.cpp|\.h)$/;
-                    }
+                my $file = "$dir/$_";
+                if (-d $file) {
+                    push @dirs, $file;
+                }
+                elsif (-f $file) {
+                    licenseFile $file if $file =~ /(\.cpp|\.h)$/;
                 }
             }
         }
-    }
-    else {
-        usage();
     }
 }
 else {
