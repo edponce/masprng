@@ -1,0 +1,13 @@
+#! /bin/bash
+
+EXE=(
+lcg
+lcg64
+)
+
+for t in ${EXE[@]}; do
+    echo
+    echo $t: Timing C++ interface:
+    ./time_$t 2> /dev/null
+done
+

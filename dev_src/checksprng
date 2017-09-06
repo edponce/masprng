@@ -1,0 +1,13 @@
+#! /bin/bash
+
+EXE=(
+lcg
+lcg64
+)
+
+for t in ${EXE[@]}; do
+    echo
+    echo $t: Checking Default C++ interface:
+    ./main_$t < $t/$t.data 2> /dev/null
+done
+

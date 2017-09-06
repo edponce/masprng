@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: build/epm_sprng.aux
+The style file: IEEEtran.bst
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: IEEEabrv.bib
+Database file #2: sprng.bib
+-- IEEEtran.bst version 1.12 (2007/01/11) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Warning--empty journal in lee2007trace
+
+Done.
+You've used 10 entries,
+            4024 wiz_defined-function locations,
+            1233 strings with 16050 characters,
+and the built_in function-call counts, 6783 in all, are:
+= -- 540
+> -- 157
+< -- 50
++ -- 84
+- -- 28
+* -- 332
+:= -- 1047
+add.period$ -- 21
+call.type$ -- 10
+change.case$ -- 9
+chr.to.int$ -- 108
+cite$ -- 11
+duplicate$ -- 502
+empty$ -- 568
+format.name$ -- 37
+if$ -- 1542
+int.to.chr$ -- 0
+int.to.str$ -- 10
+missing$ -- 88
+newline$ -- 53
+num.names$ -- 10
+pop$ -- 208
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 532
+stack$ -- 0
+substring$ -- 265
+swap$ -- 385
+text.length$ -- 14
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 10
+warning$ -- 1
+while$ -- 27
+width$ -- 12
+write$ -- 114
+(There was 1 warning)
