@@ -1,13 +1,7 @@
-# Binary files
+*.swp
+*.o
 rng
 testsuite
-
-# Object files
-*.o
-
-# Documentation
 obj/
-tests/obj
+tests/obj/
 html/
-
-# Extra files
