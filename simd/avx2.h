@@ -119,7 +119,7 @@ __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 {
     const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vtmp, vh, vl;
+    SIMD_INT vtmp, vhi, vlo;
 
     vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier 
     vhi = _mm256_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
