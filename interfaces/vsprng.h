@@ -22,7 +22,7 @@ enum VSPRNG_TYPE
 
 
 /*! \class VSPRNG
- *  \brief Interface (abstract base class) for SIMD RNG types. 
+ *  \brief Interface (abstract base class) for SIMD RNG types.
  *
  *  Methods that are virtual require each class for RNG types to define these methods.
  */

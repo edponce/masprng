@@ -12,12 +12,12 @@
     #define ARCH_ATTR_ALIGNED(a)     __attribute__((aligned(a)))
     #define ARCH_ASSUME_ALIGNED(a,x) __assume_aligned(a, x)
     #define ARCH_ASSUME(a)           __assume(a)
-    #define ARCH_ATTR_INLINE               
+    #define ARCH_ATTR_INLINE
 #else
     #define ARCH_ATTR_ALIGNED(a)
     #define ARCH_ASSUME_ALIGNED(a,x)
     #define ARCH_ASSUME(a)
-    #define ARCH_ATTR_INLINE               
+    #define ARCH_ATTR_INLINE
 #endif
 
 

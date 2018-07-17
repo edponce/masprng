@@ -23,27 +23,27 @@
 
 #if TEST == 0
 #define RNG_TYPE_STR "Integer"
-#define RNG_TYPE int 
+#define RNG_TYPE int
 #define get_rn() get_rn_int()
-#define VRNG_TYPE SIMD_INT 
+#define VRNG_TYPE SIMD_INT
 #define RNG_FMT "%d"
-#define RNG_ELEMS SIMD_STREAMS_32 
+#define RNG_ELEMS SIMD_STREAMS_32
 #define RNG_NEQ(a,b) (a != b)
 #elif TEST == 1
 #define RNG_TYPE_STR "Float"
-#define RNG_TYPE float 
+#define RNG_TYPE float
 #define get_rn() get_rn_flt()
-#define VRNG_TYPE SIMD_FLT 
+#define VRNG_TYPE SIMD_FLT
 #define RNG_FMT "%f"
 #define RNG_ELEMS SIMD_STREAMS_32
 #define RNG_NEQ(a,b) (fabs(a-b) > FLT_EPSILON)
-#else 
+#else
 #define RNG_TYPE_STR "Double"
 #define RNG_TYPE double
 #define get_rn() get_rn_dbl()
-#define VRNG_TYPE SIMD_DBL 
+#define VRNG_TYPE SIMD_DBL
 #define RNG_FMT "%f"
-#define RNG_ELEMS SIMD_STREAMS_64 
+#define RNG_ELEMS SIMD_STREAMS_64
 #define RNG_NEQ(a,b) (fabs(a-b) > DBL_EPSILON)
 #endif
 
@@ -93,7 +93,7 @@ int main_gen(int rng_lim)
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
-    // Initial multiplier indices 
+    // Initial multiplier indices
     int m[nstrms];
     for (i = 0; i < nstrms; ++i)
         m[i] = i % 7;
@@ -137,7 +137,7 @@ int main_gen(int rng_lim)
     }
     t1 = stopTime(timers);
 
-    // Print results 
+    // Print results
     printf("gen nums %d\n", rng[RNG_ELEMS-1]->get_ngens());
     printf("Scalar real time = %.16f sec\n", t1);
     for (i = 0; i < RNG_ELEMS; ++i)
@@ -184,7 +184,7 @@ int main_gen(int rng_lim)
         vrngs = vrng->get_rn();
     t2 = stopTime(timers);
 
-    // Print results 
+    // Print results
 # if defined(DEBUG)
     simd_storeu(primes2, vrng->get_prime());
     simd_storeu(seeds2, vrng->get_seed());
@@ -198,7 +198,7 @@ int main_gen(int rng_lim)
 
     printf("gen nums %d\n", vrng->get_ngens());
     printf("Vector real time = %.16f sec\n", t2);
-    for (i = 0; i < RNG_ELEMS; ++i) 
+    for (i = 0; i < RNG_ELEMS; ++i)
 # if defined(DEBUG)
 #   if defined(LONG_SPRNG)
         printf("vector = " RNG_FMT "\t%lu\t%lu\t%d\n", rngs2[i], seeds2[i], mults2[i], primes2[i]);
@@ -217,7 +217,7 @@ int main_gen(int rng_lim)
 
     // Validate run
     int valid = 1;
-    for (i = 0; i < RNG_ELEMS; ++i) { 
+    for (i = 0; i < RNG_ELEMS; ++i) {
 # if defined(DEBUG)
         if (RNG_NEQ(rngs[i], rngs2[i]) || RNG_NEQ(seeds[i], seeds2[i])) {
 # else

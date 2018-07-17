@@ -5,8 +5,8 @@
 #include "sprng.h"
 
 
-/*! \class LCG 
- *  \brief Class for linear congruential RNG. 
+/*! \class LCG
+ *  \brief Class for linear congruential RNG.
  */
 class LCG: public SPRNG
 {

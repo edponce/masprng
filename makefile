@@ -22,7 +22,7 @@ CC := g++
 # -fopenmp, -fopenmp-simd = enable OpenMP
 # -pthread = enable pthreads
 # -std= = C/C++ language standard
-SIMDFLAG := -msse4.1
+#SIMDFLAG := -msse4.1
 #SIMDFLAG := -mavx2
 #CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
 CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
@@ -49,8 +49,8 @@ LFLAGS :=
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG  # scalar mode
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
-#DEFINES := -DSIMD_MODE
-DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
+DEFINES := -DSIMD_MODE
+#DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
 #DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
 #DEFINES := -DAVX2_SPRNG
@@ -100,7 +100,7 @@ TEST_DRIVER := $(TTOPDIR)/test_suite.cpp
 
 # Executable
 LCG_EXE := rng
-TEST_EXE := $(TTOPDIR)/testsuite 
+TEST_EXE := $(TTOPDIR)/testsuite
 
 #######################################
 
@@ -114,7 +114,7 @@ test: $(TEST_EXE)
 
 # Allows to recompile (useful to vary options using environment variables)
 force:
-	@touch $(MKFILE) 
+	@touch $(MKFILE)
 	@$(MAKE) -f $(MKFILE)
 
 debug:
@@ -124,18 +124,18 @@ debug:
 # NOTE: HEADERS and MKFILE are placed here to allow recompilation after their modification
 $(OBJDIR)/%.o: %.cpp $(HEADERS) $(MKFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS) 
+	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 $(TOBJDIR)/%.o: $(TTOPDIR)/%.cpp $(THEADERS) $(MKFILE)
 	@test ! -d $(TOBJDIR) && mkdir $(TOBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) -c $< -o $@ $(TLIBS) 
+	$(CC) $(CFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) -c $< -o $@ $(TLIBS)
 
 # Link object files
 $(LCG_EXE): $(OBJECTS) $(LCG_DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS) 
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS)
 
 $(TEST_EXE): $(OBJECTS) $(TOBJECTS) $(TEST_DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(OBJECTS) $(TOBJECTS) $(TLIBS) 
+	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(OBJECTS) $(TOBJECTS) $(TLIBS)
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)

@@ -9,7 +9,7 @@
 #include "vsprng.h"
 
 
-/*! \class VLCG 
+/*! \class VLCG
  *  \brief Class for SIMD linear congruential RNG.
  */
 class VLCG: public VSPRNG
@@ -37,7 +37,7 @@ class VLCG: public VSPRNG
 #endif
 
   private:
-    const char *gentype;    
+    const char *gentype;
     int32_t rng_type;
     int32_t prime_position;
     int32_t prime_next;

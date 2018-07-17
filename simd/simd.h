@@ -44,7 +44,7 @@
 
 
 /*
- *  Compiler and architecture specific settings 
+ *  Compiler and architecture specific settings
  */
 #include "arch.h"
 

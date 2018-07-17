@@ -3,7 +3,7 @@
 
 
 /*
- *  Compiler and architecture specific settings 
+ *  Compiler and architecture specific settings
  */
 #include "arch.h"
 
@@ -17,20 +17,20 @@
 
 
 /*
- *  AVX512 512-bit wide vector units 
+ *  AVX512 512-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
 #define SIMD_INT __m512i
 #define SIMD_FLT __m512
 #define SIMD_DBL __m512d
-#define SIMD_WIDTH_BYTES 64 
-#define SIMD_STREAMS_32  16 
-#define SIMD_STREAMS_64  8 
+#define SIMD_WIDTH_BYTES 64
+#define SIMD_STREAMS_32  16
+#define SIMD_STREAMS_64  8
 
 
 #define __VSPRNG_REQUIRED__                  // identifies SIMD functions required for VSPRNG
 #define __SIMD_FUN_ATTR__   ARCH_ATTR_INLINE // force inline when no optimizations
-#define __SIMD_FUN_PREFIX__ inline static 
+#define __SIMD_FUN_PREFIX__ inline static
 
 
 /*
@@ -38,7 +38,7 @@
  *
  *  simd_*_iXX = signed XX-bit integers
  *  simd_*_uXX = unsigned XX-bit integers
- *  simd_*_fXX = floating-point XX-bit elements 
+ *  simd_*_fXX = floating-point XX-bit elements
  *  simd_*_XX  = unsigned/signed XX-bit integers
  *  simd_*_XX  = (set functions) specifies width to consider for integer types
  *  simd_*     = datatype obtained from function overloading and parameters
@@ -69,23 +69,23 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb) __VSPRNG_REQUIRED__
  */
 #if defined(__FMA__)
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 { return _mm512_fmadd_ps(va, vb, vc); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm512_fmadd_pd(va, vb, vc); }
 
 #else
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc) 
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
 	const SIMD_FLT vab = _mm512_mul_ps(va, vb);
 	return _mm512_add_ps(vab, vc);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc) 
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
 	const SIMD_DBL vab = _mm512_mul_pd(va, vb);
 	return _mm512_add_pd(vab, vc);
@@ -94,18 +94,18 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 
 /*!
  *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
- *  and store the unsigned 64-bit results 
+ *  and store the unsigned 64-bit results
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm512_mul_epu32(va, vb); }
 
 /*!
  *  Multiply low signed 32-bit integers from each packed 64-bit elements
- *  and store the signed 64-bit results 
+ *  and store the signed 64-bit results
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm512_mul_epi32(va, vb); }
 
 /*!
@@ -118,7 +118,7 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 { return _mm512_mullo_epi64(va, vb); }
 
 /*!
- *  Multiply packed 32-bit integers, produce intermediate 64-bit integers, 
+ *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
  *  and store the low 32-bit results
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -146,20 +146,20 @@ SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 { return _mm512_xor_si512(va, vb); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 { return _mm512_and_si512(va, vb); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 { return _mm512_and_ps(va, vb); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__ 
+SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 { return _mm512_and_pd(va, vb); }
 
 
 /*****************************
- *  Shift/Shuffle intrinsics 
+ *  Shift/Shuffle intrinsics
  *****************************/
 /*
  *  Shift left (logical) packed 32/64-bit integers
@@ -169,7 +169,7 @@ SIMD_INT simd_sll_32(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
 { return _mm512_slli_epi32(va, (unsigned int)shft); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_srl_32(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__ 
+SIMD_INT simd_srl_32(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
 { return _mm512_srli_epi32(va, (unsigned int)shft); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -181,7 +181,7 @@ SIMD_INT simd_srl_64(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
 { return _mm512_srli_epi64(va, (unsigned int)shft); }
 
 /*
- *  Shuffle 32-bit elements using control value 
+ *  Shuffle 32-bit elements using control value
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl) __VSPRNG_REQUIRED__
@@ -196,7 +196,7 @@ SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl) 
  *  into a single register
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
 {
     const __m256i vb_lo = _mm512_castsi512_si256(vb);
     return _mm512_inserti64x4(va, vb_lo, 0x1);
@@ -211,21 +211,21 @@ SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb) __VSPRNG_REQUIRED__
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb) 
+SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
 {
     const __m256d vb_lo = _mm512_castpd512_pd256(vb);
     return _mm512_insertf64x4(va, vb_lo, 0x1);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb) 
+SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
 {
     const __m256i va_hi = _mm512_extracti64x4_epi64(va, 0x1);
     return _mm512_inserti64x4(vb, va_hi, 0x0);
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb) 
+SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
 {
     const __m256d va_hi = _mm512_extractf64x4_pd(va, 0x1);
     const SIMD_DBL vc = _mm512_insertf64x4(vb, va_hi, 0x0);
@@ -233,7 +233,7 @@ SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
 }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb) 
+SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 {
     const __m256d va_hi = _mm512_extractf64x4_pd(va, 0x1);
     return _mm512_insertf64x4(vb, va_hi, 0x0);
@@ -258,7 +258,7 @@ SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUI
 
 
 /*******************
- *  Set intrinsics 
+ *  Set intrinsics
  *******************/
 /*
  *  Set vector to zero.
@@ -357,7 +357,7 @@ SIMD_INT simd_set(const unsigned long int * const sa, const int n) __VSPRNG_REQU
 
 
 /***********************
- *  Convert intrinsics 
+ *  Convert intrinsics
  ***********************/
 /*!
  *  Convert packed 32-bit integer elements
@@ -404,14 +404,14 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
 
 /********************
- *  Load intrinsics 
+ *  Load intrinsics
  ********************/
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_load(const int * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_loadu(const int * const sa) 
+SIMD_INT simd_loadu(const int * const sa)
 { return _mm512_loadu_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -419,7 +419,7 @@ SIMD_INT simd_load(const unsigned int * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_loadu(const unsigned int * const sa) 
+SIMD_INT simd_loadu(const unsigned int * const sa)
 { return _mm512_loadu_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -427,7 +427,7 @@ SIMD_INT simd_load(const long int * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_loadu(const long int * const sa) 
+SIMD_INT simd_loadu(const long int * const sa)
 { return _mm512_loadu_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -435,15 +435,15 @@ SIMD_INT simd_load(const unsigned long int * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_loadu(const unsigned long int * const sa) 
+SIMD_INT simd_loadu(const unsigned long int * const sa)
 { return _mm512_loadu_si512((SIMD_INT *)sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_load(const float * const sa) __VSPRNG_REQUIRED__ 
+SIMD_FLT simd_load(const float * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_ps(sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_loadu(const float * const sa)  
+SIMD_FLT simd_loadu(const float * const sa)
 { return _mm512_loadu_ps(sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -451,19 +451,19 @@ SIMD_DBL simd_load(const double * const sa) __VSPRNG_REQUIRED__
 { return _mm512_load_pd(sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_DBL simd_loadu(const double * const sa) 
+SIMD_DBL simd_loadu(const double * const sa)
 { return _mm512_loadu_pd(sa); }
 
 
 /*******************************
- *  Store intrinsics 
+ *  Store intrinsics
  *******************************/
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 void simd_store(int * const sa, const SIMD_INT va) __VSPRNG_REQUIRED__
 { _mm512_store_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(int * const sa, const SIMD_INT va) 
+void simd_storeu(int * const sa, const SIMD_INT va)
 { _mm512_storeu_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -471,7 +471,7 @@ void simd_store(unsigned int * const sa, const SIMD_INT va) __VSPRNG_REQUIRED__
 { _mm512_store_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(unsigned int * const sa, const SIMD_INT va) 
+void simd_storeu(unsigned int * const sa, const SIMD_INT va)
 { _mm512_storeu_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -479,7 +479,7 @@ void simd_store(long int * const sa, const SIMD_INT va) __VSPRNG_REQUIRED__
 { _mm512_store_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(long int * const sa, const SIMD_INT va) 
+void simd_storeu(long int * const sa, const SIMD_INT va)
 { _mm512_storeu_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -487,7 +487,7 @@ void simd_store(unsigned long int * const sa, const SIMD_INT va) __VSPRNG_REQUIR
 { _mm512_store_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(unsigned long int * const sa, const SIMD_INT va) 
+void simd_storeu(unsigned long int * const sa, const SIMD_INT va)
 { _mm512_storeu_si512((SIMD_INT *)sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -495,7 +495,7 @@ void simd_store(float * const sa, const SIMD_FLT va) __VSPRNG_REQUIRED__
 { _mm512_store_ps(sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(float * const sa, const SIMD_FLT va) 
+void simd_storeu(float * const sa, const SIMD_FLT va)
 { _mm512_storeu_ps(sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
@@ -503,7 +503,7 @@ void simd_store(double * const sa, const SIMD_DBL va) __VSPRNG_REQUIRED__
 { _mm512_store_pd(sa, va); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-void simd_storeu(double * const sa, const SIMD_DBL va) 
+void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm512_storeu_pd(sa, va); }
 
 
