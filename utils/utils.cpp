@@ -17,8 +17,9 @@ int setOmpEnv(const int num_threads)
     int nt;
 
 #if defined(_OPENMP)
-    if (getenv("OMP_NUM_THREADS"))
-        nt = (num_threads > 0) ? (num_threads) : OMP_NUM_THREADS;
+    char *env_value = getenv("OMP_NUM_THREADS");
+    if (env_value)
+        nt = (num_threads > 0) ? (num_threads) : atoi(env_value);
     else
         nt = (num_threads > 0) ? (num_threads) : 1;
     omp_set_num_threads(nt);
