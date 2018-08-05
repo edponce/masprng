@@ -29,7 +29,7 @@ long int getNumProcOnline();
 long int getPageSz();
 
 /*!
- *  Get the size in bytes of L1 data cache 
+ *  Get the size in bytes of L1 data cache
  */
 long int getL1Sz();
 
@@ -39,12 +39,12 @@ long int getL1Sz();
 long int getL1LineSz();
 
 /*!
- *  Get the associativity of L1 data cache 
+ *  Get the associativity of L1 data cache
  */
 long int getL1Assoc();
 
 /*!
- *  Get the size in bytes of L2 cache 
+ *  Get the size in bytes of L2 cache
  */
 long int getL2Sz();
 
@@ -54,12 +54,12 @@ long int getL2Sz();
 long int getL2LineSz();
 
 /*!
- *  Get the associativity of L2 cache 
+ *  Get the associativity of L2 cache
  */
 long int getL2Assoc();
 
 /*!
- *  Get the size in bytes of L3 cache 
+ *  Get the size in bytes of L3 cache
  */
 long int getL3Sz();
 
@@ -69,7 +69,7 @@ long int getL3Sz();
 long int getL3LineSz();
 
 /*!
- *  Get the associativity of L3 cache 
+ *  Get the associativity of L3 cache
  */
 long int getL3Assoc();
 

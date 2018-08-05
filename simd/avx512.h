@@ -15,6 +15,8 @@
 #include <x86intrin.h>
 //#include <immintrin.h>
 
+#include <stdint.h>  // xx_t types
+
 
 /*
  *  AVX512 512-bit wide vector units

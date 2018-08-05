@@ -14,6 +14,8 @@
  */
 #include <x86intrin.h>
 
+#include <stdint.h>  // xx_t types
+
 
 /*
  *  SSE4.1 128-bit wide vector units

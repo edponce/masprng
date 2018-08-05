@@ -6,8 +6,8 @@
 MKFILE := $(MAKEFILE_LIST)
 
 # C/C++ compiler
-CC := g++
-#CC := icpc
+CXX := g++
+#CXX := icpc
 
 # GNU compiler and linker options
 # -Wall, -Wextra = enable warnings
@@ -24,14 +24,19 @@ CC := g++
 # -std= = C/C++ language standard
 #SIMDFLAG := -msse4.1
 #SIMDFLAG := -mavx2
+
+ifeq ($(CXX),g++) # GNU
 #CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++11 -O3 -march=native -funroll-loops
 CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -fopenmp
 
+
 # INTEL compiler and linker options
-#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -no-gcc -std=c++11 -O3 -march=native -funroll-loops
-#CFLAGS := $(SIMDFLAG) -g -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
+else ifeq ($(CXX),icpc) # Intel
+CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -no-gcc -std=c++11 -O3 -march=native -funroll-loops
+#CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -std=c++98 -O3 -march=native -funroll-loops
 #CFLAGS += -pthread -openmp
+endif
 
 # Linker options
 LFLAGS :=
@@ -49,11 +54,11 @@ LFLAGS :=
 # -DOMP_STACKSIZE=8M = stack size for non-master threads
 #DEFINES := -DLONG_SPRNG  # scalar mode
 #DEFINES := -DSIMD_MODE -DLONG_SPRNG  # auto SIMD mode
-#DEFINES := -DSIMD_MODE
+DEFINES := -DSIMD_MODE
 #DEFINES := -DSSE4_1_SPRNG -DLONG_SPRNG  # SSE4.1 SIMD mode
 #DEFINES := -DSSE4_1_SPRNG
 #DEFINES := -DAVX2_SPRNG -DLONG_SPRNG  # AVX2 SIMD mode
-DEFINES := -DAVX2_SPRNG
+#DEFINES := -DAVX2_SPRNG
 #DEFINES := -DAVX512_SPRNG -DLONG_SPRNG  # AVX512BW SIMD mode
 #DEFINES := -DAVX512_SPRNG
 #DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=8
@@ -124,18 +129,18 @@ debug:
 # NOTE: HEADERS and MKFILE are placed here to allow recompilation after their modification
 $(OBJDIR)/%.o: %.cpp $(HEADERS) $(MKFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 $(TOBJDIR)/%.o: $(TTOPDIR)/%.cpp $(THEADERS) $(MKFILE)
 	@test ! -d $(TOBJDIR) && mkdir $(TOBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) -c $< -o $@ $(TLIBS)
+	$(CXX) $(CFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) -c $< -o $@ $(TLIBS)
 
 # Link object files
 $(LCG_EXE): $(OBJECTS) $(LCG_DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(LCG_DRIVER) -o $@ $(OBJECTS) $(LIBS)
 
 $(TEST_EXE): $(OBJECTS) $(TOBJECTS) $(TEST_DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(OBJECTS) $(TOBJECTS) $(TLIBS)
+	$(CXX) $(CFLAGS) $(LFLAGS) $(DEFINES) $(TINCDIR) $(TLIBDIR) $(TEST_DRIVER) -o $@ $(OBJECTS) $(TOBJECTS) $(TLIBS)
 
 asm:
 	@$(MAKE) force CFLAGS="-S $(CFLAGS)" -f $(MKFILE)
