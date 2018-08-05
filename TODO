@@ -5,3 +5,10 @@ provide 2 modes for layout of random numbers: (1) interleaved streams, (2) indep
 fix builtin features support
 
 lcg/vlcg.h:    // NOTE: thread-safe?
+
+
+In Intel 17 compilers:
+    1. -Wno-unused-result flag not available
+    2. detectIntelProcSIMD() undefined _FEATURE_XX
+    3. detectProcSIMD() returns 0
+    4. warning #854: const variable "GLOBALS" requires an initializer -- class "LCG_GLOBALS" has no user-provided default constructor
