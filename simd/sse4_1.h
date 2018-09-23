@@ -10,9 +10,12 @@
 
 /*
  *  Include supporting header files based on compiler and architecture
- *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
+#if defined(__INTEL_COMPILER)
+#include <smmintrin.h>
+#else
 #include <x86intrin.h>
+#endif
 
 #include <stdint.h>  // xx_t types
 
@@ -32,6 +35,22 @@
 #define __VSPRNG_REQUIRED__                  // identifies SIMD functions required for VSPRNG
 #define __SIMD_FUN_ATTR__   ARCH_ATTR_INLINE // force inline when no optimizations
 #define __SIMD_FUN_PREFIX__ inline static
+
+
+#ifndef _SHUFFLE_CTRL_
+#define _SHUFFLE_CTRL_
+/*!
+ *  Control values for shuffle operations
+ *  \todo Move this enum to a global area, all SIMD modes will use it
+ */
+enum SHUFFLE_CTRL { XCHG = 0, // Exchange lower/upper halfs of register
+                    XCHG8,    // Exchange pairs of 8-bit elements
+                    XCHG16,   // Exchange pairs of 16-bit elements
+                    XCHG32,   // Exchange pairs of 32-bit elements
+                    XCHG64,   // Exchange pairs of 64-bit elements
+                    DUPLO,     // Duplicate lower half into upper half of register
+                    DUPHI };   // Duplicate upper half into lower half of register
+#endif
 
 
 /*
@@ -208,12 +227,46 @@ SIMD_INT simd_srl_64(const SIMD_INT va, const int shft) __VSPRNG_REQUIRED__
  *  Shuffle 32-bit elements using control value
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl) __VSPRNG_REQUIRED__
-{ return _mm_shuffle_epi32(va, ctrl); }
+SIMD_INT simd_shuffle_i32(const SIMD_INT va, const SHUFFLE_CTRL ctrl) __VSPRNG_REQUIRED__
+{
+    SIMD_INT vtmp;
+    switch (ctrl) {
+        case XCHG: vtmp = _mm_shuffle_epi32(va, 0x4E); break;
+        case XCHG8:
+        {
+            const SIMD_INT vmsk = _mm_set_epi64x(0x0E0F0C0D0A0B0809, 0x0607040502030001);
+            vtmp =  _mm_shuffle_epi8(va, vmsk);
+        }
+        break;
+        case XCHG16:
+        {
+            const SIMD_INT vmsk = _mm_set_epi64x(0x0D0C0F0E09080B0A, 0x0504070601000302);
+            vtmp = _mm_shuffle_epi8(va, vmsk);
+        }
+        break;
+        case XCHG32: vtmp = _mm_shuffle_epi32(va, 0xB1); break;
+        case XCHG64: vtmp = _mm_shuffle_epi32(va, 0x4E); break;
+        case DUPLO: vtmp = _mm_shuffle_epi32(va, 0x44); break;
+        case DUPHI: vtmp = _mm_shuffle_epi32(va, 0xEE); break;
+        default: vtmp =  va;
+    }
+    return vtmp;
+}
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl) __VSPRNG_REQUIRED__
-{ return _mm_shuffle_ps(va, vb, (unsigned int)ctrl); }
+SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SHUFFLE_CTRL ctrl) __VSPRNG_REQUIRED__
+{
+    SIMD_INT va_int = _mm_castps_si128(va);
+    switch (ctrl) {
+        case XCHG: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case XCHG32: va_int = _mm_shuffle_epi32(va_int, 0xB1); break;
+        case XCHG64: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case DUPLO: va_int = _mm_shuffle_epi32(va_int, 0x44); break;
+        case DUPHI: va_int = _mm_shuffle_epi32(va_int, 0xEE); break;
+        default:;
+    }
+    return _mm_castsi128_ps(va_int);
+}
 
 /*
  *  Merge either low/high parts from pair of registers
@@ -409,11 +462,9 @@ SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm_store_si128((SIMD_INT *)sa_ul, va);
 
-    #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
         *(sa_flt_ptr++) = (float)*(sa_ul_ptr++);
 
-    #pragma vector aligned
     for (int i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
         *(sa_flt_ptr++) = 0.0;
 
@@ -434,7 +485,6 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va) __VSPRNG_REQUIRED__
 
     _mm_store_si128((SIMD_INT *)sa_ul, va);
 
-    #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
         *(sa_dbl_ptr++) = (double)*(sa_ul_ptr++);
 

@@ -49,7 +49,7 @@ class VLCG: public VSPRNG
     SIMD_INT *strm_mask32;
     SIMD_INT *strm_mask64;
     void multiply(SIMD_INT * const, const SIMD_INT * const, const SIMD_INT * const) const;
-} __SIMD_ALIGN__;
+};
 
 
 #endif // SIMD_MODE

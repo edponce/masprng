@@ -10,13 +10,19 @@
     #undef SIMD_MODE
     #undef AVX512_SPRNG
     #undef AVX2_SPRNG
+    #undef AVX_SPRNG
     #undef SSE4_1_SPRNG
+    #undef SSE2_SPRNG
 # if defined(__AVX512BW__)
     #define AVX512_SPRNG
 # elif defined(__AVX2__)
     #define AVX2_SPRNG
+# elif defined(__AVX__)
+    #define AVX_SPRNG
 # elif defined(__SSE4_1__)
     #define SSE4_1_SPRNG
+# elif defined(__SSE2__)
+    #define SSE2_SPRNG
 # endif
 #endif
 
@@ -32,9 +38,15 @@
 #elif defined(AVX2_SPRNG)
     #define SIMD_MODE
     #include "avx2.h"
+#elif defined(AVX_SPRNG)
+    #define SIMD_MODE
+    #include "avx.h"
 #elif defined(SSE4_1_SPRNG)
     #define SIMD_MODE
     #include "sse4_1.h"
+#elif defined(SSE2_SPRNG)
+    #define SIMD_MODE
+    #include "sse2.h"
 #else
     // Disable SIMD for scalar mode
     #define SIMD_WIDTH_BYTES 8

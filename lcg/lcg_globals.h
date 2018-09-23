@@ -40,7 +40,7 @@ struct LCG_GLOBALS
 /*!
  *  Global instance of configuration structure.
  */
-const LCG_GLOBALS GLOBALS;
+LCG_GLOBALS GLOBALS;
 
 
 #else // cplusplus

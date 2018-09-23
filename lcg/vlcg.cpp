@@ -131,8 +131,6 @@ void VLCG::multiply(SIMD_INT * const a, const SIMD_INT * const b, const SIMD_INT
     s[2] = simd_and(a[0], vmsk_fac[0]);
     s[3] = simd_srl_32(a[0], 0xC);
 
-    // NOTE: check info on vectorization compiler hints
-    #pragma vector aligned
     for (int i = 0; i < 4; ++i) {
         SIMD_INT * const res_ptr __SIMD_ALIGN__ = res + i;
 

@@ -35,17 +35,18 @@ int setOmpEnv(const int num_threads)
 }
 
 
+// Check that only GCC and clang compilers use this function.
+#if defined(__GNUC__) && !defined(__PGI) && !defined(__INTEL_COMPILER)
 #define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-int detectProcSIMD()
-{
-#if GNUC_VERSION > 40800
+#if (GNUC_VERSION >= 40800) || (defined(__clang__) && (GNUC_VERSION >= 40200))
 #define CPU_INIT_SUPPORT() __builtin_cpu_init()
 #define CPU_SUPPORTS(a)   (__builtin_cpu_supports(a) ? 1 : 0)
 #else
 #define CPU_INIT_SUPPORT()
-#define CPU_SUPPORTS(a) 0 // NOTE: assume SIMD support is not available if no way of checking
+#define CPU_SUPPORTS(a) 0
 #endif
-
+int detectGCCProcSIMD()
+{
     int support = 1;
 
     CPU_INIT_SUPPORT();
@@ -95,35 +96,68 @@ int detectProcSIMD()
 #endif
 
     return support;
-
+}
 #undef CPU_SUPPORTS
 #undef CPU_INIT_SUPPORT
-}
+#endif
 
 
+#if defined(__INTEL_COMPILER)
+#include <immintrin.h>
 int detectIntelProcSIMD()
 {
     int avail = 0;
-
-#if defined(__INTEL_COMPILER)
     unsigned long int features;
 
-    features = _FEATURE_SSE | _FEATURE_SSE2 | _FEATURE_SSE3 | _FEATURE_SSSE3 | _FEATURE_SSE4_1 | _FEATURE_SSE4_2;
+#if defined(__SSE2__)
+    features = _FEATURE_SSE2;
     avail = _may_i_use_cpu_feature(features);
-    printf("SSE - SSE4.2 = %s\n", (avail) ? "YES" : "NO");
+    printf("SSE2 = %s\n", (avail) ? "YES" : "NO");
+#endif
 
-    features = _FEATURE_AVX | _FEATURE_AVX2;
+#if defined(__SSE3__)
+    features = _FEATURE_SSE3;
     avail = _may_i_use_cpu_feature(features);
-    printf("AVX - AVX2 = %s\n", (avail) ? "YES" : "NO");
+    printf("SSE3 = %s\n", (avail) ? "YES" : "NO");
+#endif
 
+#if defined(__SSE4_1__)
+    features = _FEATURE_SSE4_1;
+    avail = _may_i_use_cpu_feature(features);
+    printf("SSE4.1 = %s\n", (avail) ? "YES" : "NO");
+#endif
+
+#if defined(__SSE4_2__)
+    features = _FEATURE_SSE4_2;
+    avail = _may_i_use_cpu_feature(features);
+    printf("SSE4.2 = %s\n", (avail) ? "YES" : "NO");
+#endif
+
+#if defined(__AVX__)
+    features = _FEATURE_AVX;
+    avail = _may_i_use_cpu_feature(features);
+    printf("AVX = %s\n", (avail) ? "YES" : "NO");
+#endif
+
+#if defined(__AVX2__)
+    features = _FEATURE_AVX2;
+    avail = _may_i_use_cpu_feature(features);
+    printf("AVX2 = %s\n", (avail) ? "YES" : "NO");
+#endif
+
+#if defined(__FMA__)
     features = _FEATURE_FMA;
     avail = _may_i_use_cpu_feature(features);
     printf("FMA = %s\n", (avail) ? "YES" : "NO");
+#endif
 
+#if defined(__AVX512F__) && defined(__AVX512PF__) && defined(__AVX512CD__) && defined(__AVX512ER__)
     features = _FEATURE_AVX512F | _FEATURE_AVX512PF | _FEATURE_AVX512CD | _FEATURE_AVX512ER;
     avail = _may_i_use_cpu_feature(features);
     printf("AVX512 - AVX512xx = %s\n", (avail) ? "YES" : "NO");
+#endif
 
+#if defined(__KNC__)
     features = _FEATURE_KNCNI;
     avail = _may_i_use_cpu_feature(features);
     printf("KNCNI = %s\n", (avail) ? "YES" : "NO");
@@ -131,6 +165,17 @@ int detectIntelProcSIMD()
 
     return avail;
 }
+#endif
+
+
+#if defined(__PGI)
+int detectPGIProcSIMD()
+{
+    int support = 1;
+
+    return support;
+}
+#endif
 
 
 void printSysconf()

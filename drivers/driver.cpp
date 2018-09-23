@@ -54,7 +54,7 @@ int main_gen(int);
 int main(int argc, char *argv[])
 {
     if (!detectProcSIMD()) {
-        printf("ERROR: current system does not supports requested vector extensions.\n");
+        printf("ERROR: current system/compiler does not supports requested vector extensions.\n");
         return 0;
     }
     printSysconf();
@@ -64,10 +64,11 @@ int main(int argc, char *argv[])
     if (argc > 1)
         rng_lim = atoi(argv[1]);
 
-    if (rng_lim > 0)
+    if (rng_lim > 0) {
         retval = main_gen(rng_lim);
-    else
+    } else {
         retval = check_gen(RNG_TYPE_NUM);
+    }
 
 	if (retval)
 		printf("ERROR: program could not run successfully.\n");

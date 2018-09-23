@@ -10,6 +10,7 @@
 int check_gen(const int rng_type)
 {
     int i;
+    int iread;
     const int nstrms = SIMD_STREAMS_32;
 
     // Initial seeds
@@ -17,7 +18,7 @@ int check_gen(const int rng_type)
     for (i = 0; i < nstrms; ++i)
         iseeds[i] = 985456376 - i;
 
-    // Initial multiplier indices 
+    // Initial multiplier indices
     int m[nstrms];
     for (i = 0; i < nstrms; ++i)
         m[i] = 0;
@@ -57,7 +58,12 @@ int check_gen(const int rng_type)
     // Integer generator
     int valid = 1;
     for (i = 0; i < 200; ++i) {
-        scanf("%d\n", &rn);
+        iread = scanf("%d\n", &rn);
+        if (iread == EOF) {
+            valid = 0;
+            perror("Failed to scan integer generator");
+            break;
+        }
         irngs = rng->get_rn_int();
 
         if (rn != irngs) {
@@ -86,7 +92,12 @@ int check_gen(const int rng_type)
     // Float generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
-        scanf("%d\n", &rn);
+        iread = scanf("%d\n", &rn);
+        if (iread == EOF) {
+            valid = 0;
+            perror("Failed to scan float generator");
+            break;
+        }
         frngs = rng->get_rn_flt();
 
         int rn1 = rn >> 11;
@@ -118,7 +129,12 @@ int check_gen(const int rng_type)
     // Double generator
     valid = 1;
     for (i = 0; i < 50; ++i) {
-        scanf("%d\n", &rn);
+        iread = scanf("%d\n", &rn);
+        if (iread == EOF) {
+            valid = 0;
+            perror("Failed to scan double generator");
+            break;
+        }
         drngs = rng->get_rn_dbl();
 
         int rn1 = rn >> 1;

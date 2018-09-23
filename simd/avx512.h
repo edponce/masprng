@@ -10,10 +10,12 @@
 
 /*
  *  Include supporting header files based on compiler and architecture
- *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
+#if defined(__INTEL_COMPILER)
+#include <zmmintrin.h>
+#else
 #include <x86intrin.h>
-//#include <immintrin.h>
+#endif
 
 #include <stdint.h>  // xx_t types
 

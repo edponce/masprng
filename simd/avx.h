@@ -1,5 +1,5 @@
-#ifndef __AVX2_H
-#define __AVX2_H
+#ifndef __AVX_H
+#define __AVX_H
 
 
 /*
@@ -21,7 +21,7 @@
 
 
 /*
- *  AVX2 256-bit wide vector units
+ *  AVX 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
 #define SIMD_INT __m256i
@@ -123,17 +123,45 @@ SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 /*!
  *  Multiply low signed 32-bit integers from each packed 64-bit elements
  *  and store the signed 64-bit results
- *  NOTE: requires at least AVX2 for _mm256_mul_epi32()
+ *  AVX2 uses _mm256_mul_epi32(va, vb)
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_mul_epi32(va, vb); }
+{
+    int sa[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    int sb[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    return _mm256_set_epi64x((long int)sa[6]*(long int)sb[6], (long int)sa[4]*(long int)sb[4], (long int)sa[2]*(long int)sb[2], (long int)sa[0]*(long int)sb[0]);
+}
+
+/*!
+ *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
+ *  and store the low 32-bit results
+ *  AVX2 uses _mm256_mullo_epi32(va, vb)
+ */
+__SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
+SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
+{
+    int sa[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+    int sb[SIMD_STREAMS_32] ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+        sa[i] = (int)((long int)sa[i] * (long int)sb[i]);
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
 
 /*!
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  since vector extensions do not support 64-bit integer multiplication.
  *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
+ *  AVX2 uses _mm256_mullo_epi32()
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
@@ -142,7 +170,8 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
     SIMD_INT vtmp, vhi, vlo;
 
     vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier
-    vhi = _mm256_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
+    //vhi = _mm256_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
+    vhi = simd_mullo_i32(va, vtmp);        // xl * yh, xh * yl
     vtmp = _mm256_slli_epi64(vhi, 0x20);   // shift << 32
     vhi = _mm256_add_epi64(vhi, vtmp);     // h = h1 + h2
     vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
@@ -150,15 +179,6 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
 
     return _mm256_add_epi64(vlo, vhi);     // l + h
 }
-
-/*!
- *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
- *  and store the low 32-bit results
- *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
- */
-__SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb) __VSPRNG_REQUIRED__
-{ return _mm256_mullo_epi32(va, vb); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
 SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb) __VSPRNG_REQUIRED__
@@ -613,5 +633,5 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm256_storeu_pd(sa, va); }
 
 
-#endif  // __AVX2_H
+#endif  // __AVX_H
 

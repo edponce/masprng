@@ -9,9 +9,18 @@ int setOmpEnv(const int);
 
 /*!
  *  Detect CPU SIMD features
+ *  Define order has __GNUC__ last because other compilers may define it.
  */
-int detectProcSIMD();
+#if defined(__INTEL_COMPILER)
 int detectIntelProcSIMD();
+#define detectProcSIMD() detectIntelProcSIMD()
+#elif defined(__PGI)
+int detectPGIProcSIMD();
+#define detectProcSIMD() detectPGIProcSIMD()
+#elif defined(__GNUC__)
+int detectGCCProcSIMD();
+#define detectProcSIMD() detectGCCProcSIMD()
+#endif
 
 /*!
  *  Print some system configurations
